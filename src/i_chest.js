@@ -2,6 +2,9 @@
    A chest only exists on the map when the parent wrote a reward for that station.
    Every adventure has its own chest. When a child reaches one it bursts open and shows the reward. */
 const CH_BX=14,CH_BY=13;
+/* each child opens each chest only once per map and round, even if he drops below it and climbs again */
+const chestGot=(k,m)=>!!(k.ck&&k.ck.tk===tierKey()&&k.ck.m&&k.ck.m[m]);
+const chestMark=(k,m)=>{const tk=tierKey();k.ck={tk,m:Object.assign({},k.ck&&k.ck.tk===tk?k.ck.m:{},{[m]:1})};};
 const rewardOf=m=>((S.cfg.rewards&&S.cfg.rewards[m])||'').trim();
 function chClassic(c,P){
   R(c,3,0,8,1,P.o);R(c,2,1,10,1,P.o);R(c,1,2,12,3,P.o);

@@ -19,7 +19,7 @@ const soundOn=()=>isGuest()?(function(){try{return localStorage.getItem('kafo.sn
 
 function normAv(a){const o=Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},a||{});if(o.g!=='m'&&o.g!=='f')o.g=(o.st===1||o.st===4)?'f':'m';if(!HEADS[o.st]||HEADS[o.st].g!==o.g)o.st=defHead(o.g);if(typeof o.hr!=='string')o.hr='';return o;}
 function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:normAv(k.av),hs:+k.hs||0,pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
-    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null,sad:!!k.sad};}
+    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null,sad:!!k.sad,ck:(k.ck&&typeof k.ck==='object')?k.ck:null};}
 function normFam(uid,o){return{uid,name:o.name||'عائلة',code:o.code||'',expected:+o.expected||0,ts:+o.ts||0,cfg:{pos:Array.isArray(o.cfg&&o.cfg.pos)?o.cfg.pos:[],neg:Array.isArray(o.cfg&&o.cfg.neg)?o.cfg.neg:[]}};}
 const milestone=L=>L>=75?75:L>=50?50:L>=25?25:0;
 const goal=()=>clamp(Math.round(+S.cfg.goal)||100,10,5000);
@@ -419,7 +419,7 @@ function give(kidId,bid,type){
   const newL=lvl(to),delta=to-from,newTier=Math.max(oldTier,milestone(newL));k.tier=newTier;k.tk=tierKey();
   const ent={id:uid(),t:b.t,p:delta-bonus,k:type,from,to,ts:Date.now()};if(m.fork){ent.fk=fk0;if(bonus)ent.bonus=bonus;}
   k.log.unshift(ent);if(k.log.length>40)k.log.length=40;tally(k,ent,1);
-  const chests=[25,50,75].filter(x=>oldL<x&&newL>=x&&rewardOf(x));chests.forEach(x=>{chestHold[x]=true;});
+  const chests=[25,50,75].filter(x=>oldL<x&&newL>=x&&rewardOf(x)&&!chestGot(k,x));chests.forEach(x=>{chestMark(k,x);chestHold[x]=true;});
   let finished=false;
   if(to>=goal()){k.tier=100;k.certs.push({id:uid(),ts:Date.now(),mapId:S.cfg.mapId,round:curRound(),pts:to,goal:goal(),name:k.name,period:S.cfg.period||null});finished=true;}
   k.sad=type==='neg'&&!finished;
@@ -612,7 +612,7 @@ function renderRound(){
    +'<section class="panel" style="margin-top:14px"><h3>جولة جديدة</h3><p class="sub">تصفّر نقاط الجميع ليبدأوا من جديد، وتبقى الشهادات التي حصلوا عليها.</p><button class="btn gold" type="button" data-act="newround" data-confirm>ابدأ جولة جديدة</button></section>'+backupPanel()+'</div>';
   $$('.maps canvas').forEach((cv,i)=>setTimeout(()=>{if(!cv.isConnected)return;cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0);},i*40));
 }
-function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');renderRound();}
+function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;k.ck=null;persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');renderRound();}
 
 /* ================= certificates ================= */
 function renderCerts(){
