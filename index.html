@@ -1312,7 +1312,7 @@ EMB.fort=(c,x,y)=>{const g=y+2,w='#d9d2bd',d='#a8a18a',rf='#2f9fd0',rfd='#1f6f98
   sparkle(c,x-24,g-30,'#fff3b0');sparkle(c,x+25,g-34,'#fff3b0');};
 /* a staircase of n steps as route points (all straight stretches, so the child really hops up each step) */
 const hopSt=(x0,y0,x1,y1,n)=>{const p=[];for(let k=1;k<=n;k++){p.push([x0+(x1-x0)*(k-1)/n,y0+(y1-y0)*k/n,'l']);p.push([x0+(x1-x0)*k/n,y0+(y1-y0)*k/n,'l']);}return p;};
-def({id:'hop',feat:'مغامرة أفقية: بلوكات وقفزات وسلالم من الطوب',name:'عالم القفزات',tag:'اقفز بين البلوكات',act:'وصلت إلى حصن القفزات',goal:'fort',start:'sign',seed:111,layout:'h',
+def({id:'hop',feat:'مغامرة أفقية: بلوكات وقفزات وسلالم من الطوب',name:'عالم ماريو',tag:'اقفز بين البلوكات',act:'وصلت إلى حصن القفزات',goal:'fort',start:'sign',seed:111,layout:'h',
   noStone:1,
   wps:[[.04,.80],[.13,.80,'l'],[.20,.80,'l'],...hopSt(.20,.80,.30,.58,4),[.38,.58,'l'],...hopSt(.38,.58,.48,.80,4),[.52,.80,'l'],[.565,.64,'s'],[.615,.64,'s'],[.655,.50,'s'],[.705,.50,'s'],[.745,.64,'s'],[.795,.64,'s'],[.83,.80,'s'],[.86,.80,'l'],...hopSt(.86,.80,.955,.52,5)],
   tile:{a:'#d6743a',b:'#e0884a',hi:'#f7c08a',sh:'#6f3414',w:6,h:3},
