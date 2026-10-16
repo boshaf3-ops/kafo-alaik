@@ -1329,7 +1329,7 @@ function bhMask(){if(_bhMask)return _bhMask;const g=BH_REF,m=new Float32Array(g.
   for(let y=0;y<g.gh;y++)for(let x=0;x<g.gw;x++){let s=0,k=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=g.gw||Y>=g.gh)continue;const w=(dx&&dy)?1:(dx||dy)?2:4;s+=m[Y*g.gw+X]*w;k+=w;}o[y*g.gw+x]=s/k;}
   return(_bhMask=o);}
 /* the scale: the whole country fits the width, stretched north-south so the country is long and the player scrolls down the page */
-function bhS(W,H){const g=BH_REF,sx=Math.min((W-26)/g.gw,(H-20)/g.gh),sy=Math.min((H-20)/g.gh,sx*2.2);return{x:sx,y:sy};}
+function bhS(W,H){const g=BH_REF,sx=Math.min((W-10)/g.gw,(H-20)/g.gh),sy=Math.min((H-20)/g.gh,sx*1.4);return{x:sx,y:sy};}
 /* reference-picture pixels (or grid units with grid=1) to scene pixels */
 function bhXY(x,y,W,H,grid){const g=BH_REF,S=bhS(W,H),gx=grid?x:(x-g.x0)/2,gy=grid?y:(y-g.y0)/2;return[W/2+(gx-g.gw/2)*S.x,H/2+(gy-g.gh/2)*S.y];}
 const BH_WP=[[357,478],[352,440],[340,400],[318,366],[294,334],[284,292],[290,256],[298,226],[326,218],[352,212],[340,186],[322,158],[326,128],[338,100],[370,80],[396,60],[411,47]];
@@ -1390,7 +1390,7 @@ function bhLand(W,H){
     const v=at(x0,y0)*(1-fx)*(1-fy)+at(x0+1,y0)*fx*(1-fy)+at(x0,y0+1)*(1-fx)*fy+at(x0+1,y0+1)*fx*fy;L[y*W+x]=v>.5?1:0;}
   return(_bhC={k:W+'x'+H,L,D:coastDist(L,W,H,16),S});
 }
-def({id:'bahrain',feat:'خريطة من الأعلى: من رأس البر إلى المحرق',name:'مملكة البحرين',tag:'سافر عبر مدن المملكة',act:'وصلت إلى مطار المحرق',goal:'airport',start:'none',seed:123,tall:5,
+def({id:'bahrain',feat:'خريطة من الأعلى: من رأس البر إلى المحرق',name:'مملكة البحرين',tag:'سافر عبر مدن المملكة',act:'وصلت إلى مطار المحرق',goal:'airport',start:'none',seed:123,tall:3.7,
   route(W,H){return BH_WP.map((p,i)=>{const q=bhXY(p[0],p[1],W,H);return i===BH_WP.length-1?[q[0],q[1],'l']:[q[0],q[1]];});},
   labels(W,H,path){
     const out=[];
