@@ -10,6 +10,7 @@ D5 = {
 'بمقاس A4، احفظ الصورة ثم اطبعها.':'A4 size. Save the image, then print it.',
 'التاريخ:':'Date:',
 'رحلة الأخلاق تبدأ بخطوة':'The journey of good character begins with one step',
+'جميع الحقوق محفوظة · إعداد محمد الشافعي':'All rights reserved · Prepared by Mohammed Al-Shafei',
 'حلا يختاره':'A dessert of their choice','نزهة في الحديقة':'A trip to the park','يوم بدون واجبات منزلية':'A day without homework','هدية كبيرة':'A big gift',
 'اسم عائلتك أنت':'Your own family name','اسم العائلة المدعوة':'The invited family’s name','كل ما حصل للأبناء':'Everything that happened to the kids',
 }

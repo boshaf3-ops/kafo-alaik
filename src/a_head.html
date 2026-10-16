@@ -97,6 +97,7 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 #splash.gone{opacity:0;visibility:hidden}
 #splashCv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
 #splash .ttl,#splash .go{position:relative}
+.copy{margin:12px 0 0;font:600 12px/1.4 var(--f-body);color:#fff;opacity:.9;text-shadow:1px 1px 0 #0e2a33;letter-spacing:.01em}
 .langpick{position:relative;margin:14px auto 0;width:max-content;max-width:100%}
 #langBtn{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:9px 14px;background:#fff;color:#0e2a33;border:3px solid #0e2a33;box-shadow:0 4px 0 #0e2a33;font:700 14px/1 var(--f-body);white-space:nowrap}
 #langBtn .en{font:800 18px/1 'HJ',sans-serif;direction:ltr;letter-spacing:.02em}
@@ -389,7 +390,7 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
   <canvas id="splashCv"></canvas>
   
   <div class="ttl"><h1 data-nt>كفو عليك</h1><div class="sub-en" data-nt>Proud of you</div><p>رحلة الأخلاق تبدأ بخطوة</p></div>
-  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div></div>
+  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div><p class="copy">جميع الحقوق محفوظة · إعداد محمد الشافعي</p></div>
 </div>
 
 <div id="app">
