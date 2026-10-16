@@ -5,7 +5,7 @@ head=open(K+'a_head.html').read()
 head=re.sub(r'<title>.*?</title>\n','',head,count=1)
 head=re.sub(r'<link rel="preconnect"[^\n]*\n<link rel="preconnect"[^\n]*\n<link href="https://fonts.googleapis.com[^\n]*\n','',head,count=1)
 assert 'fonts.googleapis' not in head
-scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','e_app.js'])
+scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','l_ambient.js','e_app.js'])
 fontcss='''@font-face{font-family:Tajawal;font-weight:400 500;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Regular.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:600 700;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Bold.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:800 900;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Black.woff) format("woff")}
