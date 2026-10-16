@@ -19,7 +19,7 @@ const soundOn=()=>isGuest()?(function(){try{return localStorage.getItem('kafo.sn
 
 function normAv(a){const o=Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},a||{});if(o.g!=='m'&&o.g!=='f')o.g=(o.st===1||o.st===4)?'f':'m';if(!HEADS[o.st]||HEADS[o.st].g!==o.g)o.st=defHead(o.g);if(typeof o.hr!=='string')o.hr='';return o;}
 function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:normAv(k.av),hs:+k.hs||0,pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
-    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null};}
+    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null,sad:!!k.sad};}
 function normFam(uid,o){return{uid,name:o.name||'عائلة',code:o.code||'',expected:+o.expected||0,ts:+o.ts||0,cfg:{pos:Array.isArray(o.cfg&&o.cfg.pos)?o.cfg.pos:[],neg:Array.isArray(o.cfg&&o.cfg.neg)?o.cfg.neg:[]}};}
 const milestone=L=>L>=75?75:L>=50?50:L>=25?25:0;
 const goal=()=>clamp(Math.round(+S.cfg.goal)||100,10,5000);
@@ -275,14 +275,15 @@ function placeActors(){
   ks.forEach(k=>{const el=host.querySelector('.actor[data-id="'+k.id+'"]');if(!el)return;const l=disp[k.id],fl=flying[k.id],alt=!!(m.fork&&forkSt(k)==='alt');
     const pos=fl&&fl.pos?fl.pos():levelPos(P,l,alt),ty=fl?'u':(gapAt(m,l)>=0?'x':levelTy(P,l,alt));
     let n=0;for(const q of placed)if(Math.abs(q-l)<4)n++;placed.push(l);
-    const dx=n?((n%2)?1:-1)*Math.ceil(n/2)*CH_W*0.85:0,bob=bobbing[k.id]&&!fl?Math.abs(Math.sin(performance.now()/90))*(ty==='s'?5:2.5):0,fx=(pos[0]+dx)/W;
+    const dx=n?((n%2)?1:-1)*Math.ceil(n/2)*CH_W*0.85:0,fx=(pos[0]+dx)/W;
+    const img=el.querySelector('img'),mh=applyMove(k,el,img,isDone(k)||ty==='u'||ty==='d'||ty==='z'),bob=mh!=null?mh:(bobbing[k.id]&&!fl?Math.abs(Math.sin(performance.now()/90))*(ty==='s'?5:2.5):0);
     el.style.left=(fx*100)+'%';el.style.top=(pos[1]/curScene.H*100)+'%';el.style.zIndex=sel===k.id?9000:Math.round(pos[1]);
     el.style.transform='translate(-50%,calc(-100% - '+bob.toFixed(1)+'px))';
     const sx=fx*hw-off,side=sx<84?'r':(vw-sx<84?'l':'');if(el.dataset.side!==side)el.dataset.side=side;
     el.classList.toggle('onboat',ty==='x');
     const f=forkOf(k),tg=el.querySelector('.tag'),multi=famList().length>1,warn=f&&f.st==='alt'&&f.negs>0?'<span class="warn">'+'!'.repeat(Math.min(3,f.negs))+'</span>':(needsFork(k)?'<span class="warn">مفترق</span>':''),
       tx=(multi?'<i style="background:'+famColor(k.fam)+'"></i>':'')+esc(k.name)+' · '+Math.floor(l)+warn;if(tg.dataset.h!==tx){tg.dataset.h=tx;tg.innerHTML=tx;}tg.style.setProperty('--tl',(n*15)+'px');
-    const img=el.querySelector('img'),want=avatarURL(effAv(k),isDone(k)||ty==='u'||ty==='d'||ty==='z');if(img.getAttribute('src')!==want)img.src=want;});
+  });
 }
 /* tapping a character shows + and − beside it */
 function renderSel(){
@@ -299,20 +300,18 @@ function renderSel(){
 function selectKid(id){closePop();sel=sel===id?null:id;renderSel();if(sel)tone([[698,.05]]);}
 function animateKid(id,to){
   const from=disp[id]==null?0:disp[id];
-  if(REDUCED||Math.abs(to-from)<0.01||!$('#actors')){disp[id]=to;placeActors();return;}
-  const tok=(animTok[id]=(animTok[id]||0)+1),dur=clamp(Math.abs(to-from)*55,500,1800),t0=performance.now();bobbing[id]=true;
-  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-  (function step(now){if(animTok[id]!==tok)return;const t=clamp((now-t0)/dur,0,1);disp[id]=from+(to-from)*ease(t);placeActors();camFollow(id);if(t<1)requestAnimationFrame(step);else{bobbing[id]=false;disp[id]=to;placeActors();}})(t0);
+  if(REDUCED||Math.abs(to-from)<0.01||!$('#actors')||!curScene){disp[id]=to;placeActors();return;}
+  const tok=(animTok[id]=(animTok[id]||0)+1);moveKid(id,from,to,tok);
 }
 function floatText(id,txt,cls){const host=$('#actors'),el=host&&host.querySelector('.actor[data-id="'+id+'"]');if(!el)return;const d=document.createElement('div');d.className='float '+cls;d.textContent=txt;d.style.left=el.style.left;d.style.top='calc('+el.style.top+' - 30px)';d.style.zIndex=9999;host.appendChild(d);setTimeout(()=>d.remove(),1300);}
 function renderHome(){
   V.innerHTML='<div class="home" id="home"><div class="cam" id="cam"><div class="scene" id="scene" data-act="scenebg"><canvas id="sceneCv"></canvas><canvas id="fxCv"></canvas><div class="actors" id="actors"></div></div></div><div class="hud" id="hud"></div>'
     +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button></div><div id="homeEmpty"></div></div>';
-  sizeHome();paintScene(homeGeo());buildActors();refreshHud();renderSel();camFocus(false);
+  sizeHome();paintScene(homeGeo());buildActors();renderChests();refreshHud();renderSel();camFocus(false);
   camEl().addEventListener('scroll',()=>{if(popCtx)closePop();if(curGeo.hz&&sel&&!scrT)scrT=requestAnimationFrame(()=>{scrT=0;placeActors();});},{passive:true});
   if(!S.kids.length)$('#homeEmpty').innerHTML='<div class="home-empty panel empty"><div class="big">ابدأ بإضافة أبطالك</div><p class="sub">أضف الأبناء بأسمائهم وصورهم، ويظهرون هنا شخصيات صغيرة تتسلّق الخريطة مع كل سلوك طيب.</p><div style="margin-top:12px"><button class="btn primary" data-act="addkid">+ إضافة ابن أو ابنة</button></div></div>';
 }
-function refreshHome(){if(view!=='home')return;refreshHud();placeActors();renderSel();}
+function refreshHome(){if(view!=='home')return;refreshHud();placeActors();renderChests();renderSel();}
 function fitHome(){sizeHome();if(view!=='home'||!ready||sheetOpen)return;const g=homeGeo();if(Math.abs(g.W-curGeo.W)>=8||Math.abs(g.H-curGeo.H)>=24||!!g.hz!==!!curGeo.hz||(g.hz&&Math.abs(g.scale-curGeo.scale)/curGeo.scale>.04)){closePop();renderHome();}else placeActors();}
 
 /* ---------- simple behaviour list next to the character ---------- */
@@ -366,7 +365,7 @@ function throwKid(id,toL){
 
 /* ================= sheets ================= */
 function openSheet(html,ctx){sheetCtx=ctx||{};$('#sheetHost').innerHTML='<div class="sheet-back" data-act="backdrop"><div class="sheet" role="dialog" aria-modal="true">'+html+'</div></div>';sheetOpen=true;document.body.classList.add('sheet-open');}
-function closeSheet(){$('#sheetHost').innerHTML='';sheetOpen=false;document.body.classList.remove('sheet-open');sheetCtx=null;draft=null;wd=null;if(dirty){dirty=false;closePop();render();}else fitHome();}
+function closeSheet(){const nx=sheetCtx&&sheetCtx.next;$('#sheetHost').innerHTML='';sheetOpen=false;document.body.classList.remove('sheet-open');sheetCtx=null;draft=null;wd=null;if(dirty){dirty=false;closePop();render();}else fitHome();if(nx)setTimeout(nx,260);}
 function setSheet(html){const s=$('#sheetHost .sheet');if(!s)return;const st=s.scrollTop;s.innerHTML=html;s.scrollTop=st;}
 
 /* ---- the choice at the fork ---- */
@@ -420,29 +419,34 @@ function give(kidId,bid,type){
   const newL=lvl(to),delta=to-from,newTier=Math.max(oldTier,milestone(newL));k.tier=newTier;k.tk=tierKey();
   const ent={id:uid(),t:b.t,p:delta-bonus,k:type,from,to,ts:Date.now()};if(m.fork){ent.fk=fk0;if(bonus)ent.bonus=bonus;}
   k.log.unshift(ent);if(k.log.length>40)k.log.length=40;tally(k,ent,1);
+  const chests=[25,50,75].filter(x=>oldL<x&&newL>=x&&rewardOf(x));chests.forEach(x=>{chestHold[x]=true;});
   let finished=false;
   if(to>=goal()){k.tier=100;k.certs.push({id:uid(),ts:Date.now(),mapId:S.cfg.mapId,round:curRound(),pts:to,goal:goal(),name:k.name,period:S.cfg.period||null});finished=true;}
+  k.sad=type==='neg'&&!finished;
   const gotB=evalBadges(k);const gotH=evalHeroes(k);
   persistKid(k);closePop();
   if(view==='home'){
-    if(thrown)throwKid(k.id,dispTarget(k));else animateKid(k.id,dispTarget(k));
+    if(thrown)throwKid(k.id,dispTarget(k));else if(Math.abs(dispTarget(k)-(disp[k.id]==null?0:disp[k.id]))<0.01)reactKid(k.id,type!=='neg');else animateKid(k.id,dispTarget(k));
     floatText(k.id,(delta-bonus>0?'+':'')+(delta-bonus),delta-bonus>0?'p':'n');
     if(bonus)setTimeout(()=>floatText(k.id,'+'+bonus+' اختصار','p'),900);
     refreshHome();}
-  const wait=REDUCED?100:Math.min(1900,Math.abs(newL-oldL)*55+700)+(thrown?900:0);
+  let wait=REDUCED?100:Math.min(1900,Math.abs(newL-oldL)*55+700)+(thrown?900:0);
   let mileHit=0;for(const m2 of [25,50,75])if(oldL<m2&&newL>=m2)mileHit=m2;
   const badgeLater=()=>{if(gotB.length)setTimeout(()=>{if(!sheetOpen)openBadgeWin(k.id,gotB);},REDUCED?100:600+(thrown?1600:0));};
   if(forkMsg)setTimeout(()=>toast(forkMsg),thrown?600:wait*.6);
+  const tail=()=>{
   if(finished){tone(SND.win);setTimeout(()=>{closeSheet();openFinish(k.id);},wait);if(gotB.length)toast(k.name+' حصل على شارة: '+gotB.map(i=>BADGES.find(x=>x.id===i).n).join('، '));}
   else if(newTier>oldTier&&newTier<100){tone(SND.mile);setTimeout(()=>{if(view==='home'&&!sheetOpen)openUnlock(k.id,newTier);},wait+200);setTimeout(()=>burstAtKid(k.id,46),400);if(gotB.length)toast(k.name+' حصل على شارة: '+gotB.map(i=>BADGES.find(x=>x.id===i).n).join('، '));}
-  else if(mileHit){tone(SND.mile);const rw=(S.cfg.rewards[mileHit]||'').trim();toast(k.name+' وصل المحطة '+mileHit+'!'+(rw?' المكافأة: '+rw:''));setTimeout(()=>burstAtKid(k.id,46),400);badgeLater();}
+  else if(mileHit){tone(SND.mile);toast(k.name+' وصل المحطة '+mileHit+'!');setTimeout(()=>burstAtKid(k.id,46),400);badgeLater();}
   else if(newL>oldL){tone(SND.lvl);setTimeout(()=>burstAtKid(k.id,18),350);setTimeout(()=>{badgeLater();},wait);}
   else{tone(delta<0?SND.neg:SND.pos);badgeLater();}
+  };
+  if(chests.length&&view==='home'){const w0=wait;setTimeout(()=>{if(view!=='home'){chests.forEach(x=>{chestHold[x]=false;});wait=100;tail();return;}wait=100;openChests(k.id,chests.slice(),()=>{chests.forEach(x=>{chestHold[x]=false;});renderChests();tail();});},w0+300);}else{chests.forEach(x=>{chestHold[x]=false;});tail();}
   if(gotH.length){const tryH=n=>setTimeout(()=>{if(!sheetOpen)openHeroWin(k.id,gotH);else if(n<4)tryH(n+1);},n?2500:wait+(gotB.length||finished||newTier>oldTier?3200:1200));tryH(0);}
   if(asked&&!finished&&view==='home')setTimeout(()=>{if(!sheetOpen&&needsFork(k))openFork(k.id);},wait+(newTier>oldTier?1400:350));
 }
 function undoLast(id){
-  const k=kidById(id);if(!k||!canCtl(k)||!k.log.length)return;const e=k.log.shift();k.pts=e.from;tally(k,e,-1);
+  const k=kidById(id);if(!k||!canCtl(k)||!k.log.length)return;const e=k.log.shift();k.pts=e.from;tally(k,e,-1);k.sad=!!(k.log[0]&&k.log[0].k==='neg');
   if(k.pts<goal())k.certs=k.certs.filter(c=>c.round!==curRound());
   const m=mapOf();if(m.fork){k.fork=e.fk?JSON.parse(JSON.stringify(e.fk)):null;if(k.fork&&lvl(k.pts)<m.fork.a){k.fork.st='';k.fork.negs=0;}}
   persistKid(k);if(view==='home'){animateKid(k.id,dispTarget(k));refreshHome();}closePop();toast('تم التراجع');
@@ -603,12 +607,12 @@ function renderRound(){
    +'</div><div class="row" style="margin-top:14px"><button class="btn gold" type="button" data-act="prevcert">معاينة شهادة هذه الخريطة</button></div></section>'
    +'<section class="panel" style="margin-top:14px"><h3>فترة المغامرة</h3><p class="sub">النقاط تُسجَّل خلال هذه الفترة فقط. اتركها فاضية إذا ما تبي تحديد وقت.</p><div class="two"><div><label class="lbl" for="pStart">من تاريخ</label><input class="field" id="pStart" type="date" value="'+esc(p.start)+'"></div><div><label class="lbl" for="pEnd">إلى تاريخ</label><input class="field" id="pEnd" type="date" value="'+esc(p.end)+'"></div></div><div class="row" style="margin-top:6px"><button class="btn small" type="button" data-act="pclear">إلغاء الفترة</button></div></section>'
    +'<section class="panel" style="margin-top:14px"><h3>نقاط الوصول إلى النهاية</h3><p class="sub">كم نقطة يحتاج الابن ليوصل المستوى 100؟ كل ما قلّ الرقم صارت الخريطة أسرع.</p><input class="field" id="goalIn" type="number" min="10" max="5000" inputmode="numeric" value="'+goal()+'" style="max-width:200px"></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>مكافآت المحطات</h3><p class="sub">اكتب مكافأة لكل محطة، وتظهر لك عندما يوصلها الابن.</p>'
-   +[25,50,75,100].map(m=>'<div class="rw"><span>LV '+m+'</span><input class="field" data-rw="'+m+'" maxlength="60" value="'+esc(S.cfg.rewards[m]||'')+'" placeholder="مثال: '+({25:'حلا يختاره',50:'نزهة في الحديقة',75:'يوم بدون واجبات منزلية',100:'هدية كبيرة'}[m])+'" aria-label="مكافأة المستوى '+m+'"></div>').join('')+'</section>'
+   +'<section class="panel" style="margin-top:14px"><h3>مكافآت المحطات وصناديق الكنز</h3><p class="sub">عند المحطات 25 و50 و75 يوجد صندوق كنز على الخريطة، وعندما يصله الابن ينفجر ويكشف المكافأة التي كتبتها. إذا تركت المكافأة فارغة أو ضغطت «حذف» فلن يظهر الصندوق في هذه المحطة ولن ينفتح أي كنز.</p>'
+   +[25,50,75,100].map(m=>'<div class="rw e"><span>LV '+m+'</span><input class="field" data-rw="'+m+'" maxlength="60" value="'+esc(S.cfg.rewards[m]||'')+'" placeholder="مثال: '+({25:'حلا يختاره',50:'نزهة في الحديقة',75:'يوم بدون واجبات منزلية',100:'هدية كبيرة'}[m])+'" aria-label="مكافأة المستوى '+m+'"><button class="btn small neg" type="button" data-act="rwdel" data-m="'+m+'" aria-label="حذف مكافأة المستوى '+m+'">حذف</button></div>').join('')+'</section>'
    +'<section class="panel" style="margin-top:14px"><h3>جولة جديدة</h3><p class="sub">تصفّر نقاط الجميع ليبدأوا من جديد، وتبقى الشهادات التي حصلوا عليها.</p><button class="btn gold" type="button" data-act="newround" data-confirm>ابدأ جولة جديدة</button></section>'+backupPanel()+'</div>';
   $$('.maps canvas').forEach((cv,i)=>setTimeout(()=>{if(!cv.isConnected)return;cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0);},i*40));
 }
-function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');renderRound();}
+function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');renderRound();}
 
 /* ================= certificates ================= */
 function renderCerts(){
@@ -667,6 +671,7 @@ const ACT={
   camtop(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:c.scrollWidth,behavior:camSmooth()});else c.scrollTo({top:0,behavior:camSmooth()});},
   cambot(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:0,behavior:camSmooth()});else c.scrollTo({top:c.scrollHeight,behavior:camSmooth()});},
   fork(el){openFork(el.dataset.id);},
+  rwdel(el){const m=el.dataset.m,i=$('[data-rw="'+m+'"]');S.cfg.rewards[m]='';if(i){i.value='';i.focus();}persistCfg();toast(+m<100?'تم حذف المكافأة، ولن يظهر صندوق عند المحطة '+m:'تم حذف المكافأة');},
   bkexp(){exportBackup();},
   bkgo(){applyBackup();},
   forkgo(el){forkChoose(el.dataset.id,el.dataset.v);},

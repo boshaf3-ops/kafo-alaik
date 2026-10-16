@@ -97,7 +97,7 @@ function torso(c,col,up,skin,lg){
 }
 function legs(c,col,sh){R(c,5,17,3,3,col);R(c,8,17,3,3,col);R(c,4,20,4,2,sh||DK);R(c,8,20,4,2,sh||DK);}
 const _avCache={};
-function avatarURL(av,up){const key=JSON.stringify(av)+(up?'u':'');if(_avCache[key])return _avCache[key];const cv=mk(CH_W,CH_H);drawChar(cv.getContext('2d'),av,up);return(_avCache[key]=cv.toDataURL());}
+function avatarURL(av,up,fx){const key=JSON.stringify(av)+(up?'u':'')+(fx?'|'+fx:'');if(_avCache[key])return _avCache[key];const cv=mk(CH_W,CH_H);drawChar(cv.getContext('2d'),av,up);return(_avCache[key]=(fx?poseCv(cv,fx):cv).toDataURL());}
 
 /* ---------- tiny pixel icons used as masks ---------- */
 const ICONS={

@@ -369,7 +369,7 @@ function drawPath(c,path,m,live){
     else if(ty==='x'){R(c,x-2,y+1,4,1,'rgba(255,255,255,.6)');if(i%2)R(c,x+2,y+3,3,1,'rgba(255,255,255,.35)');}
     else drawTile(c,p[0],p[1],i,m.tile,i%10===0);}
   if(m.extra)m.extra(c,path,m,live);
-  [25,50,75].forEach(k=>{const p=path.lv[k];R(c,Math.round(p[0])+6,Math.round(p[1])+2,12,1,'rgba(0,0,0,.2)');chestAt(c,Math.round(p[0])+7,Math.round(p[1])-6,1);});
+  if(!live)[25,50,75].forEach(k=>{const p=path.lv[k];R(c,Math.round(p[0])+5,Math.round(p[1])+2,16,1,'rgba(0,0,0,.2)');chestAt2(c,m.id,p[0]+6,p[1]-11);});
   const g=path.lv[100];EMB[m.goal](c,Math.round(g[0]),Math.round(g[1]),live&&m.goal==='flag');
 }
 const SWAY_RE=/(^|[^a-z])(pine|tree|palm|reed|flower)\(/;

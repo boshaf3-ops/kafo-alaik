@@ -127,6 +127,27 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
   box-shadow:0 -2px 0 0 var(--sline),0 2px 0 0 var(--sline),-2px 0 0 0 var(--sline),2px 0 0 0 var(--sline)}
 .actor.idle img{animation:bob 1s steps(2) infinite}
 @keyframes bob{50%{transform:translateY(-2px)}}
+/* treasure chests */
+.chest{position:absolute;transform:translate(-50%,-100%);pointer-events:none;transform-origin:50% 100%}
+.chest img{display:block;width:100%;image-rendering:pixelated}
+.chest::after{content:"";position:absolute;left:-6%;right:-6%;bottom:-2px;height:3px;background:rgba(0,0,0,.2)}
+.chest:not(.poof) img{animation:chglint 2.4s steps(1) infinite}
+@keyframes chglint{0%,86%{filter:none}90%,96%{filter:brightness(1.35)}}
+.chest.poof img{animation:chpoof .6s steps(6) forwards}
+@keyframes chpoof{0%{transform:scale(1)}30%{transform:scale(1.5);filter:brightness(2.2)}100%{transform:scale(2.4);opacity:0}}
+.chest-win{text-align:center;padding:6px 2px 4px}
+.chest-stage{position:relative;max-width:420px;margin:0 auto;box-shadow:0 -4px 0 0 var(--sline),0 4px 0 0 var(--sline),-4px 0 0 0 var(--sline),4px 0 0 0 var(--sline);overflow:hidden}
+.chest-cv{display:block;width:100%;height:auto;image-rendering:pixelated;background:#7ad0ff}
+.chest-boom{position:absolute;left:50%;top:14%;transform:translate(-50%,0) scale(.2);font:400 40px/1 var(--f-display);color:#fff3b0;text-shadow:3px 3px 0 #b8302a,-3px 3px 0 #b8302a,3px -3px 0 #b8302a,-3px -3px 0 #b8302a;opacity:0;pointer-events:none;white-space:nowrap}
+.chest-boom.go{animation:chboom 1.1s steps(11) forwards}
+@keyframes chboom{0%{opacity:1;transform:translate(-50%,0) scale(.3)}25%{opacity:1;transform:translate(-50%,-8px) scale(1.3)}60%{opacity:1;transform:translate(-50%,-14px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-30px) scale(1)}}
+.chest-txt{margin-top:16px;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+.chest-txt.show{opacity:1;transform:none}
+.chest-title{font:400 30px/1.3 var(--f-display);color:var(--brand);text-wrap:balance}
+.chest-prize{margin:10px auto 0;max-width:360px;padding:12px 14px;background:var(--surface2);box-shadow:0 -4px 0 0 var(--gold),0 4px 0 0 var(--gold),-4px 0 0 0 var(--gold),4px 0 0 0 var(--gold)}
+.chest-prize small{display:block;font:700 13px/1.4 var(--f-body);color:var(--muted)}
+.chest-prize b{display:block;font:800 24px/1.4 var(--f-body);overflow-wrap:anywhere}
+.rw-row{display:flex;gap:8px;align-items:center}.rw-row .field{flex:1;min-width:0}
 /* + and - beside the selected character */
 .pm{position:absolute;inset:0;pointer-events:none}
 .pb{position:absolute;top:50%;width:46px;height:46px;margin-top:-23px;padding:0;border:0;pointer-events:auto;color:#fff;animation:pbin .18s steps(3) both;
@@ -258,6 +279,7 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .two{display:grid;gap:0 12px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 @media (max-width:520px){.two{grid-template-columns:minmax(0,1fr)}}
 .rw{display:grid;grid-template-columns:74px minmax(0,1fr);align-items:center;gap:4px}
+.rw.e{grid-template-columns:74px minmax(0,1fr) auto}
 .rw span{font:400 11px/1.4 var(--f-pixel);direction:ltr;text-align:center;background:var(--gold);color:var(--gold-ink);padding:8px 4px}
 
 /* certificates + sheet */
