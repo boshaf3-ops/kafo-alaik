@@ -4,7 +4,7 @@
 const AMB={run:null,master:null,an:null,gest:false,nb:{}};
 const ambCtx=()=>{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;};
 function ambMaster(){
-  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.6;
+  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.22;
   AMB.an=c.createAnalyser();AMB.an.fftSize=1024;AMB.master.connect(AMB.an);AMB.an.connect(c.destination);return AMB.master;
 }
 function ambNoise(kind){
@@ -14,8 +14,9 @@ function ambNoise(kind){
 }
 const AMB_N=n=>{const m=/^([A-G])([#b]?)(\d)$/.exec(n);if(!m)return 0;const s={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);return 440*Math.pow(2,((+m[3]+1)*12+s-69)/12);};
 
+const AMB_TRIM={peak:1.9,desert:1.3,jungle:1.6,river:1.3,hop:1,bahrain:1.5};
 function ambStart(id){
-  const c=ambCtx(),run={id,dead:false,nodes:[],timers:[]},g=c.createGain();g.gain.value=0;g.connect(ambMaster());g.gain.linearRampToValueAtTime(1,c.currentTime+1.4);run.g=g;
+  const c=ambCtx(),run={id,dead:false,nodes:[],timers:[]},g=c.createGain();g.gain.value=0;g.connect(ambMaster());g.gain.linearRampToValueAtTime(AMB_TRIM[id]||1,c.currentTime+1.4);run.g=g;
   const keep=n=>{run.nodes.push(n);return n;};
   /* a looping noise layer: kind white|brown, filter {t,f,q}, level, optional slow LFO on level (rate,depth) or on the filter (frate,fdepth) */
   run.layer=(o)=>{const s=keep(c.createBufferSource());s.buffer=ambNoise(o.kind||'white');s.loop=true;s.loopStart=Math.random()*1.5;
@@ -106,20 +107,26 @@ const SCAPES={
       if(i%4===0){const b=(bass[(i>>2)%8]||'C3'),f=AMB_N(b)*(((i>>2)&1)?2:1);r.osc({t,f,d:dt*3.2,v:.07,type:'triangle',a:.004});}
       if(i%2===1)r.burst({t,ft:'highpass',f:7000,d:.03,v:.012});
       if(i%8===0)r.osc({t,f:130,f2:55,d:.12,v:.08,type:'sine'});});},
-  /* مملكة البحرين: a Gulf pearl-diving sea tune: oud-like plucks in a hijaz scale, drum, claps, a held "nahham" voice and the sea */
+  /* مملكة البحرين: a Gulf pearl-diving feel in a 12-beat cycle: group hand-claps, the big drum (tabl), the small mirwas and the clay jahla, a soft oud, a held "nahham" voice and the sea */
   bahrain(r){
-    r.layer({kind:'brown',t:'lowpass',f:420,v:.07,rate:.1,depth:.04});r.layer({t:'highpass',f:3200,v:.008,rate:.1,depth:.006});
-    r.tone({f:AMB_N('D2'),v:.035,type:'triangle'});r.tone({f:AMB_N('A2'),v:.018,type:'sine'});
-    const P=('A4 - - - G4 - F#4 - Eb4 - - - D4 - - - '+'D4 - Eb4 - F#4 - G4 - A4 - - - Bb4 - A4 - '+'A4 - Bb4 - A4 - G4 - F#4 - Eb4 - F#4 - G4 - '+'F#4 - Eb4 - D4 - - - D4 - - - - - - -').split(' ');
-    r.steps(86,(n,t,dt)=>{const i=n%64,b=i%16,note=P[i];
-      if(note&&note!=='-')r.osc({t,f:AMB_N(note),d:.5,v:.05,type:'sawtooth',a:.004,lp:2200,lp2:500});
-      if(note&&note!=='-')r.osc({t,f:AMB_N(note)*2,d:.2,v:.012,type:'triangle',a:.004});
-      if(b===0||b===6||b===10)r.osc({t,f:100,f2:52,d:.22,v:.13,type:'sine'});
-      if(b===4||b===12||b===14)r.burst({t,f:2600,d:.06,v:.05,q:1.2});
-      if(b===8)r.burst({t,f:1800,d:.05,v:.03,q:1});
-      if(i===16||i===48){const v=[['A4',1.0],['Bb4',.45],['A4',.45],['G4',1.1]];let tt=t;v.forEach(([nn,d])=>{const f=AMB_N(nn);
-        r.osc({t:tt,f,d,v:.035,a:.12,vib:5.5,vd:f*.012,lp:1800});r.osc({t:tt,f:f*2,d,v:.012,a:.12,vib:5.5,vd:f*.02,lp:2400});tt+=d*.92;});}});
-    r.every(16000,28000,t=>r.osc({t,f:1900,f2:1300,d:.5,v:.022,vib:9,vd:60}));}
+    r.layer({kind:'brown',t:'lowpass',f:420,v:.06,rate:.1,depth:.035});r.layer({t:'highpass',f:3200,v:.006,rate:.1,depth:.005});
+    r.tone({f:AMB_N('D2'),v:.025,type:'triangle'});r.tone({f:AMB_N('A2'),v:.012,type:'sine'});
+    const P=('A4 - - G4 - - F#4 - - Eb4 - - '+'D4 - Eb4 - F#4 - G4 - A4 - - - '+'A4 - Bb4 - A4 - G4 - F#4 - Eb4 - '+'F#4 - Eb4 - D4 - - - - - - -').split(' ');
+    const clap=(t,v)=>{[0,.008,.017,.027].forEach((o,k)=>r.burst({t:t+o,f:1500+k*350+Math.random()*250,d:.05,v:v*(1-k*.12),q:1.4}));};
+    const dum=(t,v)=>{r.osc({t,f:115,f2:52,d:.3,v,type:'sine',a:.004});r.burst({t,kind:'brown',ft:'lowpass',f:220,d:.18,v:v*.5,a:.004});};
+    const jahla=(t,v)=>{r.osc({t,f:210,f2:150,d:.2,v:v*.7,type:'sine',a:.004});r.burst({t,f:320,q:7,d:.22,v,a:.004});};
+    const mirwas=(t,v)=>{r.osc({t,f:520,f2:370,d:.07,v,type:'triangle',a:.003});r.burst({t,f:2200,d:.03,v:v*.6,q:1.5});};
+    r.steps(88,(n,t,dt)=>{const i=n%48,b=i%12,note=P[i];
+      if(b===0||b===3||b===6||b===9)clap(t,.1);
+      if(b===5||b===11)clap(t,.05);
+      if(b===0||b===6)dum(t,.2);
+      if(b===9)dum(t,.1);
+      if(b===3||b===8)jahla(t,.07);
+      if(b===2||b===4||b===7||b===10)mirwas(t,.04);
+      if(note&&note!=='-')r.osc({t,f:AMB_N(note),d:.5,v:.03,type:'sawtooth',a:.004,lp:2000,lp2:500});
+      if(i===12||i===36){const v=[['A4',1.0],['Bb4',.45],['A4',.45],['G4',1.1]];let tt=t;v.forEach(([nn,d])=>{const f=AMB_N(nn);
+        r.osc({t:tt,f,d,v:.03,a:.12,vib:5.5,vd:f*.012,lp:1800});r.osc({t:tt,f:f*2,d,v:.01,a:.12,vib:5.5,vd:f*.02,lp:2400});tt+=d*.92;});}});
+    r.every(16000,28000,t=>r.osc({t,f:1900,f2:1300,d:.5,v:.02,vib:9,vd:60}));}
 };
 
 /* start / stop follows what is on screen: the adventure view, sound on, page visible, after the first tap */
