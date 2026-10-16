@@ -213,11 +213,13 @@ function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">'
 let curScene=null,curW=0,sel=null,popCtx=null,hinted=false,scrT=0;const disp={},bobbing={},animTok={};
 function sizeHome(){const t=$('.tabs');document.documentElement.style.setProperty('--tabH',(t?Math.max(0,innerHeight-t.getBoundingClientRect().top):78)+'px');}
 /* the world is about twice as tall as the screen; the camera follows the climber and can be scrolled */
+let camZoom=false;
+/* camZoom: the whole world fitted on one screen (zoomed out); otherwise the world is bigger than the screen and is scrolled */
 function homeGeo(){
-  const h=$('#home'),cw=h?h.clientWidth:innerWidth,ch=h&&h.clientHeight?h.clientHeight:innerHeight-80;
-  if(mapOf().layout==='h'){const H=240,scale=ch/H,W=clamp(Math.round(cw/scale*3.2),520,1000);return{W,H,scale,hz:true};}
-  const W=clamp(Math.round(250*cw/ch),140,480),scale=cw/W,H=clamp(Math.round(ch/scale*1.9),360,640);
-  return{W,H,scale,hz:false};
+  const h=$('#home'),cw=h?h.clientWidth:innerWidth,ch=h&&h.clientHeight?h.clientHeight:innerHeight-80,m=mapOf();
+  if(m.layout==='h'){const H=240,sc0=ch/H,W=clamp(Math.round(cw/sc0*3.2),520,1000);return camZoom?{W,H,scale:Math.min(cw/W,ch/H),hz:true,zoom:true,cw,ch}:{W,H,scale:sc0,hz:true};}
+  const W=clamp(Math.round(250*cw/ch),140,480),sc0=cw/W,H=m.tall?clamp(Math.round(W*m.tall),360,900):clamp(Math.round(ch/sc0*1.9),360,640);
+  return camZoom?{W,H,scale:Math.min(sc0,ch/H),hz:false,zoom:true,cw,ch}:{W,H,scale:sc0,hz:false};
 }
 let curGeo={W:0,H:0,scale:1,hz:false},hudOpen=false;const flying={};
 const camEl=()=>$('#cam');
@@ -254,8 +256,8 @@ function hudHtml(){
 function refreshHud(){const h=$('#hud');if(h)h.innerHTML=hudHtml();}
 function paintScene(g){
   const id=MAPS[S.cfg.mapId]?S.cfg.mapId:'peak';curGeo=g;curW=g.W;curScene=buildLive(id,g.W,g.H);
-  const scn=$('#scene');scn.style.width=g.hz?Math.round(g.W*g.scale)+'px':'';scn.style.height=Math.round(g.H*g.scale)+'px';
-  $('#cam').classList.toggle('hz',!!g.hz);const cc=$('.camctl');
+  const scn=$('#scene');scn.style.width=(g.hz||g.zoom)?Math.round(g.W*g.scale)+'px':'';scn.style.height=Math.round(g.H*g.scale)+'px';scn.style.margin=g.zoom?(g.hz?Math.max(0,Math.round((g.ch-g.H*g.scale)/2))+'px 0 0':'0 auto'):'';
+  $('#cam').classList.toggle('hz',!!g.hz);try{$('#cam').style.background=g.zoom?'rgb('+Array.from(curScene.cv.getContext('2d').getImageData(1,1,1,1).data).slice(0,3).join(',')+')':'';}catch(_){}const cc=$('.camctl');
   if(cc){cc.classList.toggle('hz',!!g.hz);const a=cc.querySelector('[data-act=camtop]'),b=cc.querySelector('[data-act=cambot]');if(a)a.setAttribute('aria-label',g.hz?'إلى النهاية':'إلى القمة');if(b)b.setAttribute('aria-label','إلى البداية');}
   for(const k of ['sceneCv','fxCv']){const cv=$('#'+k);cv.width=g.W;cv.height=g.H;}
   const c=$('#sceneCv').getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(curScene.cv,0,0);
@@ -306,12 +308,12 @@ function animateKid(id,to){
 function floatText(id,txt,cls){const host=$('#actors'),el=host&&host.querySelector('.actor[data-id="'+id+'"]');if(!el)return;const d=document.createElement('div');d.className='float '+cls;d.textContent=txt;d.style.left=el.style.left;d.style.top='calc('+el.style.top+' - 30px)';d.style.zIndex=9999;host.appendChild(d);setTimeout(()=>d.remove(),1300);}
 function renderHome(){
   V.innerHTML='<div class="home" id="home"><div class="cam" id="cam"><div class="scene" id="scene" data-act="scenebg"><canvas id="sceneCv"></canvas><canvas id="fxCv"></canvas><div class="actors" id="actors"></div></div></div><div class="hud" id="hud"></div>'
-    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button></div><div id="homeEmpty"></div></div>';
-  sizeHome();paintScene(homeGeo());buildActors();renderChests();refreshHud();renderSel();camFocus(false);
+    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button><button class="btn iconbtn" type="button" data-act="camzoom" aria-label="'+(camZoom?'تكبير الخريطة':'تصغير الخريطة')+'"><span class="ico i-zoom"></span></button></div><div id="homeEmpty"></div></div>';
+  sizeHome();paintScene(homeGeo());buildActors();renderChests();renderLabels();refreshHud();renderSel();camFocus(false);
   camEl().addEventListener('scroll',()=>{if(popCtx)closePop();if(curGeo.hz&&sel&&!scrT)scrT=requestAnimationFrame(()=>{scrT=0;placeActors();});},{passive:true});
   if(!S.kids.length)$('#homeEmpty').innerHTML='<div class="home-empty panel empty"><div class="big">ابدأ بإضافة أبطالك</div><p class="sub">أضف الأبناء بأسمائهم وصورهم، ويظهرون هنا شخصيات صغيرة تتسلّق الخريطة مع كل سلوك طيب.</p><div style="margin-top:12px"><button class="btn primary" data-act="addkid">+ إضافة ابن أو ابنة</button></div></div>';
 }
-function refreshHome(){if(view!=='home')return;refreshHud();placeActors();renderChests();renderSel();}
+function refreshHome(){if(view!=='home')return;refreshHud();placeActors();renderChests();renderLabels();renderSel();}
 function fitHome(){sizeHome();if(view!=='home'||!ready||sheetOpen)return;const g=homeGeo();if(Math.abs(g.W-curGeo.W)>=8||Math.abs(g.H-curGeo.H)>=24||!!g.hz!==!!curGeo.hz||(g.hz&&Math.abs(g.scale-curGeo.scale)/curGeo.scale>.04)){closePop();renderHome();}else placeActors();}
 
 /* ---------- simple behaviour list next to the character ---------- */
@@ -681,6 +683,7 @@ const ACT={
   pm(el){openPop(el.dataset.id,el.dataset.t);},
   popclose(){closePop();},
   hudtoggle(){hudOpen=!hudOpen;refreshHud();},
+  camzoom(){camZoom=!camZoom;renderHome();toast(camZoom?'الخريطة كاملة على الشاشة':'الخريطة مكبّرة');},
   camtop(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:c.scrollWidth,behavior:camSmooth()});else c.scrollTo({top:0,behavior:camSmooth()});},
   cambot(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:0,behavior:camSmooth()});else c.scrollTo({top:c.scrollHeight,behavior:camSmooth()});},
   fork(el){openFork(el.dataset.id);},

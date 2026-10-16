@@ -55,6 +55,12 @@ const CHEST={
   island:c=>{const P={o:'#2a0f10',hi:'#ff9a84',lid:'#d6402f',lidD:'#a82a20',body:'#b3342a',dark:'#7a1f1a',band:'#222831'};chClassic(c,P);
     R(c,5,6,4,3,'#ffffff');R(c,5,7,1,1,'#222831');R(c,8,7,1,1,'#222831');R(c,6,8,1,1,'#222831');R(c,7,8,1,1,'#222831');R(c,6,9,2,1,'#222831');
     R(c,6,2,2,1,'#ffd23f');R(c,6,3,2,1,'#c0392b');R(c,2,1,1,1,'#ffffff');},
+  /* a gold-star block chest: brick lid, golden star front */
+  hop:c=>{const P={o:'#3a1808',hi:'#f7c08a',lid:'#e8894a',lidD:'#a8501f',body:'#ffb02e',dark:'#d98a10',band:'#6f3414'};chClassic(c,P);
+    R(c,6,5,2,4,'#fff7c4');R(c,5,6,4,2,'#fff7c4');R(c,6,1,2,1,'#ffe27a');R(c,3,2,2,1,'#f7c08a');},
+  /* dark green treasure box with the red-and-white flag of Bahrain on the lid */
+  bahrain:c=>{const P={o:'#2a0a10',hi:'#ff8a96',lid:'#ce1126',lidD:'#9c0d1d',body:'#ce1126',dark:'#7a0a18',band:'#ffffff'};chClassic(c,P);
+    R(c,6,5,2,3,'#ffd23f');R(c,6,6,2,1,'#8a5a10');R(c,3,2,1,1,'#ffffff');R(c,4,3,1,1,'#ffffff');R(c,3,4,1,1,'#ffffff');R(c,6,1,2,1,'#ffd23f');},
   /* silver space capsule with a glowing panel */
   space:c=>{const O='#2a1f5a';
     R(c,7,0,1,1,'#ffffff');R(c,7,1,1,1,'#7ae8ff');R(c,4,2,6,1,O);R(c,3,3,8,1,O);R(c,2,4,10,1,O);R(c,4,3,6,1,'#8b5cd6');R(c,3,4,8,1,'#6a3fc0');R(c,5,3,2,1,'#c8a8ff');
@@ -67,7 +73,7 @@ const chestURL=id=>{const cv=chestCv(id);return cv._u||(cv._u=cv.toDataURL());};
 /* same chest, drawn into a scene (used for the preview cards and certificates) */
 function chestAt2(c,id,x,y){c.drawImage(chestCv(id),Math.round(x),Math.round(y));}
 const CH_ORD={25:'الأول',50:'الثاني',75:'الثالث'};
-const CH_BG={peak:['#2d62c4','#bfe0f7','#4fa043'],snow:['#5a7fb8','#e8f4ff','#f4f9ff'],volcano:['#2a1010','#ff9a4a','#3a2a2a'],river:['#3f9ad8','#bfe6f7','#4a8a3a'],desert:['#4fb8ec','#ffe9ae','#e8d3a0'],jungle:['#1b5a3a','#8fd27a','#2a5a34'],lake:['#25a9c6','#bff1ff','#58c15a'],island:['#37c0ea','#bff1ff','#f0d890'],space:['#0b0a2a','#3a2a7a','#59616d']};
+const CH_BG={peak:['#2d62c4','#bfe0f7','#4fa043'],snow:['#5a7fb8','#e8f4ff','#f4f9ff'],volcano:['#2a1010','#ff9a4a','#3a2a2a'],river:['#3f9ad8','#bfe6f7','#4a8a3a'],desert:['#4fb8ec','#ffe9ae','#e8d3a0'],jungle:['#1b5a3a','#8fd27a','#2a5a34'],lake:['#25a9c6','#bff1ff','#58c15a'],island:['#37c0ea','#bff1ff','#f0d890'],space:['#0b0a2a','#3a2a7a','#59616d'],hop:['#5aa9ff','#e6f4ff','#58c15a'],bahrain:['#2aa8dc','#bff1ff','#f0d890']};
 
 /* ---------- chests standing on the map ---------- */
 const chestHold={};let chestVis={};

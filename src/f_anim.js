@@ -11,7 +11,9 @@ const MAPFX={
   jungle:{water:['#1b7fa6','#4fb3da','#6fd0ea','#8fd2f5'],parts:[['firefly',20],['leaf',9,['#58c15a','#ffd23f','#2f9e4f']]]},
   lake:{water:['#25a9c6','#1b9ab8','#168aa8','#117a98','#0f6f8a','#8fe6f2'],parts:[['petal',8,['#ff9fc4','#ffffff']]],clouds:[[.2,.04,1]]},
   island:{water:['#37c0ea','#2fb2e2','#27a2d8','#2092cc','#1a82bf','#bff1ff'],clouds:[[.3,.028,1]]},
-  space:{twinkle:{n:26,maxY:1},shoot:true}
+  space:{twinkle:{n:26,maxY:1},shoot:true},
+  hop:{water:['#2f8fd0','#5cb4ea','#8fd2f5'],parts:[['leaf',7,['#58c15a','#ffd23f','#8ad66f']]]},
+  bahrain:{water:['#37c0ea','#2aa8dc','#2fb2e2','#27a2d8','#5fcbee']}
 };
 const WATER_HI=((105<<24)|0xffffff)>>>0,WATER_DN=((48<<24)|(0x4f<<16)|(0x32<<8)|0x06)>>>0;
 const LAVA_HI=((210<<24)|(0x7a<<16)|(0xe2<<8)|0xff)>>>0,LAVA_DN=((160<<24)|(0x0f<<16)|(0x29<<8)|0xc2)>>>0;

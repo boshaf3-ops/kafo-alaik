@@ -363,7 +363,7 @@ function drawPath(c,path,m,live){
     prev=ty;
     if(ty==='u'||ty==='d'){R(c,x-3,y,7,1,WOOD1);R(c,x-3,y+1,7,1,WOOD3);}
     else if(ty==='b'){R(c,x-3,y-1,6,2,i%2?WOOD2:WOOD1);R(c,x-3,y+1,6,1,WOOD3);}
-    else if(ty==='s'){if(i%2===0){ell(c,x,y+2,4,2,'#3d4650');ell(c,x,y+1,4,2,'#8c96a3');R(c,x-2,y,3,1,'#c3cad3');}else{R(c,x-2,y+3,4,1,'rgba(255,255,255,.45)');}}
+    else if(ty==='s'){if(m.noStone){}else if(i%2===0){ell(c,x,y+2,4,2,'#3d4650');ell(c,x,y+1,4,2,'#8c96a3');R(c,x-2,y,3,1,'#c3cad3');}else{R(c,x-2,y+3,4,1,'rgba(255,255,255,.45)');}}
     else if(ty==='t'){R(c,x-4,y,8,2,m.tile.b);R(c,x-4,y,8,1,m.tile.hi);R(c,x-4,y+2,8,1,m.tile.sh);}
     else if(ty==='z'){if(i%4===0)R(c,x,y-12,1,4,'#3a2a1a');}
     else if(ty==='x'){R(c,x-2,y+1,4,1,'rgba(255,255,255,.6)');if(i%2)R(c,x+2,y+3,3,1,'rgba(255,255,255,.35)');}

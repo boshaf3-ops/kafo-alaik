@@ -137,6 +137,7 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .wt .wtb{display:block;width:calc(100% - 8px);margin:4px 4px 0;padding:6px 4px;font-size:12px;line-height:1.3}
 .wt small{padding-bottom:2px}
 /* treasure chests */
+.stn{position:absolute;z-index:3;pointer-events:none;white-space:nowrap;font:800 12px/1.25 Tajawal,sans-serif;color:#7a0a18;background:rgba(255,255,255,.92);border:1.5px solid #ce1126;border-radius:9px;padding:0 6px;box-shadow:0 1px 3px rgba(0,0,0,.3)}.stn.r{transform:translate(0,-50%)}.stn.l{transform:translate(-100%,-50%)}.stn.c{transform:translate(-50%,-50%)}.stn.ttl{font-size:14px;background:#ce1126;color:#fff;border-color:#fff;padding:1px 10px}
 .chest{position:absolute;transform:translate(-50%,-100%);pointer-events:none;transform-origin:50% 100%}
 .chest img{display:block;width:100%;image-rendering:pixelated}
 .chest::after{content:"";position:absolute;left:-6%;right:-6%;bottom:-2px;height:3px;background:rgba(0,0,0,.2)}
@@ -181,7 +182,7 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 /* sideways maps scroll left to right; boats, rocks and the fork sheet */
 .cam.hz{overflow-x:auto;overflow-y:hidden;direction:ltr;touch-action:pan-x}
 .cam.hz .actor .tag,.cam.hz .float{direction:rtl}
-.camctl.hz .ico{transform:rotate(90deg)}
+.camctl.hz .ico{transform:rotate(90deg)}.camctl.hz .ico.i-zoom{transform:none}
 .actor .bt{display:none;position:absolute;left:50%;bottom:-6px;width:var(--bw,170%);aspect-ratio:26/11;transform:translateX(-50%);background:var(--boat) no-repeat center/100% 100%;image-rendering:pixelated;pointer-events:none;z-index:-1}
 .actor.onboat .bt{display:block}
 .rock{position:absolute;width:var(--rw,9%);aspect-ratio:1;transform:translate(-50%,-50%);background:var(--rockimg) no-repeat center/100% 100%;image-rendering:pixelated;pointer-events:none;z-index:9500}
