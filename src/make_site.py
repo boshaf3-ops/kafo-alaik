@@ -48,7 +48,10 @@ page=f'''<!doctype html>
 <noscript><p style="font:16px sans-serif;padding:24px;text-align:center">يحتاج «كفو عليك» إلى تفعيل جافاسكربت ليعمل.</p></noscript>
 <script>
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){{
-  window.addEventListener('load',()=>{{navigator.serviceWorker.register('sw.js').catch(()=>{{}});}});
+  const had=!!navigator.serviceWorker.controller;let rl=false;
+  /* a new version took over: reload once when nothing is open (all data lives in the device storage) */
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{{if(!had||rl)return;const go=()=>{{if(typeof sheetOpen!=='undefined'&&sheetOpen){{setTimeout(go,3000);return;}}rl=true;location.reload();}};go();}});
+  window.addEventListener('load',()=>{{navigator.serviceWorker.register('sw.js').then(r=>{{r.update().catch(()=>{{}});document.addEventListener('visibilitychange',()=>{{if(!document.hidden)r.update().catch(()=>{{}});}});}}).catch(()=>{{}});}});
 }}
 </script>
 </body>
@@ -73,7 +76,7 @@ self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise
 self.addEventListener('fetch',e=>{{
   const r=e.request;if(r.method!=='GET')return;const u=new URL(r.url);
   // the page itself: network first so a new version arrives, cache when offline
-  if(r.mode==='navigate'){{e.respondWith(fetch(r).then(res=>{{const cp=res.clone();caches.open(VERSION).then(c=>c.put('index.html',cp));return res;}}).catch(()=>caches.match('index.html')));return;}}
+  if(r.mode==='navigate'){{e.respondWith(fetch(r,{{cache:'no-cache'}}).then(res=>{{const cp=res.clone();caches.open(VERSION).then(c=>c.put('index.html',cp));return res;}}).catch(()=>caches.match('index.html')));return;}}
   // same-origin files and the optional pixel font: cache first, fill the cache on first use
   if(u.origin===location.origin||u.hostname==='fonts.googleapis.com'||u.hostname==='fonts.gstatic.com'){{
     e.respondWith(caches.match(r).then(hit=>hit||fetch(r).then(res=>{{if(res&&(res.ok||res.type==='opaque')){{const cp=res.clone();caches.open(VERSION).then(c=>c.put(r,cp));}}return res;}}).catch(()=>hit)));}}
