@@ -616,16 +616,29 @@ function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;k.ck=null;pe
 
 /* ================= certificates ================= */
 function renderCerts(){
-  const list=[];S.kids.forEach(k=>k.certs.forEach(ct=>list.push({k,ct})));list.sort((a,b)=>b.ct.ts-a.ct.ts);
-  V.innerHTML='<div class="view"><div class="sec-head"><div><h2>الشهادات</h2><p class="sub">كل ابن يوصل المستوى 100 تُحفظ له شهادة بثيم الخريطة، جاهزة للطباعة.</p></div><button class="btn gold" data-act="prevcert">معاينة شهادة</button></div>'
-   +(list.length?'<div class="cgrid">'+list.map(o=>'<article class="kcard" style="grid-template-columns:60px minmax(0,1fr)"><div class="av">'+avHtml(o.k)+'</div><div class="grow"><div class="nm">'+esc(o.ct.name||o.k.name)+'</div><div class="meta">'+esc((MAPS[o.ct.mapId]||MAPS.peak).name)+' · '+esc(fmtDate(o.ct.ts))+'</div></div><div style="grid-column:1/-1"><button class="btn gold small" type="button" data-act="certshow" data-id="'+o.k.id+'" data-cid="'+o.ct.id+'">عرض وحفظ الشهادة</button></div></article>').join('')+'</div>'
-     :'<div class="panel empty"><div class="big">لا شهادات بعد</div><p class="sub">أول ابن يصل إلى المستوى 100 تظهر شهادته هنا.</p></div>')+'</div>';
+  V.innerHTML='<div class="view"><div class="sec-head"><div><h2>الشهادات</h2><p class="sub">لكل ابن ملف خاص. اضغط «الشهادات» لترى عوالمه كلها، وكل عالم أنهاه تظهر شهادته مضيئة بالأصفر للعرض والحفظ.</p></div><button class="btn gold" data-act="prevcert">معاينة شهادة</button></div>'
+   +(S.kids.length?'<div class="cgrid">'+S.kids.map(k=>{const n=new Set(k.certs.map(c=>c.mapId).filter(x=>MAPS[x])).size;
+     return '<article class="kcard" style="grid-template-columns:60px minmax(0,1fr)"><div class="av">'+avHtml(k)+'</div><div class="grow"><div class="nm">'+esc(k.name)+'</div><div class="meta">'+(n?'شهادات '+n+' من '+MAP_LIST.length+' عوالم':'لا شهادات بعد')+'</div></div><div style="grid-column:1/-1"><button class="btn gold small" type="button" data-act="kcerts" data-id="'+k.id+'">الشهادات</button></div></article>';}).join('')+'</div>'
+     :'<div class="panel empty"><div class="big">لا أبناء بعد</div><p class="sub">أضف ابنًا من صفحة «الأبناء»، وتظهر هنا شهاداته.</p></div>')+'</div>';
 }
-async function showCert(o,title){
+/* one child's file: every world as an icon; a world he finished glows yellow with its certificate, the others stay dim and empty */
+function certsHtml(k){
+  const by={};k.certs.forEach(c=>{if(MAPS[c.mapId])(by[c.mapId]=by[c.mapId]||[]).push(c);});
+  const n=Object.keys(by).length;
+  return '<div class="sheet-head"><div class="av">'+avHtml(k)+'</div><div class="grow"><h2>شهادات '+esc(k.name)+'</h2><div class="sub">'+(n?'أنهى '+n+' من '+MAP_LIST.length+' عوالم':'لم ينهِ أي عالم بعد')+'</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
+   +'<div class="maps wt-grid">'+MAP_LIST.map(m=>{const cs=(by[m.id]||[]).slice().sort((a,b)=>a.ts-b.ts),on=cs.length>0;
+     return '<div class="map-card wt '+(on?'on':'off')+'" aria-label="'+esc(m.name)+(on?'':'، لا توجد شهادة')+'"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'" role="img" aria-label="'+esc(m.name)+'"></canvas><b>'+esc(m.name)+'</b>'
+      +(on?(cs.length>1?'<small>'+cs.length+' شهادات</small>':'')+cs.map(c=>'<button class="btn gold small wtb" type="button" data-act="certshow" data-back="1" data-id="'+k.id+'" data-cid="'+c.id+'">عرض وحفظ الشهادة'+(cs.length>1?' · الجولة '+(c.round||1):'')+'</button>').join(''):'')+'</div>';}).join('')+'</div>';
+}
+function openKidCerts(id){
+  const k=kidById(id);if(!k)return;openSheet(certsHtml(k),{});
+  $$('#sheetHost canvas[data-map]').forEach((cv,i)=>setTimeout(()=>{if(cv.isConnected)cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0);},i*40));
+}
+async function showCert(o,title,back){
   openSheet('<h2>'+esc(title)+'</h2><p class="sub">جارٍ تجهيز الشهادة…</p>',{});
   try{const cv=await makeCert(o),blob=await new Promise(r=>cv.toBlob(r,'image/png')),url=URL.createObjectURL(blob);certBlob={blob,name:o.name||'بطل'};
     if(!sheetOpen)return;
-    setSheet('<h2>'+esc(title)+'</h2><img class="certimg" src="'+url+'" alt="الشهادة"><div class="row" style="justify-content:center"><button class="btn primary" type="button" data-act="certsave">حفظ الصورة للطباعة</button><button class="btn" type="button" data-act="close">إغلاق</button></div><p class="sub" style="text-align:center">بمقاس A4، احفظ الصورة ثم اطبعها.</p>');
+    setSheet('<h2>'+esc(title)+'</h2><img class="certimg" src="'+url+'" alt="الشهادة"><div class="row" style="justify-content:center"><button class="btn primary" type="button" data-act="certsave">حفظ الصورة للطباعة</button>'+(back?'<button class="btn" type="button" data-act="kcerts" data-id="'+back+'">رجوع للعوالم</button>':'')+'<button class="btn" type="button" data-act="close">إغلاق</button></div><p class="sub" style="text-align:center">بمقاس A4، احفظ الصورة ثم اطبعها.</p>');
   }catch(e){console.warn(e);if(sheetOpen)setSheet('<h2>تعذّر إنشاء الشهادة</h2><p class="sub">حاول مرة ثانية.</p><button class="btn" type="button" data-act="close">إغلاق</button>');}
 }
 async function saveCert(){
@@ -701,7 +714,8 @@ const ACT={
   pclear(){S.cfg.period=null;persistCfg();renderRound();toast('أُلغيت الفترة');},
   newround(){newRound();},
   cert(el){const k=kidById(el.dataset.id);if(!k)return;const ct=k.certs.slice().reverse().find(c=>c.round===curRound())||k.certs[k.certs.length-1];if(!ct)return;closeSheet();showCert(certOpts(k,ct),'شهادة '+k.name);},
-  certshow(el){const k=kidById(el.dataset.id);if(!k)return;const ct=k.certs.find(c=>c.id===el.dataset.cid);if(!ct)return;showCert(certOpts(k,ct),'شهادة '+(ct.name||k.name));},
+  certshow(el){const k=kidById(el.dataset.id);if(!k)return;const ct=k.certs.find(c=>c.id===el.dataset.cid);if(!ct)return;showCert(certOpts(k,ct),'شهادة '+(ct.name||k.name),el.dataset.back?k.id:null);},
+  kcerts(el){openKidCerts(el.dataset.id);},
   certsave(){saveCert();},
   badges(el){closePop();closeSheet();openBadges(el.dataset.id);},
   feed(){closePop();openFeed();},

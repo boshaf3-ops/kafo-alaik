@@ -127,6 +127,15 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
   box-shadow:0 -2px 0 0 var(--sline),0 2px 0 0 var(--sline),-2px 0 0 0 var(--sline),2px 0 0 0 var(--sline)}
 .actor.idle img{animation:bob 1s steps(2) infinite}
 @keyframes bob{50%{transform:translateY(-2px)}}
+.wt-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+.wt{margin:2px;width:calc(100% - 4px);padding-bottom:6px}
+.wt canvas{aspect-ratio:200/280}
+.wt b{font-size:12px;padding:5px 2px 2px}
+.wt.on{box-shadow:0 -4px 0 0 var(--gold),0 4px 0 0 var(--gold),-4px 0 0 0 var(--gold),4px 0 0 0 var(--gold),0 0 14px 4px rgba(255,210,63,.55)}
+.wt.off canvas{filter:grayscale(1) brightness(.55);opacity:.32}
+.wt.off b{opacity:.45}
+.wt .wtb{display:block;width:calc(100% - 8px);margin:4px 4px 0;padding:6px 4px;font-size:12px;line-height:1.3}
+.wt small{padding-bottom:2px}
 /* treasure chests */
 .chest{position:absolute;transform:translate(-50%,-100%);pointer-events:none;transform-origin:50% 100%}
 .chest img{display:block;width:100%;image-rendering:pixelated}
