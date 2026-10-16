@@ -142,6 +142,7 @@ const SND={pos:[[523,.07],[659,.07],[784,.12]],neg:[[247,.12,'sawtooth'],[185,.2
 /* ---------- interface sounds: every tap makes a small game-like sound; muting silences them all (tone() checks soundOn) ---------- */
 const UIS={
   tick:[[760,.03,'triangle']],
+  tab:[[660,.04,'triangle'],[990,.07,'triangle']],
   up:[[400,.03,'triangle'],[500,.03,'triangle'],[620,.03,'triangle'],[780,.06,'triangle']],
   down:[[780,.03,'triangle'],[620,.03,'triangle'],[500,.03,'triangle'],[400,.06,'triangle']],
   back:[[520,.03,'sine'],[340,.07,'sine']],
@@ -158,8 +159,7 @@ function uiSound(el){
   if(!el||el.disabled)return;const a=el.dataset.act,t=el.dataset.tab;
   if(a==='give')return;
   let s=UIS.tick;
-  if(t){const tabs=$$('[data-tab]').map(b=>b.dataset.tab),ni=tabs.indexOf(t),oi=tabs.indexOf(typeof view==='string'?view:''),up=ni>=oi,b=440+Math.max(0,ni)*55;
-    s=up?[[b,.04,'triangle'],[b*1.5,.07,'triangle']]:[[b*1.5,.04,'triangle'],[b,.07,'triangle']];}
+  if(t)s=UIS.tab;
   else if(a==='pm')s=el.dataset.t==='neg'?UIS.minus:UIS.plus;
   else if(a==='pick'){const i=Math.max(0,(S.kids||[]).findIndex(k=>k.id===el.dataset.id));s=[[500+i*70,.04,'sine'],[750+i*70,.07,'sine']];}
   else if(a==='camtop')s=UIS.up;
