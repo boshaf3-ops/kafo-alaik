@@ -322,6 +322,9 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .lockp .ico{width:54px;height:54px;color:var(--gold)}
 .lockp .field{text-align:center;max-width:260px;margin:10px auto}
 .dangerp{border:0}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.split .splitL .bgrid{grid-template-columns:1fr}
+.lockedpts{text-align:center;padding:26px 14px}
 .panel.posp h3{color:var(--pos)}.panel.negp h3{color:var(--neg)}
 .panel.posp{box-shadow:0 -4px 0 0 var(--pos),0 4px 0 0 var(--pos),-4px 0 0 0 var(--pos),4px 0 0 0 var(--pos),0 8px 0 0 var(--shade)}
 .panel.negp{box-shadow:0 -4px 0 0 var(--neg),0 4px 0 0 var(--neg),-4px 0 0 0 var(--neg),4px 0 0 0 var(--neg),0 8px 0 0 var(--shade)}
@@ -401,6 +404,7 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
   <nav class="tabs" role="tablist" aria-label="الأقسام">
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
+    <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>النقاط</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
     <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
@@ -2555,8 +2559,8 @@ function drawSplash(){
 
 /* ================= navigation ================= */
 const V=$('#view');
-function go(tab){let sec=null;if(tab==='beh'){tab='settings';sec='pts';}else if(tab==='round'){tab='settings';sec='round';}if(sec)SETOPEN[sec]=true;if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
-function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderSettings,round:renderSettings,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
+function go(tab){let sec=null;if(tab==='round'){tab='settings';sec='round';}if(sec)SETOPEN[sec]=true;if(tab==='beh'&&!pwActOK()){guardPw(()=>go('beh'));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
+function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderSettings,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
 const needJoin=()=>isGuest()&&!myFam();
 function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">':'<img class="sp" alt="" src="'+avatarURL(effAv(k),false)+'">';}
 
@@ -2837,6 +2841,15 @@ function renderKids(){
   }).join('');
   V.innerHTML='<div class="view"><div class="sec-head"><div><h2>الأبناء</h2><p class="sub">'+(isGuest()?'أضف أبناء عائلتك، وتشوف معهم أبناء بقية العائلات على الجبل نفسه. تتحكم بأبنائك فقط.':'أضف أبناءك بأسمائهم وأعمارهم وصورهم، واختر لكل واحد شخصيته الكرتونية.')+'</p></div><button class="btn primary" data-act="addkid">+ إضافة ابن أو ابنة</button></div>'
    +invPanel()+(S.kids.length||!isGuest()?body:'')+((!S.kids.length&&!Object.keys(S.fams).length)?'<div class="panel empty"><div class="big">ما أضفت أحد بعد</div><p class="sub">اضغط «إضافة ابن أو ابنة» وأدخل الاسم والعمر، والصورة اختيارية.</p></div>':'')+'</div>';
+  splitKids();
+}
+function splitKids(){
+  if(innerWidth<760)return;
+  const v=V.firstElementChild;if(!v)return;
+  const r=document.createElement('div');r.className='splitR';while(v.firstChild)r.appendChild(v.firstChild);
+  const l=document.createElement('div');l.className='splitL';
+  l.innerHTML=pwActOK()?'<h2>نظام النقاط</h2>'+ptsBody():'<div class="panel lockedpts"><span class="ico i-lock" style="width:40px;height:40px;color:var(--gold)"></span><h3>نظام النقاط مقفل</h3><button class="btn primary" type="button" data-act="ptsunlock">فتح بكلمة السر</button></div>';
+  v.classList.add('split');v.appendChild(r);v.appendChild(l);
 }
 function fmtCode(c){return c&&c.length>3?c.slice(0,3)+'-'+c.slice(3):(c||'');}
 const normCode=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -2938,6 +2951,8 @@ function behCol(type){
    +'</div><form class="addrow" data-form="beh" data-type="'+type+'"><input class="field" name="t" maxlength="40" required placeholder="'+(pos?'مثال: ساعد في ترتيب البيت':'مثال: تأخر عن النوم')+'" aria-label="اسم السلوك"><input class="field" name="p" type="number" min="1" max="100" value="'+(pos?3:2)+'" inputmode="numeric" aria-label="النقاط"><button class="btn '+(pos?'pos':'neg')+'" type="submit">إضافة</button></form>'
    +(sg.length?'<p class="sub" style="margin-top:14px">اقتراحات سريعة (اضغط لإضافتها):</p><div class="sugg">'+sg.map(o=>'<button class="btn small" type="button" data-act="sugg" data-type="'+type+'" data-i="'+o.i+'">'+esc(o.s[0])+' '+(pos?'+':'-')+o.s[1]+'</button>').join('')+'</div>':'')+'</section>';
 }
+function ptsBody(){return '<p class="sub">السلوك الإيجابي يرفع الابن مستويات على الخريطة، والسلبي ينزله. أنت تحدد النقاط'+(isGuest()?' لأبناء عائلتك.':(Object.keys(S.fams).length?' لأبنائك، ولكل عائلة سلوكياتها الخاصة.':'.'))+'</p><div class="bgrid" style="margin-top:10px">'+behCol('pos')+behCol('neg')+'</div>';}
+function renderBehaviors(){V.innerHTML='<div class="view"><h2>نظام النقاط</h2>'+ptsBody()+'</div>';}
 function addBeh(f){const t=f.t.value.trim(),p=clamp(Math.round(+f.p.value)||1,1,100),type=f.dataset.type;if(!t)return;(type==='pos'?BH().pos:BH().neg).push({id:uid(),t,p});persistBH();render();}
 
 /* ================= round (map, period, goal, rewards) ================= */
@@ -2989,7 +3004,7 @@ function pwFormHtml(msg){
 async function doUnlock(){
   const i=$('#pwIn');if(!i)return;const ok=await pwCheck(i.value);
   if(!ok){toast('كلمة السر غير صحيحة');i.value='';i.focus();return;}
-  if(view==='settings'&&!sheetOpen)pwUntil=Date.now()+3*3600e3;else pwActUntil=Date.now()+2*60e3;tone(SND.lvl);
+  if(view==='settings'&&!sheetOpen)pwUntil=Date.now()+3*3600e3;else pwActUntil=Date.now()+5*60e3;tone(SND.lvl);
   const fn=pwAfter;pwAfter=null;if(sheetOpen)closeSheet();render();if(fn)setTimeout(fn,280);
 }
 function forgotSheet(){
@@ -3024,7 +3039,7 @@ function soundSec(){
    +'<div class="vol"><span class="ico i-mute"></span><input type="range" id="volBg" min="0" max="100" step="5" value="'+VOL.bg+'" aria-label="مستوى صوت الخلفية"><span class="ico i-sound"></span><b id="volBgN">'+VOL.bg+'</b></div>'
    +'<p class="sub">حرّك الشريط يمينًا لرفع الصوت ويسارًا لتقليله.</p><div class="row"><button class="btn gold" type="button" data-act="sndtest">تجربة الصوت</button></div>';
 }
-function ptsSec(){return '<p class="sub">السلوك الإيجابي يرفع الابن مستويات على الخريطة، والسلبي ينزله. عدّل النقاط بالأزرار + و −، أو احذف السلوك أو أضف غيره.</p><div class="bgrid" style="margin-top:6px">'+behCol('pos')+behCol('neg')+'</div>';}
+function ptsSec(){return '<p class="sub">نظام النقاط له تبويب خاص في الشريط السفلي عشان توصله بسرعة.</p><div class="row"><button class="btn gold" type="button" data-act="gobeh">افتح نظام النقاط</button></div>';}
 function pwSec(){
   const has=hasPw();
   return (has?'<p class="sub">كلمة السر مفعّلة: لا أحد يفتح الإعدادات ولا يعدّل الأبناء إلا بها.</p>':'<p class="sub">ضع كلمة سر تحمي الإعدادات وتعديل الأبناء من العبث. (على هذا الجهاز فقط)</p>')
@@ -3045,7 +3060,7 @@ function renderSettings(){
   V.innerHTML='<div class="view"><h2>الإعدادات</h2><p class="sub">'+esc(famName(g?me.uid:''))+'</p>'
    +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
    +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
-   +secHtml('pts','نظام النقاط','تعديل السلوكيات الإيجابية والسلبية ونقاطها',ptsSec())
+   +secHtml('pts','نظام النقاط','اختصار لتبويب النقاط في الشريط',ptsSec())
    +(g?'':secHtml('round','الجولة','الخريطة والفترة والهدف والمكافآت وتصفير النقاط',roundBody()))
    +(g||db?'':secHtml('bk','نسخة احتياطية','حفظ نسخة من بيانات اللعبة أو استعادتها',backupPanel().replace(/<section class="panel" style="margin-top:14px">/,'<section>')))
    +secHtml('pw','كلمة السر',hasPw()?'مفعّلة · غيّرها أو أزلها':'غير مفعّلة · ضع كلمة تحمي الإعدادات',pwSec())
@@ -3141,6 +3156,7 @@ const ACT={
   close(){closeSheet();},
   addkid(){guardPw(()=>openKidEditor());},
   editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
+  ptsunlock(){guardPw(()=>render());},
   sndtoggle(){toggleSound();render();},
   sndtest(){if(!soundOn()){toast('الصوت مكتوم، شغّله أولًا');return;}tone(SND.pos);AMB.gest=true;AMB.testUntil=Date.now()+5000;ambSync();toast('تسمع الآن صوت خلفية الخريطة الحالية');},
   pwforgot(){closeSheet();forgotSheet();},
@@ -3212,7 +3228,7 @@ document.addEventListener('keydown',e=>{
 $('#soundBtn').addEventListener('click',()=>{toggleSound();if(view==='settings'&&pwOK())render();});
 function updateSound(){const b=$('#soundBtn');b.setAttribute('aria-pressed',String(soundOn()));b.setAttribute('aria-label',soundOn()?'إيقاف الصوت':'تشغيل الصوت');b.firstElementChild.className='ico '+(soundOn()?'i-sound':'i-mute');}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&db&&ready&&!pendingWrites&&$('#splash').classList.contains('gone'))resync();});
-let rzT;window.addEventListener('resize',()=>{if(!$('#splash').classList.contains('gone')){drawSplash();return;}clearTimeout(rzT);rzT=setTimeout(fitHome,200);});
+let rzT,wasWide=innerWidth>=760;window.addEventListener('resize',()=>{const w=innerWidth>=760;if(w!==wasWide){wasWide=w;if(view==='kids'&&!sheetOpen)render();}if(!$('#splash').classList.contains('gone')){drawSplash();return;}clearTimeout(rzT);rzT=setTimeout(fitHome,200);});
 
 /* ================= start ================= */
 $('#goBtn').addEventListener('click',()=>{

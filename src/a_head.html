@@ -293,6 +293,9 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .lockp .ico{width:54px;height:54px;color:var(--gold)}
 .lockp .field{text-align:center;max-width:260px;margin:10px auto}
 .dangerp{border:0}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.split .splitL .bgrid{grid-template-columns:1fr}
+.lockedpts{text-align:center;padding:26px 14px}
 .panel.posp h3{color:var(--pos)}.panel.negp h3{color:var(--neg)}
 .panel.posp{box-shadow:0 -4px 0 0 var(--pos),0 4px 0 0 var(--pos),-4px 0 0 0 var(--pos),4px 0 0 0 var(--pos),0 8px 0 0 var(--shade)}
 .panel.negp{box-shadow:0 -4px 0 0 var(--neg),0 4px 0 0 var(--neg),-4px 0 0 0 var(--neg),4px 0 0 0 var(--neg),0 8px 0 0 var(--shade)}
@@ -372,6 +375,7 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
   <nav class="tabs" role="tablist" aria-label="الأقسام">
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
+    <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>النقاط</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
     <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
