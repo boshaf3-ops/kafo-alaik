@@ -1,0 +1,39 @@
+{
+  "name": "كفو عليك",
+  "short_name": "كفو عليك",
+  "description": "تطبيق عائلي لتحفيز الأبناء على السلوك الطيب بخرائط مغامرة وشارات وشهادات.",
+  "lang": "ar",
+  "dir": "rtl",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#dcefee",
+  "theme_color": "#0a8f68",
+  "categories": [
+    "education",
+    "kids",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
