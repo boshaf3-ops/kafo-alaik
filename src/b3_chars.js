@@ -137,13 +137,21 @@ const HERO={
     R(c,2,10,12,10,CR);R(c,2,19,12,1,adj(CR,.7));hLegs(c,BL,CR,G);
     R(c,4,11,8,6,BL);R(c,6,12,4,1,G);R(c,7,13,2,2,G);R(c,4,15,8,1,G);R(c,4,16,8,1,'rgba(0,0,0,.2)');hArms(c,up,BL,sk,G);
     drawFace(c,sk,false);R(c,4,5,8,2,'#222831');R(c,6,6,1,1,'#ffffff');R(c,9,6,1,1,'#ffffff');R(c,4,2,8,3,B);R(c,4,5,1,1,B);R(c,11,5,1,1,B);R(c,6,1,2,1,B);R(c,9,1,2,1,B);},
-  /* ثوب وغترة وعقال: white thobe, white ghutra held by a black egal */
+  /* ثوب أبيض وغترة بيضاء وعقال: white thobe, white ghutra held by a black egal (men only) */
   th:(c,up,sk)=>{const W='#f7f7f1',Sh='#dcdcd0',B='#1b1b2f';
     R(c,4,11,8,6,W);R(c,3,16,10,5,W);R(c,3,20,10,1,Sh);R(c,7,11,1,8,Sh);R(c,8,12,1,1,'#c9c9bd');R(c,8,14,1,1,'#c9c9bd');R(c,4,16,8,1,'rgba(0,0,0,.08)');
     R(c,5,21,2,1,'#6b4a2b');R(c,9,21,2,1,'#6b4a2b');hArms(c,up,W,sk,null,0);
     drawFace(c,sk,false);R(c,5,8,1,1,'rgba(0,0,0,.18)');
     R(c,5,0,6,1,W);R(c,3,1,10,3,W);R(c,3,4,2,7,W);R(c,11,4,2,7,W);R(c,3,9,2,3,Sh);R(c,11,9,2,3,Sh);R(c,4,3,8,1,Sh);
     R(c,3,2,10,1,B);R(c,4,1,8,1,B);R(c,12,3,1,2,B);R(c,5,4,6,1,W);},
+  /* ثوب أبيض وغترة حمراء (شماغ) وعقال */
+  thr:(c,up,sk)=>{const W='#f7f7f1',Sh='#dcdcd0',RD='#c0392b',RD2='#8f2619',B='#1b1b2f';
+    R(c,4,11,8,6,W);R(c,3,16,10,5,W);R(c,3,20,10,1,Sh);R(c,7,11,1,8,Sh);R(c,8,12,1,1,'#c9c9bd');R(c,8,14,1,1,'#c9c9bd');R(c,4,16,8,1,'rgba(0,0,0,.08)');
+    R(c,5,21,2,1,'#6b4a2b');R(c,9,21,2,1,'#6b4a2b');hArms(c,up,W,sk,null,0);
+    drawFace(c,sk,false);R(c,5,8,1,1,'rgba(0,0,0,.18)');
+    R(c,5,0,6,1,RD);R(c,3,1,10,3,RD);R(c,3,4,2,7,RD);R(c,11,4,2,7,RD);R(c,3,9,2,3,RD2);R(c,11,9,2,3,RD2);R(c,4,3,8,1,RD2);
+    for(const [x,y] of [[4,1],[6,1],[8,1],[10,1],[5,3],[9,3],[3,6],[3,8],[12,6],[12,8],[4,10],[11,10],[11,5],[4,5]])R(c,x,y,1,1,'#ffffff');
+    R(c,3,2,10,1,B);R(c,4,1,8,1,B);R(c,12,3,1,2,B);R(c,5,4,6,1,RD);},
   /* بطل القفزات: orange cap with a star, cream shirt, blue dungarees with gold buttons */
   bd:(c,up,sk)=>{const CAP='#ec8a1c',CD='#b85c0a',SH='#ffe9a8',BL='#2f6fe0',BD='#1f4aa8',G='#ffd23f',BR='#5b3a22';
     R(c,5,17,3,3,BL);R(c,8,17,3,3,BL);R(c,4,20,4,2,BR);R(c,8,20,4,2,BR);R(c,7,17,2,3,BD);
@@ -178,6 +186,12 @@ const HERO={
     R(c,4,11,8,6,A);R(c,3,16,10,5,A);R(c,3,20,10,1,G);R(c,7,11,1,9,Sh);R(c,4,14,8,1,G);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,A,sk,G);
     drawFace(c,sk,true);
     R(c,5,0,6,1,A);R(c,3,1,10,3,A);R(c,3,4,2,8,A);R(c,11,4,2,8,A);R(c,4,3,8,1,Sh);R(c,3,11,2,2,Sh);R(c,11,11,2,2,Sh);R(c,6,1,1,1,G);R(c,7,2,1,1,G);R(c,5,4,6,1,A);},
+  /* عباءة سوداء وبرقع: the traditional face mask leaves only the eyes */
+  thb:(c,up,sk)=>{const A='#252a38',Sh='#171b26',G='#e0b84a',BQ='#5a3a22',BQ2='#3a2416';
+    R(c,4,11,8,6,A);R(c,3,16,10,5,A);R(c,3,20,10,1,G);R(c,7,11,1,9,Sh);R(c,4,14,8,1,G);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,A,sk,G);
+    drawFace(c,sk,true);
+    R(c,5,4,6,6,BQ);R(c,5,4,6,1,G);R(c,7,5,2,5,BQ2);R(c,5,6,2,1,sk);R(c,9,6,2,1,sk);R(c,6,6,1,1,'#1b1b2f');R(c,9,6,1,1,'#1b1b2f');R(c,5,9,6,1,BQ2);
+    R(c,5,0,6,1,A);R(c,3,1,10,3,A);R(c,3,4,2,8,A);R(c,11,4,2,8,A);R(c,4,3,8,1,Sh);R(c,3,11,2,2,Sh);R(c,11,11,2,2,Sh);R(c,6,1,1,1,G);R(c,7,2,1,1,G);},
   /* بطلة القفزات: orange cap with a star, cream long-sleeved shirt, blue pinafore with gold buttons */
   bdf:(c,up,sk)=>{const CAP='#ec8a1c',CD='#b85c0a',SH='#ffe9a8',BL='#2f6fe0',BD='#1f4aa8',G='#ffd23f',BR='#5b3a22',HR='#6b3a22';
     R(c,5,17,3,3,'#f4f4ee');R(c,8,17,3,3,'#f4f4ee');R(c,5,20,3,2,BR);R(c,8,20,3,2,BR);R(c,4,21,4,1,'#2a1c10');R(c,8,21,4,1,'#2a1c10');
@@ -192,7 +206,7 @@ const HERO={
     drawFace(c,sk,true);R(c,4,2,8,3,B);R(c,4,5,1,2,B);R(c,11,5,1,2,B);R(c,4,3,8,1,G);R(c,7,2,2,1,'#ee5fa7');}
 };
 const HEROES={
-  m:[{id:'nj',n:'نينجا الظل',need:2},{id:'sm',n:'ساموراي الفجر',need:4},{id:'cp',n:'قبطان العاصفة',need:6},{id:'ma',n:'سيّد القتال',need:9},{id:'wz',n:'ساحر النجوم',need:13},{id:'hk',n:'فارس الصقر',need:18},{id:'th',n:'ثوب وغترة وعقال',need:20},{id:'bd',n:'بطل القفزات',need:24}],
-  f:[{id:'njf',n:'نينجا الورد',need:2},{id:'smf',n:'ساموراي الزهر',need:4},{id:'cpf',n:'قبطانة البحار',need:6},{id:'maf',n:'سيّدة القتال',need:9},{id:'wzf',n:'ساحرة القمر',need:13},{id:'hkf',n:'بطلة الشروق',need:18},{id:'thf',n:'عباءة وشيلة',need:20},{id:'bdf',n:'بطلة القفزات',need:24}]
+  m:[{id:'nj',n:'نينجا الظل',need:2},{id:'sm',n:'ساموراي الفجر',need:4},{id:'cp',n:'قبطان العاصفة',need:6},{id:'ma',n:'سيّد القتال',need:9},{id:'wz',n:'ساحر النجوم',need:13},{id:'hk',n:'فارس الصقر',need:18},{id:'th',n:'ثوب وغترة بيضاء',need:20},{id:'thr',n:'ثوب وغترة حمراء',need:22},{id:'bd',n:'بطل القفزات',need:24}],
+  f:[{id:'njf',n:'نينجا الورد',need:2},{id:'smf',n:'ساموراي الزهر',need:4},{id:'cpf',n:'قبطانة البحار',need:6},{id:'maf',n:'سيّدة القتال',need:9},{id:'wzf',n:'ساحرة القمر',need:13},{id:'hkf',n:'بطلة الشروق',need:18},{id:'thf',n:'عباءة وشيلة',need:20},{id:'thb',n:'عباءة وبرقع',need:22},{id:'bdf',n:'بطلة القفزات',need:24}]
 };
 const heroList=g=>HEROES[g==='f'?'f':'m'];

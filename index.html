@@ -797,13 +797,21 @@ const HERO={
     R(c,2,10,12,10,CR);R(c,2,19,12,1,adj(CR,.7));hLegs(c,BL,CR,G);
     R(c,4,11,8,6,BL);R(c,6,12,4,1,G);R(c,7,13,2,2,G);R(c,4,15,8,1,G);R(c,4,16,8,1,'rgba(0,0,0,.2)');hArms(c,up,BL,sk,G);
     drawFace(c,sk,false);R(c,4,5,8,2,'#222831');R(c,6,6,1,1,'#ffffff');R(c,9,6,1,1,'#ffffff');R(c,4,2,8,3,B);R(c,4,5,1,1,B);R(c,11,5,1,1,B);R(c,6,1,2,1,B);R(c,9,1,2,1,B);},
-  /* ثوب وغترة وعقال: white thobe, white ghutra held by a black egal */
+  /* ثوب أبيض وغترة بيضاء وعقال: white thobe, white ghutra held by a black egal (men only) */
   th:(c,up,sk)=>{const W='#f7f7f1',Sh='#dcdcd0',B='#1b1b2f';
     R(c,4,11,8,6,W);R(c,3,16,10,5,W);R(c,3,20,10,1,Sh);R(c,7,11,1,8,Sh);R(c,8,12,1,1,'#c9c9bd');R(c,8,14,1,1,'#c9c9bd');R(c,4,16,8,1,'rgba(0,0,0,.08)');
     R(c,5,21,2,1,'#6b4a2b');R(c,9,21,2,1,'#6b4a2b');hArms(c,up,W,sk,null,0);
     drawFace(c,sk,false);R(c,5,8,1,1,'rgba(0,0,0,.18)');
     R(c,5,0,6,1,W);R(c,3,1,10,3,W);R(c,3,4,2,7,W);R(c,11,4,2,7,W);R(c,3,9,2,3,Sh);R(c,11,9,2,3,Sh);R(c,4,3,8,1,Sh);
     R(c,3,2,10,1,B);R(c,4,1,8,1,B);R(c,12,3,1,2,B);R(c,5,4,6,1,W);},
+  /* ثوب أبيض وغترة حمراء (شماغ) وعقال */
+  thr:(c,up,sk)=>{const W='#f7f7f1',Sh='#dcdcd0',RD='#c0392b',RD2='#8f2619',B='#1b1b2f';
+    R(c,4,11,8,6,W);R(c,3,16,10,5,W);R(c,3,20,10,1,Sh);R(c,7,11,1,8,Sh);R(c,8,12,1,1,'#c9c9bd');R(c,8,14,1,1,'#c9c9bd');R(c,4,16,8,1,'rgba(0,0,0,.08)');
+    R(c,5,21,2,1,'#6b4a2b');R(c,9,21,2,1,'#6b4a2b');hArms(c,up,W,sk,null,0);
+    drawFace(c,sk,false);R(c,5,8,1,1,'rgba(0,0,0,.18)');
+    R(c,5,0,6,1,RD);R(c,3,1,10,3,RD);R(c,3,4,2,7,RD);R(c,11,4,2,7,RD);R(c,3,9,2,3,RD2);R(c,11,9,2,3,RD2);R(c,4,3,8,1,RD2);
+    for(const [x,y] of [[4,1],[6,1],[8,1],[10,1],[5,3],[9,3],[3,6],[3,8],[12,6],[12,8],[4,10],[11,10],[11,5],[4,5]])R(c,x,y,1,1,'#ffffff');
+    R(c,3,2,10,1,B);R(c,4,1,8,1,B);R(c,12,3,1,2,B);R(c,5,4,6,1,RD);},
   /* بطل القفزات: orange cap with a star, cream shirt, blue dungarees with gold buttons */
   bd:(c,up,sk)=>{const CAP='#ec8a1c',CD='#b85c0a',SH='#ffe9a8',BL='#2f6fe0',BD='#1f4aa8',G='#ffd23f',BR='#5b3a22';
     R(c,5,17,3,3,BL);R(c,8,17,3,3,BL);R(c,4,20,4,2,BR);R(c,8,20,4,2,BR);R(c,7,17,2,3,BD);
@@ -838,6 +846,12 @@ const HERO={
     R(c,4,11,8,6,A);R(c,3,16,10,5,A);R(c,3,20,10,1,G);R(c,7,11,1,9,Sh);R(c,4,14,8,1,G);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,A,sk,G);
     drawFace(c,sk,true);
     R(c,5,0,6,1,A);R(c,3,1,10,3,A);R(c,3,4,2,8,A);R(c,11,4,2,8,A);R(c,4,3,8,1,Sh);R(c,3,11,2,2,Sh);R(c,11,11,2,2,Sh);R(c,6,1,1,1,G);R(c,7,2,1,1,G);R(c,5,4,6,1,A);},
+  /* عباءة سوداء وبرقع: the traditional face mask leaves only the eyes */
+  thb:(c,up,sk)=>{const A='#252a38',Sh='#171b26',G='#e0b84a',BQ='#5a3a22',BQ2='#3a2416';
+    R(c,4,11,8,6,A);R(c,3,16,10,5,A);R(c,3,20,10,1,G);R(c,7,11,1,9,Sh);R(c,4,14,8,1,G);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,A,sk,G);
+    drawFace(c,sk,true);
+    R(c,5,4,6,6,BQ);R(c,5,4,6,1,G);R(c,7,5,2,5,BQ2);R(c,5,6,2,1,sk);R(c,9,6,2,1,sk);R(c,6,6,1,1,'#1b1b2f');R(c,9,6,1,1,'#1b1b2f');R(c,5,9,6,1,BQ2);
+    R(c,5,0,6,1,A);R(c,3,1,10,3,A);R(c,3,4,2,8,A);R(c,11,4,2,8,A);R(c,4,3,8,1,Sh);R(c,3,11,2,2,Sh);R(c,11,11,2,2,Sh);R(c,6,1,1,1,G);R(c,7,2,1,1,G);},
   /* بطلة القفزات: orange cap with a star, cream long-sleeved shirt, blue pinafore with gold buttons */
   bdf:(c,up,sk)=>{const CAP='#ec8a1c',CD='#b85c0a',SH='#ffe9a8',BL='#2f6fe0',BD='#1f4aa8',G='#ffd23f',BR='#5b3a22',HR='#6b3a22';
     R(c,5,17,3,3,'#f4f4ee');R(c,8,17,3,3,'#f4f4ee');R(c,5,20,3,2,BR);R(c,8,20,3,2,BR);R(c,4,21,4,1,'#2a1c10');R(c,8,21,4,1,'#2a1c10');
@@ -852,8 +866,8 @@ const HERO={
     drawFace(c,sk,true);R(c,4,2,8,3,B);R(c,4,5,1,2,B);R(c,11,5,1,2,B);R(c,4,3,8,1,G);R(c,7,2,2,1,'#ee5fa7');}
 };
 const HEROES={
-  m:[{id:'nj',n:'نينجا الظل',need:2},{id:'sm',n:'ساموراي الفجر',need:4},{id:'cp',n:'قبطان العاصفة',need:6},{id:'ma',n:'سيّد القتال',need:9},{id:'wz',n:'ساحر النجوم',need:13},{id:'hk',n:'فارس الصقر',need:18},{id:'th',n:'ثوب وغترة وعقال',need:20},{id:'bd',n:'بطل القفزات',need:24}],
-  f:[{id:'njf',n:'نينجا الورد',need:2},{id:'smf',n:'ساموراي الزهر',need:4},{id:'cpf',n:'قبطانة البحار',need:6},{id:'maf',n:'سيّدة القتال',need:9},{id:'wzf',n:'ساحرة القمر',need:13},{id:'hkf',n:'بطلة الشروق',need:18},{id:'thf',n:'عباءة وشيلة',need:20},{id:'bdf',n:'بطلة القفزات',need:24}]
+  m:[{id:'nj',n:'نينجا الظل',need:2},{id:'sm',n:'ساموراي الفجر',need:4},{id:'cp',n:'قبطان العاصفة',need:6},{id:'ma',n:'سيّد القتال',need:9},{id:'wz',n:'ساحر النجوم',need:13},{id:'hk',n:'فارس الصقر',need:18},{id:'th',n:'ثوب وغترة بيضاء',need:20},{id:'thr',n:'ثوب وغترة حمراء',need:22},{id:'bd',n:'بطل القفزات',need:24}],
+  f:[{id:'njf',n:'نينجا الورد',need:2},{id:'smf',n:'ساموراي الزهر',need:4},{id:'cpf',n:'قبطانة البحار',need:6},{id:'maf',n:'سيّدة القتال',need:9},{id:'wzf',n:'ساحرة القمر',need:13},{id:'hkf',n:'بطلة الشروق',need:18},{id:'thf',n:'عباءة وشيلة',need:20},{id:'thb',n:'عباءة وبرقع',need:22},{id:'bdf',n:'بطلة القفزات',need:24}]
 };
 const heroList=g=>HEROES[g==='f'?'f':'m'];
 
@@ -1357,14 +1371,17 @@ function bhMask(){if(_bhMask)return _bhMask;const g=BH_REF,m=new Float32Array(g.
 function bhS(W,H){const g=BH_REF,sx=Math.min((W-10)/g.gw,(H-20)/g.gh),sy=Math.min((H-20)/g.gh,sx*1.4);return{x:sx,y:sy};}
 /* reference-picture pixels (or grid units with grid=1) to scene pixels */
 function bhXY(x,y,W,H,grid){const g=BH_REF,S=bhS(W,H),gx=grid?x:(x-g.x0)/2,gy=grid?y:(y-g.y0)/2;return[W/2+(gx-g.gw/2)*S.x,H/2+(gy-g.gh/2)*S.y];}
-const BH_WP=[[357,478],[352,440],[340,400],[318,366],[294,334],[284,292],[290,256],[298,226],[326,218],[352,212],[340,186],[322,158],[326,128],[338,100],[370,80],[396,60],[411,47]];
+const BH_WP=[[357,478],[352,440],[340,400],[318,366],[294,334],[282,296],[284,262],[290,236],[304,222],[330,216],[352,212],[340,186],[322,160],[350,176],[390,176],[408,150],[392,164],[360,158],[346,128],[338,100],[362,92],[392,66],[411,47]];
 /* the stations in travel order: icon offset from the stop and the side its name sits on */
 const BH_ST=[
   {n:'رأس البر',p:[357,478],ic:'gazelle',ox:20,oy:3,side:'r'},
   {n:'الزلاق',p:[294,334],ic:'f1',ox:22,oy:3,side:'r'},
-  {n:'مدينة حمد',p:[298,226],ic:'r22',ox:-4,oy:-12,side:'c'},
+  {n:'المالكية',p:[282,296],ic:'palms',ox:19,oy:3,side:'r'},
+  {n:'صدد',p:[284,262],ic:'mosque',ox:20,oy:3,side:'r'},
+  {n:'مدينة حمد',p:[304,222],ic:'r22',ox:-4,oy:-12,side:'c'},
   {n:'الرفاع',p:[352,212],ic:'riffa',ox:16,oy:8,side:'r'},
-  {n:'مدينة عيسى',p:[322,158],ic:'gate',ox:-21,oy:3,side:'l'},
+  {n:'مدينة عيسى',p:[322,160],ic:'gate',ox:-21,oy:3,side:'l'},
+  {n:'سترة',p:[408,150],ic:'refinery',ox:-3,oy:-2,side:'r'},
   {n:'المنامة',p:[338,100],ic:'bfh',ox:-22,oy:5,side:'l'},
   {n:'المحرق',p:[411,47],ic:'airport',ox:0,oy:0,side:'l',goal:1}
 ];
@@ -1398,6 +1415,11 @@ const BHI={
   bfh:(c,x,y)=>{ell(c,x,y+1,14,2,'rgba(0,0,0,.18)');R(c,x-12,y-5,25,5,'#9fb4c8');R(c,x-12,y-5,25,1,'#cfe0ee');
     const tw=(tx,h,sl)=>{for(let j=0;j<h;j++){const ty=y-5-h+j+1,cut=j<5?Math.max(0,(5-j)*(sl?1:0)):0;R(c,tx+cut,ty,8-cut,1,j%3===2?'#1f6fa8':'#2b8fd6');R(c,tx+cut,ty,2,1,'#8fd6f5');}R(c,tx+7,y-4-h,1,h,'#1d5a8a');};
     tw(x-10,28,1);tw(x+2,22,1);R(c,x-7,y-37,1,3,'#cfd6de');R(c,x+5,y-31,1,3,'#cfd6de');},
+  mosque:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-8,y-8,15,8,'#f3ead0');R(c,x-8,y-8,15,1,'#fffbe8');ell(c,x-1,y-9,5,4,'#2fa39a');R(c,x-1,y-15,1,3,'#ffd23f');
+    R(c,x+8,y-19,3,19,'#f3ead0');R(c,x+7,y-21,5,2,'#2fa39a');R(c,x+9,y-24,1,3,'#ffd23f');R(c,x-3,y-5,4,5,'#2a6a64');R(c,x-7,y-6,2,2,'#2a6a64');R(c,x+3,y-6,2,2,'#2a6a64');},
+  palms:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-4,y-6,8,6,'#e6c48a');R(c,x-5,y-7,10,1,'#a8501f');R(c,x-1,y-4,3,4,'#6b4a2b');palm(c,x-8,y,10);palm(c,x+8,y,9);},
+  refinery:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-9,y-7,9,7,'#cfd6de');ell(c,x-5,y-7,5,2,'#e6ebf0');R(c,x-9,y-3,9,1,'#9aa3b2');R(c,x+2,y-18,3,18,'#9aa3b2');R(c,x+2,y-18,1,18,'#cfd6de');
+    R(c,x+3,y-22,1,4,'#ff9a2e');R(c,x+3,y-21,1,2,'#ffd23f');R(c,x+5,y-8,6,8,'#b5bec9');R(c,x+5,y-8,6,1,'#e6ebf0');},
   airport:(c,x,y)=>{ell(c,x,y+2,20,3,'rgba(0,0,0,.18)');R(c,x-17,y-3,36,5,'#59616d');for(let i=-15;i<17;i+=6)R(c,x+i,y-1,3,1,'#ffffff');
     R(c,x+11,y-20,3,17,'#d9d2bd');R(c,x+9,y-26,7,6,'#2b8fd6');R(c,x+9,y-27,7,1,'#d6402f');R(c,x+10,y-25,5,2,'#8fd6f5');
     R(c,x-15,y-11,15,4,'#ffffff');R(c,x-1,y-10,3,2,'#ffffff');R(c,x-15,y-15,3,5,'#ce1126');R(c,x-9,y-9,7,3,'#cfd6de');R(c,x-5,y-14,3,5,'#cfd6de');R(c,x-3,y-10,3,1,'#2b8fd6');}

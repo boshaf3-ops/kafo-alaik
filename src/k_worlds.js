@@ -79,14 +79,17 @@ function bhMask(){if(_bhMask)return _bhMask;const g=BH_REF,m=new Float32Array(g.
 function bhS(W,H){const g=BH_REF,sx=Math.min((W-10)/g.gw,(H-20)/g.gh),sy=Math.min((H-20)/g.gh,sx*1.4);return{x:sx,y:sy};}
 /* reference-picture pixels (or grid units with grid=1) to scene pixels */
 function bhXY(x,y,W,H,grid){const g=BH_REF,S=bhS(W,H),gx=grid?x:(x-g.x0)/2,gy=grid?y:(y-g.y0)/2;return[W/2+(gx-g.gw/2)*S.x,H/2+(gy-g.gh/2)*S.y];}
-const BH_WP=[[357,478],[352,440],[340,400],[318,366],[294,334],[284,292],[290,256],[298,226],[326,218],[352,212],[340,186],[322,158],[326,128],[338,100],[370,80],[396,60],[411,47]];
+const BH_WP=[[357,478],[352,440],[340,400],[318,366],[294,334],[282,296],[284,262],[290,236],[304,222],[330,216],[352,212],[340,186],[322,160],[350,176],[390,176],[408,150],[392,164],[360,158],[346,128],[338,100],[362,92],[392,66],[411,47]];
 /* the stations in travel order: icon offset from the stop and the side its name sits on */
 const BH_ST=[
   {n:'رأس البر',p:[357,478],ic:'gazelle',ox:20,oy:3,side:'r'},
   {n:'الزلاق',p:[294,334],ic:'f1',ox:22,oy:3,side:'r'},
-  {n:'مدينة حمد',p:[298,226],ic:'r22',ox:-4,oy:-12,side:'c'},
+  {n:'المالكية',p:[282,296],ic:'palms',ox:19,oy:3,side:'r'},
+  {n:'صدد',p:[284,262],ic:'mosque',ox:20,oy:3,side:'r'},
+  {n:'مدينة حمد',p:[304,222],ic:'r22',ox:-4,oy:-12,side:'c'},
   {n:'الرفاع',p:[352,212],ic:'riffa',ox:16,oy:8,side:'r'},
-  {n:'مدينة عيسى',p:[322,158],ic:'gate',ox:-21,oy:3,side:'l'},
+  {n:'مدينة عيسى',p:[322,160],ic:'gate',ox:-21,oy:3,side:'l'},
+  {n:'سترة',p:[408,150],ic:'refinery',ox:-3,oy:-2,side:'r'},
   {n:'المنامة',p:[338,100],ic:'bfh',ox:-22,oy:5,side:'l'},
   {n:'المحرق',p:[411,47],ic:'airport',ox:0,oy:0,side:'l',goal:1}
 ];
@@ -120,6 +123,11 @@ const BHI={
   bfh:(c,x,y)=>{ell(c,x,y+1,14,2,'rgba(0,0,0,.18)');R(c,x-12,y-5,25,5,'#9fb4c8');R(c,x-12,y-5,25,1,'#cfe0ee');
     const tw=(tx,h,sl)=>{for(let j=0;j<h;j++){const ty=y-5-h+j+1,cut=j<5?Math.max(0,(5-j)*(sl?1:0)):0;R(c,tx+cut,ty,8-cut,1,j%3===2?'#1f6fa8':'#2b8fd6');R(c,tx+cut,ty,2,1,'#8fd6f5');}R(c,tx+7,y-4-h,1,h,'#1d5a8a');};
     tw(x-10,28,1);tw(x+2,22,1);R(c,x-7,y-37,1,3,'#cfd6de');R(c,x+5,y-31,1,3,'#cfd6de');},
+  mosque:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-8,y-8,15,8,'#f3ead0');R(c,x-8,y-8,15,1,'#fffbe8');ell(c,x-1,y-9,5,4,'#2fa39a');R(c,x-1,y-15,1,3,'#ffd23f');
+    R(c,x+8,y-19,3,19,'#f3ead0');R(c,x+7,y-21,5,2,'#2fa39a');R(c,x+9,y-24,1,3,'#ffd23f');R(c,x-3,y-5,4,5,'#2a6a64');R(c,x-7,y-6,2,2,'#2a6a64');R(c,x+3,y-6,2,2,'#2a6a64');},
+  palms:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-4,y-6,8,6,'#e6c48a');R(c,x-5,y-7,10,1,'#a8501f');R(c,x-1,y-4,3,4,'#6b4a2b');palm(c,x-8,y,10);palm(c,x+8,y,9);},
+  refinery:(c,x,y)=>{ell(c,x,y+1,12,2,'rgba(0,0,0,.18)');R(c,x-9,y-7,9,7,'#cfd6de');ell(c,x-5,y-7,5,2,'#e6ebf0');R(c,x-9,y-3,9,1,'#9aa3b2');R(c,x+2,y-18,3,18,'#9aa3b2');R(c,x+2,y-18,1,18,'#cfd6de');
+    R(c,x+3,y-22,1,4,'#ff9a2e');R(c,x+3,y-21,1,2,'#ffd23f');R(c,x+5,y-8,6,8,'#b5bec9');R(c,x+5,y-8,6,1,'#e6ebf0');},
   airport:(c,x,y)=>{ell(c,x,y+2,20,3,'rgba(0,0,0,.18)');R(c,x-17,y-3,36,5,'#59616d');for(let i=-15;i<17;i+=6)R(c,x+i,y-1,3,1,'#ffffff');
     R(c,x+11,y-20,3,17,'#d9d2bd');R(c,x+9,y-26,7,6,'#2b8fd6');R(c,x+9,y-27,7,1,'#d6402f');R(c,x+10,y-25,5,2,'#8fd6f5');
     R(c,x-15,y-11,15,4,'#ffffff');R(c,x-1,y-10,3,2,'#ffffff');R(c,x-15,y-15,3,5,'#ce1126');R(c,x-9,y-9,7,3,'#cfd6de');R(c,x-5,y-14,3,5,'#cfd6de');R(c,x-3,y-10,3,1,'#2b8fd6');}
