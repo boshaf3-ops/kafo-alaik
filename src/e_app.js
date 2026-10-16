@@ -164,11 +164,12 @@ const UIS={
 };
 function uiSound(el){
   if(!el||el.disabled)return;const a=el.dataset.act,t=el.dataset.tab;
-  if(a==='give')return;
+  if(a==='give'||a==='gall')return;
   let s=UIS.tick;
   if(t)s=UIS.tab;
   else if(a==='pm')s=el.dataset.t==='neg'?UIS.minus:UIS.plus;
   else if(a==='pick'){const i=Math.max(0,(S.kids||[]).findIndex(k=>k.id===el.dataset.id));s=[[500+i*70,.04,'sine'],[750+i*70,.07,'sine']];}
+  else if(a==='groupbeh'||a==='gtype')s=UIS.chime;
   else if(a==='camtop')s=UIS.up;
   else if(a==='cambot')s=UIS.down;
   else if(a==='camzoom')s=camZoom?UIS.zin:UIS.zout;
@@ -354,7 +355,7 @@ function animateKid(id,to){
 function floatText(id,txt,cls){const host=$('#actors'),el=host&&host.querySelector('.actor[data-id="'+id+'"]');if(!el)return;const d=document.createElement('div');d.className='float '+cls;d.textContent=txt;d.style.left=el.style.left;d.style.top='calc('+el.style.top+' - 30px)';d.style.zIndex=9999;host.appendChild(d);setTimeout(()=>d.remove(),1300);}
 function renderHome(){
   V.innerHTML='<div class="home" id="home"><div class="cam" id="cam"><div class="scene" id="scene" data-act="scenebg"><canvas id="sceneCv"></canvas><canvas id="fxCv"></canvas><div class="actors" id="actors"></div></div></div><div class="hud" id="hud"></div>'
-    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button><button class="btn iconbtn" type="button" data-act="camzoom" aria-label="'+(camZoom?'تكبير الخريطة':'تصغير الخريطة')+'"><span class="ico i-zoom"></span></button></div><button class="btn iconbtn homebtn" type="button" data-act="tohome" aria-label="القائمة الرئيسية"><span class="ico i-house"></span></button><div id="homeEmpty"></div></div>';
+    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button><button class="btn iconbtn" type="button" data-act="camzoom" aria-label="'+(camZoom?'تكبير الخريطة':'تصغير الخريطة')+'"><span class="ico i-zoom"></span></button>'+(S.kids.filter(canCtl).length>1?'<button class="btn iconbtn" type="button" data-act="groupbeh" aria-label="نقاط لجميع الأبناء"><span class="ico i-group"></span></button>':'')+'</div><button class="btn iconbtn homebtn" type="button" data-act="tohome" aria-label="القائمة الرئيسية"><span class="ico i-house"></span></button><div id="homeEmpty"></div></div>';
   sizeHome();paintScene(homeGeo());buildActors();renderChests();renderLabels();refreshHud();renderSel();camFocus(false);
   camEl().addEventListener('scroll',()=>{if(popCtx)closePop();if(curGeo.hz&&sel&&!scrT)scrT=requestAnimationFrame(()=>{scrT=0;placeActors();});},{passive:true});
   if(!S.kids.length)$('#homeEmpty').innerHTML='<div class="home-empty panel empty"><div class="big">ابدأ بإضافة أبطالك</div><p class="sub">أضف الأبناء بأسمائهم وصورهم، ويظهرون هنا شخصيات صغيرة تتسلّق الخريطة مع كل سلوك طيب.</p><div style="margin-top:12px"><button class="btn primary" data-act="addkid">+ إضافة ابن أو ابنة</button></div></div>';
@@ -492,6 +493,38 @@ function give(kidId,bid,type){
   if(chests.length&&view==='home'){const w0=wait;setTimeout(()=>{if(view!=='home'){chests.forEach(x=>{chestHold[x]=false;});wait=100;tail();return;}wait=100;openChests(k.id,chests.slice(),()=>{chests.forEach(x=>{chestHold[x]=false;});renderChests();tail();});},w0+300);}else{chests.forEach(x=>{chestHold[x]=false;});tail();}
   if(gotH.length){const tryH=n=>setTimeout(()=>{if(!sheetOpen)openHeroWin(k.id,gotH);else if(n<4)tryH(n+1);},n?2500:wait+(gotB.length||finished||newTier>oldTier?3200:1200));tryH(0);}
   if(asked&&!finished&&view==='home')setTimeout(()=>{if(!sheetOpen&&needsFork(k))openFork(k.id);},wait+(newTier>oldTier?1400:350));
+}
+/* ---------- one behaviour for all the kids at once (button under the map zoom) ---------- */
+function groupKids(){return S.kids.filter(k=>canCtl(k)&&!isDone(k)&&!needsFork(k));}
+function openGroup(t){
+  if(!S.kids.filter(canCtl).length)return;closePop();
+  if(!canAward()){const st=periodState();toast(st.k==='before'?'الفترة لم تبدأ بعد':'انتهت الفترة');return;}
+  if(t!=='pos'&&t!=='neg'){
+    openSheet('<div class="empty"><div class="big" style="font-size:34px;color:var(--brand)">لجميع الأبناء</div><p style="margin-top:6px">اختر نوع السلوك، ثم السلوك الذي يُمنح لكل الأبناء دفعة واحدة.</p>'
+     +'<button class="btn gold forkopt" type="button" data-act="gtype" data-t="pos"><b>سلوك إيجابي</b></button>'
+     +'<button class="btn forkopt" type="button" data-act="gtype" data-t="neg"><b>سلوك سلبي</b></button>'
+     +'<div class="row" style="justify-content:center;margin-top:14px"><button class="btn" type="button" data-act="close">إغلاق</button></div></div>',{});
+    return;}
+  const pos=t==='pos',bh=BH(),list=pos?bh.pos:bh.neg;
+  openSheet('<div class="empty"><div class="big" style="font-size:30px;color:var(--brand)">'+(pos?'سلوك إيجابي لجميع الأبناء':'سلوك سلبي لجميع الأبناء')+'</div>'
+   +(list.length?'<div class="pop-list" style="margin-top:10px">'+list.map(b=>'<button class="pop-row '+(pos?'pos':'neg')+'" type="button" data-act="gall" data-bid="'+b.id+'" data-t="'+t+'"><span class="t">'+esc(b.t)+'</span><span class="chip '+(pos?'':'neg')+'">'+(pos?'+':'-')+b.p+'</span></button>').join('')+'</div>'
+     :'<p class="sub" style="margin-top:10px">ما فيه سلوكيات بعد.</p><button class="btn small" type="button" data-act="gobeh">إضافة سلوكيات</button>')
+   +'<div class="row" style="justify-content:center;margin-top:14px"><button class="btn" type="button" data-act="groupbeh">رجوع</button><button class="btn" type="button" data-act="close">إغلاق</button></div></div>',{});
+}
+function giveAll(bid,type){
+  const bh=BH(),list=type==='neg'?bh.neg:bh.pos,b=list.find(x=>x.id===bid);if(!b||!canAward()){closeSheet();return;}
+  const all=S.kids.filter(canCtl),ok=groupKids().filter(k=>type!=='neg'||k.pts>0);
+  closeSheet();
+  if(!ok.length){toast('ما فيه ابن يمكن منحه هذا السلوك الآن');return;}
+  const skip=all.length-ok.length;
+  toast('«'+b.t+'» '+(type==='neg'?'-':'+')+b.p+' لـ '+ok.length+(ok.length>2?' أبناء':ok.length===2?' ابنين':' ابن')+(skip?' (تخطّينا '+skip+')':''));
+  const step=i=>{
+    if(i>=ok.length)return;const k=ok[i];if(!kidById(k.id)||isDone(k)||needsFork(k)){step(i+1);return;}
+    const l0=lvl(k.pts);give(k.id,bid,type);const l1=lvl(k.pts);
+    const w=(REDUCED?100:Math.min(1900,Math.abs(l1-l0)*55+700))+700;
+    const next=()=>{if(sheetOpen){setTimeout(next,400);return;}step(i+1);};
+    if(i+1<ok.length)setTimeout(next,w);};
+  step(0);
 }
 function undoLast(id){
   const k=kidById(id);if(!k||!canCtl(k)||!k.log.length)return;const e=k.log.shift();k.pts=e.from;tally(k,e,-1);k.sad=!!(k.log[0]&&k.log[0].k==='neg');
@@ -854,6 +887,9 @@ const ACT={
   pm(el){openPop(el.dataset.id,el.dataset.t);},
   popclose(){closePop();},
   hudtoggle(){hudOpen=!hudOpen;refreshHud();},
+  groupbeh(){openGroup();},
+  gtype(el){openGroup(el.dataset.t);},
+  gall(el){giveAll(el.dataset.bid,el.dataset.t);},
   camzoom(){camZoom=!camZoom;renderHome();toast(camZoom?'الخريطة كاملة على الشاشة':'الخريطة مكبّرة');},
   camtop(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:c.scrollWidth,behavior:camSmooth()});else c.scrollTo({top:0,behavior:camSmooth()});},
   cambot(){const c=camEl();if(!c)return;if(curGeo.hz)c.scrollTo({left:0,behavior:camSmooth()});else c.scrollTo({top:c.scrollHeight,behavior:camSmooth()});},
