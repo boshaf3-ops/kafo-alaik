@@ -354,7 +354,7 @@ function animateKid(id,to){
 function floatText(id,txt,cls){const host=$('#actors'),el=host&&host.querySelector('.actor[data-id="'+id+'"]');if(!el)return;const d=document.createElement('div');d.className='float '+cls;d.textContent=txt;d.style.left=el.style.left;d.style.top='calc('+el.style.top+' - 30px)';d.style.zIndex=9999;host.appendChild(d);setTimeout(()=>d.remove(),1300);}
 function renderHome(){
   V.innerHTML='<div class="home" id="home"><div class="cam" id="cam"><div class="scene" id="scene" data-act="scenebg"><canvas id="sceneCv"></canvas><canvas id="fxCv"></canvas><div class="actors" id="actors"></div></div></div><div class="hud" id="hud"></div>'
-    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button><button class="btn iconbtn" type="button" data-act="camzoom" aria-label="'+(camZoom?'تكبير الخريطة':'تصغير الخريطة')+'"><span class="ico i-zoom"></span></button></div><div id="homeEmpty"></div></div>';
+    +'<div class="camctl"><button class="btn iconbtn" type="button" data-act="camtop" aria-label="إلى القمة"><span class="ico i-up"></span></button><button class="btn iconbtn" type="button" data-act="cambot" aria-label="إلى البداية"><span class="ico i-down"></span></button><button class="btn iconbtn" type="button" data-act="camzoom" aria-label="'+(camZoom?'تكبير الخريطة':'تصغير الخريطة')+'"><span class="ico i-zoom"></span></button></div><button class="btn iconbtn homebtn" type="button" data-act="tohome" aria-label="القائمة الرئيسية"><span class="ico i-house"></span></button><div id="homeEmpty"></div></div>';
   sizeHome();paintScene(homeGeo());buildActors();renderChests();renderLabels();refreshHud();renderSel();camFocus(false);
   camEl().addEventListener('scroll',()=>{if(popCtx)closePop();if(curGeo.hz&&sel&&!scrT)scrT=requestAnimationFrame(()=>{scrT=0;placeActors();});},{passive:true});
   if(!S.kids.length)$('#homeEmpty').innerHTML='<div class="home-empty panel empty"><div class="big">ابدأ بإضافة أبطالك</div><p class="sub">أضف الأبناء بأسمائهم وصورهم، ويظهرون هنا شخصيات صغيرة تتسلّق الخريطة مع كل سلوك طيب.</p><div style="margin-top:12px"><button class="btn primary" data-act="addkid">+ إضافة ابن أو ابنة</button></div></div>';
@@ -853,6 +853,7 @@ const ACT={
   close(){closeSheet();},
   addkid(){guardPw(()=>openKidEditor());},
   editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
+  tohome(){closeSheet();closePop&&closePop();const sp=$('#splash');sp.classList.remove('gone');drawSplash();},
   setlang(el){if(el.dataset.v!==I18N.lang)setLang(el.dataset.v);},
   ptsunlock(){guardPw(()=>render());},
   sndtoggle(){toggleSound();render();},
