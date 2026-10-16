@@ -250,7 +250,7 @@ function drawSplash(){
 
 /* ================= navigation ================= */
 const V=$('#view');
-function go(tab){if((tab==='beh'||tab==='round')&&!isGuest()&&!pwActOK()){guardPw(()=>go(tab));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
+function go(tab){if((tab==='beh'||tab==='round')&&!isGuest()&&!pwActOK()){guardPw(()=>go(tab));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);if(TIPS[tab]&&tab!=='start')setTimeout(()=>{if(view===tab)showTip(tab);},350);}
 function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderRound,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
 const needJoin=()=>isGuest()&&!myFam();
 function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">':'<img class="sp" alt="" src="'+avatarURL(effAv(k),false)+'">';}
@@ -768,6 +768,25 @@ function renderSettings(){
    +'</div>';
 }
 
+
+/* ================= first-time tips (shown once per device) ================= */
+const TIPS={
+  start:{t:'أهلًا بك في «كفو عليك»',lead:'قبل ما تبدأ المغامرة، لازم تضيف أبناءك أولًا:',li:['اضغط «إضافة ابن أو ابنة» واكتب الاسم والعمر.','اختر شخصيته الكرتونية أو ضع صورته.','بعدها أضف السلوكيات من تبويب «النقاط»، وابدأ المغامرة.'],btn:'أضف الأبناء الآن',act:'tipkid'},
+  beh:{t:'نظام النقاط',lead:'هنا تكتب السلوكيات اللي تبي تشجعها أو تمنعها:',li:['السلوك الإيجابي يضيف نقاطًا ويرفع الابن على الخريطة.','السلوك السلبي يخصم نقاطًا وينزّله.','اكتب السلوك وعدد نقاطه، أو اختر من الاقتراحات السريعة.','بعدها اضغط على شخصية الابن في الخريطة، واختر له السلوك.'],btn:'فهمت',act:'close'},
+  round:{t:'الجولة',lead:'هنا تجهّز الجولة بالطريقة اللي تناسبك:',li:['الخريطة: كل الأبناء يلعبون على الخريطة نفسها.','الفترة: من متى إلى متى تُحسب النقاط (اختيارية).','الهدف: كم نقطة يحتاج الابن ليوصل النهاية.','المكافآت: هدية عند كل محطة، وتنفتح من صندوق الكنز.','تصفير النقاط: تبدأ جولة جديدة وتبقى الشهادات.'],btn:'فهمت',act:'close'}
+};
+function tipsGet(){try{return JSON.parse(localStorage.getItem('kafo.tips')||'null');}catch(e){return null;}}
+function tipsPut(o){try{localStorage.setItem('kafo.tips',JSON.stringify(o));}catch(e){}}
+function showTip(k){
+  const d=TIPS[k];if(!d||isGuest()||sheetOpen||!ready)return false;
+  let o=tipsGet();
+  if(!o){o={};if(S.kids.length)Object.keys(TIPS).forEach(x=>o[x]=1);}   /* existing users never see the tips */
+  if(o[k]){tipsPut(o);return false;}
+  o[k]=1;tipsPut(o);
+  openSheet('<div class="tip"><h2>'+d.t+'</h2><p>'+d.lead+'</p><ol>'+d.li.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="row" style="justify-content:center"><button class="btn primary" type="button" data-act="'+d.act+'">'+d.btn+'</button></div></div>',{});
+  return true;
+}
+
 /* ================= certificates ================= */
 function renderCerts(){
   V.innerHTML='<div class="view"><div class="sec-head"><div><h2>الشهادات</h2><p class="sub">لكل ابن ملف خاص. اضغط «الشهادات» لترى عوالمه كلها، وكل عالم أنهاه تظهر شهادته مضيئة بالأصفر للعرض والحفظ.</p></div><button class="btn gold" data-act="prevcert">معاينة شهادة</button></div>'
@@ -856,6 +875,7 @@ const ACT={
   addkid(){guardPw(()=>openKidEditor());},
   editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
   tohome(){closeSheet();closePop&&closePop();const sp=$('#splash');sp.classList.remove('gone');drawSplash();},
+  tipkid(){closeSheet();openKidEditor();},
   setlang(el){if(el.dataset.v!==I18N.lang)setLang(el.dataset.v);},
   ptsunlock(){guardPw(()=>render());},
   sndtoggle(){toggleSound();render();},
@@ -942,7 +962,7 @@ $('#goBtn').addEventListener('click',()=>{
   if(!ready)return;
   $('#splash').classList.add('gone');stopSplash();tone(SND.lvl);
   const own=isGuest()?myKids():S.kids;
-  if(!own.length){go('kids');if(!needJoin())openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
+  if(!own.length){go('kids');if(!needJoin()&&!showTip('start'))openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
 });
 (async function init(){
   i18nStart();$$('.langmenu button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===I18N.lang)));drawSplash();$('#goBtn').disabled=true;

@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+D6 = {
+'أهلًا بك في «كفو عليك»':'Welcome to “Kafo Alaik”',
+'قبل ما تبدأ المغامرة، لازم تضيف أبناءك أولًا:':'Before you start the adventure, you need to add your kids first:',
+'اضغط «إضافة ابن أو ابنة» واكتب الاسم والعمر.':'Tap “Add a son or daughter” and enter the name and age.',
+'اختر شخصيته الكرتونية أو ضع صورته.':'Pick a cartoon character or add a photo.',
+'بعدها أضف السلوكيات من تبويب «النقاط»، وابدأ المغامرة.':'Then add behaviors from the “Points” tab and start the adventure.',
+'أضف الأبناء الآن':'Add the kids now',
+'هنا تكتب السلوكيات اللي تبي تشجعها أو تمنعها:':'Write the behaviors you want to encourage or discourage here:',
+'السلوك الإيجابي يضيف نقاطًا ويرفع الابن على الخريطة.':'A positive behavior adds points and moves the child up the map.',
+'السلوك السلبي يخصم نقاطًا وينزّله.':'A negative behavior deducts points and moves them down.',
+'اكتب السلوك وعدد نقاطه، أو اختر من الاقتراحات السريعة.':'Write the behavior and its points, or pick from the quick suggestions.',
+'بعدها اضغط على شخصية الابن في الخريطة، واختر له السلوك.':'Then tap the child’s character on the map and choose the behavior.',
+'فهمت':'Got it',
+'هنا تجهّز الجولة بالطريقة اللي تناسبك:':'Set up the round here the way that suits you:',
+'الخريطة: كل الأبناء يلعبون على الخريطة نفسها.':'Map: all the kids play on the same map.',
+'الفترة: من متى إلى متى تُحسب النقاط (اختيارية).':'Period: the dates during which points count (optional).',
+'الهدف: كم نقطة يحتاج الابن ليوصل النهاية.':'Goal: how many points a child needs to reach the end.',
+'المكافآت: هدية عند كل محطة، وتنفتح من صندوق الكنز.':'Rewards: a gift at each station, revealed by the treasure chest.',
+'تصفير النقاط: تبدأ جولة جديدة وتبقى الشهادات.':'Reset points: start a new round; certificates are kept.',
+}

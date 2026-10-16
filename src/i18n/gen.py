@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json,sys,re
 sys.path.insert(0,'/home/claude/i18n')
-from p1 import D1;from p2 import D2;from p3 import P;from p4 import D4;from p5 import D5,P5
+from p1 import D1;from p2 import D2;from p3 import P;from p4 import D4;from p5 import D5,P5;from p6 import D6
 D={}
-for d in (D1,D2,D4,D5): D.update(d)
+for d in (D1,D2,D4,D5,D6): D.update(d)
 pats=[[a,b.replace("\\'","'")] for a,b in list(P)+P5 if b is not None]
 pats.sort(key=lambda x:-len(x[0]))
 js=open('/home/claude/i18n/engine.js').read()
