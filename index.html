@@ -300,6 +300,28 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .step{width:34px;min-height:34px;padding:0;margin:2px;font-size:18px}
 .sugg{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .sugg .btn{min-height:34px;padding:2px 10px;font-size:13px;font-weight:700}
+
+/* settings */
+.panel.set{padding:0;margin:14px 4px}
+.set>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:14px 46px 14px 18px;font:800 18px/1.3 var(--f-body);position:relative;min-height:56px;justify-content:center}
+.set>summary::-webkit-details-marker{display:none}
+.set>summary small{font:500 13px/1.4 var(--f-body);color:var(--muted)}
+.set>summary::after{content:"\25BE";position:absolute;inset-inline-end:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px}
+.set[open]>summary::after{content:"\25B4"}
+.set[open]>summary{box-shadow:0 3px 0 0 var(--soft)}
+.setbody{padding:6px 14px 16px}
+.setbody .panel{box-shadow:none;background:var(--surface2);margin:12px 0 0}
+.srow{display:flex;align-items:center;gap:12px;margin:10px 0}
+.srow .grow{flex:1;min-width:0}.srow b{overflow-wrap:anywhere}
+.srow .av{width:50px;height:50px;display:grid;place-items:center;background:var(--sky);overflow:hidden;flex:none;box-shadow:0 -3px 0 0 var(--line),0 3px 0 0 var(--line),-3px 0 0 0 var(--line),3px 0 0 0 var(--line)}
+.vol{display:flex;align-items:center;gap:10px;direction:ltr;margin:6px 4px 12px}
+.vol input[type=range]{flex:1;min-width:0;height:36px;accent-color:var(--brand)}
+.vol b{min-width:38px;text-align:center;font:400 12px/1 var(--f-pixel)}
+.vol .ico{width:22px;height:22px;color:var(--muted)}
+.lockp{text-align:center;padding:30px 18px;margin-top:20px}
+.lockp .ico{width:54px;height:54px;color:var(--gold)}
+.lockp .field{text-align:center;max-width:260px;margin:10px auto}
+.dangerp{border:0}
 .panel.posp h3{color:var(--pos)}.panel.negp h3{color:var(--neg)}
 .panel.posp{box-shadow:0 -4px 0 0 var(--pos),0 4px 0 0 var(--pos),-4px 0 0 0 var(--pos),4px 0 0 0 var(--pos),0 8px 0 0 var(--shade)}
 .panel.negp{box-shadow:0 -4px 0 0 var(--neg),0 4px 0 0 var(--neg),-4px 0 0 0 var(--neg),4px 0 0 0 var(--neg),0 8px 0 0 var(--shade)}
@@ -379,9 +401,8 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
   <nav class="tabs" role="tablist" aria-label="الأقسام">
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
-    <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>السلوكيات</span></button>
-    <button class="tab" role="tab" data-tab="round"><span class="ico i-flag"></span><span>الجولة</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
+    <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
   <main id="view"></main>
 </div>
@@ -505,6 +526,7 @@ const ICONS={
   up:['.....##.....','....####....','...######...','..########..','.##########.','############'],
   down:['############','.##########.','..########..','...######...','....####....','.....##.....'],
   zoom:['..######....','.########...','###....###..','##......##..','##......##..','###....###..','.########...','..#######...','......####..','.......####.','........####','.........###'],
+  gear:['.....##.....','.#..####..#.','.##########.','..###..###..','.####..####.','####....####','####....####','.####..####.','..###..###..','.##########.','.#..####..#.','.....##.....'],
   lock:['..######..','.##....##.','.##....##.','##########','##########','####..####','####..####','##########'],
   crown:['#....#....#','##..###..##','###########','###########','###########','###########']
 };
@@ -2134,7 +2156,7 @@ function reactKid(id,good){
 const AMB={run:null,master:null,an:null,gest:false,nb:{}};
 const ambCtx=()=>{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;};
 function ambMaster(){
-  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.22;
+  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.22*(typeof volBg==='function'?volBg():1);
   AMB.an=c.createAnalyser();AMB.an.fftSize=1024;AMB.master.connect(AMB.an);AMB.an.connect(c.destination);return AMB.master;
 }
 function ambNoise(kind){
@@ -2269,7 +2291,7 @@ const SCAPES={
 };
 
 /* start / stop follows what is on screen: the adventure view, sound on, page visible, after the first tap */
-const ambWant=()=>{try{return soundOn()&&AMB.gest&&!document.hidden&&typeof view==='string'&&view==='home'&&!!MAPS[S.cfg.mapId];}catch(e){return false;}};
+const ambWant=()=>{try{return soundOn()&&AMB.gest&&!document.hidden&&typeof view==='string'&&(view==='home'||Date.now()<(AMB.testUntil||0))&&!!MAPS[S.cfg.mapId];}catch(e){return false;}};
 function ambSync(){
   try{
     if(!ambWant()){if(AMB.run)ambStop();return;}
@@ -2299,6 +2321,13 @@ const myFam=()=>isGuest()?(S.fams[me.uid]||null):null;
 const behFor=k=>(k.fam&&S.fams[k.fam])?S.fams[k.fam].cfg:S.cfg;
 const BH=()=>isGuest()?((myFam()||{}).cfg||{pos:[],neg:[]}):S.cfg;
 const soundOn=()=>isGuest()?(function(){try{return localStorage.getItem('kafo.snd')!=='0';}catch(e){return true;}})():S.cfg.sound;
+
+/* ---- volumes (kept on this device): sound effects and background ambience; 60 is the original level, 100 is louder, 0 is silent ---- */
+function volGet(){const d={fx:60,bg:60};try{const o=JSON.parse(localStorage.getItem('kafo.vol')||'null');if(o){if(isFinite(o.fx))d.fx=clamp(Math.round(+o.fx),0,100);if(isFinite(o.bg))d.bg=clamp(Math.round(+o.bg),0,100);}}catch(e){}return d;}
+let VOL=volGet();
+const volFx=()=>VOL.fx/60,volBg=()=>VOL.bg/60;
+function volSave(){try{localStorage.setItem('kafo.vol',JSON.stringify(VOL));}catch(e){}}
+function volApply(){try{if(AMB.master)AMB.master.gain.value=.22*volBg();}catch(e){}}
 
 function normAv(a){const o=Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},a||{});if(o.g!=='m'&&o.g!=='f')o.g=(o.st===1||o.st===4)?'f':'m';if(!HEADS[o.st]||HEADS[o.st].g!==o.g)o.st=defHead(o.g);if(typeof o.hr!=='string')o.hr='';return o;}
 function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:normAv(k.av),hs:+k.hs||0,pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
@@ -2420,7 +2449,7 @@ function syncUI(full,moved){
 let toastT;
 function toast(msg){const t=$('#toast');if(!msg){return;}t.innerHTML='<div>'+esc(msg)+'</div>';clearTimeout(toastT);toastT=setTimeout(()=>{t.innerHTML='';},3200);}
 let ac=null;
-function tone(seq){if(!soundOn())return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();let t=ac.currentTime+.01;for(const n of seq){const o=ac.createOscillator(),g=ac.createGain();o.type=n[2]||'square';o.frequency.value=n[0];g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.001,t+n[1]);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+n[1]+.02);t+=n[1]*.92;}}catch(e){}}
+function tone(seq){if(!soundOn()||VOL.fx<=0)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();let t=ac.currentTime+.01;for(const n of seq){const o=ac.createOscillator(),g=ac.createGain();o.type=n[2]||'square';o.frequency.value=n[0];g.gain.setValueAtTime(Math.max(.0004,.05*volFx()),t);g.gain.exponentialRampToValueAtTime(.001,t+n[1]);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+n[1]+.02);t+=n[1]*.92;}}catch(e){}}
 const SND={pos:[[523,.07],[659,.07],[784,.12]],neg:[[247,.12,'sawtooth'],[185,.22,'sawtooth']],lvl:[[523,.07],[659,.07],[784,.07],[1047,.18]],mile:[[523,.09],[659,.09],[784,.09],[1047,.09],[784,.09],[1047,.09],[1319,.3]],win:[[523,.1],[523,.1],[523,.1],[659,.14],[784,.1],[659,.1],[784,.1],[1047,.4]]};
 /* ---------- interface sounds: every tap makes a small game-like sound; muting silences them all (tone() checks soundOn) ---------- */
 const UIS={
@@ -2526,8 +2555,8 @@ function drawSplash(){
 
 /* ================= navigation ================= */
 const V=$('#view');
-function go(tab){view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
-function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderRound,certs:renderCerts}[view]||renderHome)();}
+function go(tab){let sec=null;if(tab==='beh'){tab='settings';sec='pts';}else if(tab==='round'){tab='settings';sec='round';}if(sec)SETOPEN[sec]=true;if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
+function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderSettings,round:renderSettings,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
 const needJoin=()=>isGuest()&&!myFam();
 function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">':'<img class="sp" alt="" src="'+avatarURL(effAv(k),false)+'">';}
 
@@ -2689,7 +2718,7 @@ function throwKid(id,toL){
 
 /* ================= sheets ================= */
 function openSheet(html,ctx){sheetCtx=ctx||{};$('#sheetHost').innerHTML='<div class="sheet-back" data-act="backdrop"><div class="sheet" role="dialog" aria-modal="true">'+html+'</div></div>';sheetOpen=true;document.body.classList.add('sheet-open');}
-function closeSheet(){const nx=sheetCtx&&sheetCtx.next;$('#sheetHost').innerHTML='';sheetOpen=false;document.body.classList.remove('sheet-open');sheetCtx=null;draft=null;wd=null;if(dirty){dirty=false;closePop();render();}else fitHome();if(nx)setTimeout(nx,260);}
+function closeSheet(){const nx=sheetCtx&&sheetCtx.next;$('#sheetHost').innerHTML='';sheetOpen=false;document.body.classList.remove('sheet-open');sheetCtx=null;draft=null;wd=null;pwAfter=null;if(dirty){dirty=false;closePop();render();}else fitHome();if(nx)setTimeout(nx,260);}
 function setSheet(html){const s=$('#sheetHost .sheet');if(!s)return;const st=s.scrollTop;s.innerHTML=html;s.scrollTop=st;}
 
 /* ---- the choice at the fork ---- */
@@ -2909,34 +2938,121 @@ function behCol(type){
    +'</div><form class="addrow" data-form="beh" data-type="'+type+'"><input class="field" name="t" maxlength="40" required placeholder="'+(pos?'مثال: ساعد في ترتيب البيت':'مثال: تأخر عن النوم')+'" aria-label="اسم السلوك"><input class="field" name="p" type="number" min="1" max="100" value="'+(pos?3:2)+'" inputmode="numeric" aria-label="النقاط"><button class="btn '+(pos?'pos':'neg')+'" type="submit">إضافة</button></form>'
    +(sg.length?'<p class="sub" style="margin-top:14px">اقتراحات سريعة (اضغط لإضافتها):</p><div class="sugg">'+sg.map(o=>'<button class="btn small" type="button" data-act="sugg" data-type="'+type+'" data-i="'+o.i+'">'+esc(o.s[0])+' '+(pos?'+':'-')+o.s[1]+'</button>').join('')+'</div>':'')+'</section>';
 }
-function renderBehaviors(){V.innerHTML='<div class="view"><h2>السلوكيات</h2><p class="sub">السلوك الإيجابي يرفع الابن مستويات على الخريطة، والسلبي ينزله. أنت تحدد النقاط'+(isGuest()?' لأبناء عائلتك.':(Object.keys(S.fams).length?' لأبنائك، ولكل عائلة سلوكياتها الخاصة.':'.'))+'</p><div class="bgrid" style="margin-top:10px">'+behCol('pos')+behCol('neg')+'</div></div>';}
-function addBeh(f){const t=f.t.value.trim(),p=clamp(Math.round(+f.p.value)||1,1,100),type=f.dataset.type;if(!t)return;(type==='pos'?BH().pos:BH().neg).push({id:uid(),t,p});persistBH();renderBehaviors();}
+function addBeh(f){const t=f.t.value.trim(),p=clamp(Math.round(+f.p.value)||1,1,100),type=f.dataset.type;if(!t)return;(type==='pos'?BH().pos:BH().neg).push({id:uid(),t,p});persistBH();render();}
 
 /* ================= round (map, period, goal, rewards) ================= */
-function renderRoundRO(){
+function roundBodyRO(){
   const m=mapOf(),p=S.cfg.period,st=periodState();
-  V.innerHTML='<div class="view"><h2>الجولة</h2><p class="sub">الرئيس هو الذي يحدد الخريطة والفترة وعدد النقاط، وكل العائلات تتسلق على الخريطة نفسها.</p>'
-   +'<section class="panel" style="margin-top:12px"><h3>الخريطة الحالية: '+esc(m.name)+'</h3><div class="maps"><div class="map-card" style="pointer-events:none"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><b>'+esc(m.name)+'</b><small>'+esc(m.tag)+'</small></div></div></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>تفاصيل الجولة</h3><div class="row"><span class="pill">الجولة '+curRound()+'</span><span class="pill">الهدف '+goal()+' نقطة</span>'
+  return '<section class="panel"><h3>الخريطة الحالية: '+esc(m.name)+'</h3><div class="maps"><div class="map-card" style="pointer-events:none"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><b>'+esc(m.name)+'</b><small>'+esc(m.tag)+'</small></div></div></section>'
+   +'<section class="panel"><h3>تفاصيل الجولة</h3><div class="row"><span class="pill">الجولة '+curRound()+'</span><span class="pill">الهدف '+goal()+' نقطة</span>'
    +(p&&p.start&&p.end?'<span class="pill">'+esc(fmtDay(p.start))+' ← '+esc(fmtDay(p.end))+'</span>':'<span class="pill">بدون فترة محددة</span>')+(st.k==='in'?'<span class="pill">باقي '+daysTxt(st.left)+'</span>':'')+'</div></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>مكافآت المحطات</h3>'+[25,50,75,100].map(x=>'<div class="rw"><span>LV '+x+'</span><span>'+esc(S.cfg.rewards[x]||'—')+'</span></div>').join('')+'</section></div>';
-  $$('.maps canvas').forEach(cv=>cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0));
+   +'<section class="panel"><h3>مكافآت المحطات</h3>'+[25,50,75,100].map(x=>'<div class="rw"><span>LV '+x+'</span><span>'+esc(S.cfg.rewards[x]||'—')+'</span></div>').join('')+'</section>';
 }
-function renderRound(){
-  if(isGuest())return renderRoundRO();
+function roundBody(){
+  if(isGuest())return roundBodyRO();
   const p=S.cfg.period||{start:'',end:''};
-  V.innerHTML='<div class="view"><h2>الجولة</h2><p class="sub">اختر الخريطة وحدد الفترة وعدد النقاط المطلوبة للوصول إلى المستوى 100.</p>'
-   +'<section class="panel" style="margin-top:12px"><h3>اختر الخريطة</h3><p class="sub">الأبناء كلهم يتنافسون على الخريطة نفسها، وتقدر تغيّرها وقت ما تبي ويبقى تقدّمهم كما هو.</p><div class="maps">'
+  return '<section class="panel"><h3>اختر الخريطة</h3><p class="sub">الأبناء كلهم يتنافسون على الخريطة نفسها، وتقدر تغيّرها وقت ما تبي ويبقى تقدّمهم كما هو.</p><div class="maps">'
    +MAP_LIST.map(m=>'<button class="map-card" type="button" data-act="pickmap" data-id="'+m.id+'" aria-pressed="'+(m.id===S.cfg.mapId)+'"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><b>'+m.name+'</b><small>'+m.tag+'</small><small class="ft">'+m.feat+'</small></button>').join('')
    +'</div><div class="row" style="margin-top:14px"><button class="btn gold" type="button" data-act="prevcert">معاينة شهادة هذه الخريطة</button></div></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>فترة المغامرة</h3><p class="sub">النقاط تُسجَّل خلال هذه الفترة فقط. اتركها فاضية إذا ما تبي تحديد وقت.</p><div class="two"><div><label class="lbl" for="pStart">من تاريخ</label><input class="field" id="pStart" type="date" value="'+esc(p.start)+'"></div><div><label class="lbl" for="pEnd">إلى تاريخ</label><input class="field" id="pEnd" type="date" value="'+esc(p.end)+'"></div></div><div class="row" style="margin-top:6px"><button class="btn small" type="button" data-act="pclear">إلغاء الفترة</button></div></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>نقاط الوصول إلى النهاية</h3><p class="sub">كم نقطة يحتاج الابن ليوصل المستوى 100؟ كل ما قلّ الرقم صارت الخريطة أسرع.</p><input class="field" id="goalIn" type="number" min="10" max="5000" inputmode="numeric" value="'+goal()+'" style="max-width:200px"></section>'
-   +'<section class="panel" style="margin-top:14px"><h3>مكافآت المحطات وصناديق الكنز</h3><p class="sub">عند المحطات 25 و50 و75 يوجد صندوق كنز على الخريطة، وعندما يصله الابن ينفجر ويكشف المكافأة التي كتبتها. إذا تركت المكافأة فارغة أو ضغطت «حذف» فلن يظهر الصندوق في هذه المحطة ولن ينفتح أي كنز.</p>'
+   +'<section class="panel"><h3>فترة المغامرة</h3><p class="sub">النقاط تُسجَّل خلال هذه الفترة فقط. اتركها فاضية إذا ما تبي تحديد وقت.</p><div class="two"><div><label class="lbl" for="pStart">من تاريخ</label><input class="field" id="pStart" type="date" value="'+esc(p.start)+'"></div><div><label class="lbl" for="pEnd">إلى تاريخ</label><input class="field" id="pEnd" type="date" value="'+esc(p.end)+'"></div></div><div class="row" style="margin-top:6px"><button class="btn small" type="button" data-act="pclear">إلغاء الفترة</button></div></section>'
+   +'<section class="panel"><h3>نقاط الوصول إلى النهاية</h3><p class="sub">كم نقطة يحتاج الابن ليوصل المستوى 100؟ كل ما قلّ الرقم صارت الخريطة أسرع.</p><input class="field" id="goalIn" type="number" min="10" max="5000" inputmode="numeric" value="'+goal()+'" style="max-width:200px"></section>'
+   +'<section class="panel"><h3>مكافآت المحطات وصناديق الكنز</h3><p class="sub">عند المحطات 25 و50 و75 يوجد صندوق كنز على الخريطة، وعندما يصله الابن ينفجر ويكشف المكافأة التي كتبتها. إذا تركت المكافأة فارغة أو ضغطت «حذف» فلن يظهر الصندوق في هذه المحطة ولن ينفتح أي كنز.</p>'
    +[25,50,75,100].map(m=>'<div class="rw e"><span>LV '+m+'</span><input class="field" data-rw="'+m+'" maxlength="60" value="'+esc(S.cfg.rewards[m]||'')+'" placeholder="مثال: '+({25:'حلا يختاره',50:'نزهة في الحديقة',75:'يوم بدون واجبات منزلية',100:'هدية كبيرة'}[m])+'" aria-label="مكافأة المستوى '+m+'"><button class="btn small neg" type="button" data-act="rwdel" data-m="'+m+'" aria-label="حذف مكافأة المستوى '+m+'">حذف</button></div>').join('')+'</section>'
-   +'<section class="panel" style="margin-top:14px"><h3>جولة جديدة</h3><p class="sub">تصفّر نقاط الجميع ليبدأوا من جديد، وتبقى الشهادات التي حصلوا عليها.</p><button class="btn gold" type="button" data-act="newround" data-confirm>ابدأ جولة جديدة</button></section>'+backupPanel()+'</div>';
-  $$('.maps canvas').forEach((cv,i)=>setTimeout(()=>{if(!cv.isConnected)return;cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0);},i*40));
+   +'<section class="panel"><h3>تصفير النقاط: جولة جديدة</h3><p class="sub">تصفّر نقاط الجميع ليبدأوا من جديد، وتبقى الشهادات التي حصلوا عليها.</p><button class="btn gold" type="button" data-act="newround" data-confirm>ابدأ جولة جديدة</button></section>';
 }
-function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;k.ck=null;persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');renderRound();}
+function paintMaps(){$$('.maps canvas').forEach((cv,i)=>setTimeout(()=>{if(!cv.isConnected||cv.dataset.done)return;cv.dataset.done='1';cv.getContext('2d').drawImage(buildScene(cv.dataset.map).cv,0,0);},i*40));}
+function newRound(){S.kids.forEach(k=>{k.pts=0;k.log=[];k.sad=false;k.ck=null;persistKid(k);disp[k.id]=0;});S.cfg.round=curRound()+1;persistCfg();toast('بدأت الجولة '+curRound()+'. الكل من جديد عند البداية');render();}
+
+
+/* ================= settings: family, children, sound, points, round, backup, password ================= */
+const SETOPEN={};let pwUntil=0,pwActUntil=0,pwAfter=null;
+/* the password lives on this device only (a salted hash, never the word itself) and is not part of backups */
+const pwGet=()=>{try{return JSON.parse(localStorage.getItem('kafo.pw')||'null');}catch(e){return null;}};
+const hasPw=()=>!!pwGet();
+const pwOK=()=>!hasPw()||pwUntil>Date.now();
+const pwActOK=()=>pwOK()||pwActUntil>Date.now();
+async function pwHash(pw,salt){
+  const data=new TextEncoder().encode(salt+':'+pw);
+  if(window.crypto&&crypto.subtle){try{const b=await crypto.subtle.digest('SHA-256',data);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}catch(e){}}
+  let h=5381;for(const c of data)h=((h*33)^c)>>>0;return 'x'+h.toString(16);
+}
+async function pwSave(pw){const salt=genCode()+genCode();const h=await pwHash(pw,salt);try{localStorage.setItem('kafo.pw',JSON.stringify({s:salt,h}));return true;}catch(e){return false;}}
+async function pwCheck(pw){const o=pwGet();if(!o)return true;return (await pwHash(pw,o.s))===o.h;}
+/* run fn now, or after the password is entered (used by actions outside the settings page, like editing a child) */
+function guardPw(fn){if(pwActOK()){fn();return;}pwAfter=fn;openSheet(pwFormHtml('أدخل كلمة السر لتكمل'),{});setTimeout(()=>{const i=$('#pwIn');if(i)i.focus();},60);}
+function pwFormHtml(msg){
+  return '<form id="pwForm" autocomplete="off" style="text-align:center"><span class="ico i-lock" style="width:46px;height:46px;color:var(--gold)"></span><h2>'+esc(msg)+'</h2>'
+   +'<input class="field" id="pwIn" type="password" autocomplete="off" maxlength="40" placeholder="كلمة السر" aria-label="كلمة السر" style="text-align:center;max-width:260px;margin:10px auto">'
+   +'<div class="row" style="justify-content:center"><button class="btn primary" type="submit">فتح</button><button class="btn" type="button" data-act="close">إلغاء</button></div>'
+   +'<p style="margin-top:8px"><button class="btn small" type="button" data-act="pwforgot">نسيت كلمة السر؟</button></p></form>';
+}
+async function doUnlock(){
+  const i=$('#pwIn');if(!i)return;const ok=await pwCheck(i.value);
+  if(!ok){toast('كلمة السر غير صحيحة');i.value='';i.focus();return;}
+  if(view==='settings'&&!sheetOpen)pwUntil=Date.now()+3*3600e3;else pwActUntil=Date.now()+2*60e3;tone(SND.lvl);
+  const fn=pwAfter;pwAfter=null;if(sheetOpen)closeSheet();render();if(fn)setTimeout(fn,280);
+}
+function forgotSheet(){
+  openSheet('<div class="empty"><div class="big" style="font-size:32px;color:var(--neg)">الرجوع إلى الإعدادات الأصلية</div><p style="margin-top:8px">سيُحذف كل شيء نهائيًا: الأبناء والنقاط والشهادات والمكافآت وكلمة السر، وترجع اللعبة كأنها جديدة. لا يمكن التراجع.</p>'
+   +'<div class="row" style="justify-content:center;margin-top:14px"><button class="btn neg" type="button" data-act="wipego" data-confirm>نعم، احذف كل شيء</button><button class="btn" type="button" data-act="close">إلغاء</button></div></div>',{});
+}
+async function wipeAll(){
+  try{S.kids.forEach(k=>{if(canCtl(k))persistRemove(k);});}catch(e){}
+  if(db&&!isGuest()){S.cfg=DEF_CFG();persistCfg();}
+  try{await wq;}catch(e){}
+  try{['kafo.v1','kafo.pw','kafo.vol','kafo.snd'].forEach(k=>localStorage.removeItem(k));}catch(e){}
+  S.kids=[];S.cfg=DEF_CFG();pwUntil=0;pwActUntil=0;location.reload();
+}
+function toggleSound(){
+  if(isGuest()){try{localStorage.setItem('kafo.snd',soundOn()?'0':'1');}catch(e){}}else{S.cfg.sound=!S.cfg.sound;persistCfg();}
+  updateSound();if(soundOn())tone(SND.pos);
+}
+const volIcon=()=>'<span class="ico i-mute"></span>';
+function famSec(){
+  const nm=isGuest()?((myFam()||{}).name||''):(S.cfg.famName||''),ks=myKids();
+  return '<label class="lbl" for="famIn">اسم العائلة</label><input class="field" id="famIn" maxlength="24" value="'+esc(nm)+'" placeholder="مثال: عائلة الشافعي" autocomplete="off">'
+   +'<div class="lbl" style="margin-top:18px">الأبناء ('+ks.length+')</div>'
+   +(ks.length?ks.map(k=>'<div class="srow"><div class="av">'+avHtml(k)+'</div><div class="grow"><b>'+esc(k.name)+'</b><div class="sub">'+(k.age!==''?'العمر '+esc(k.age)+' · ':'')+k.pts+' نقطة</div></div><button class="btn small" type="button" data-act="editkid" data-id="'+k.id+'">تعديل</button></div>').join(''):'<p class="sub">ما أضفت أحد بعد.</p>')
+   +'<div class="row"><button class="btn primary" type="button" data-act="addkid">+ إضافة ابن أو ابنة</button></div><p class="sub">للحذف: اضغط «تعديل» على الابن ثم «حذف الابن».</p>';
+}
+function soundSec(){
+  const on=soundOn();
+  return '<div class="row"><button class="btn '+(on?'pos':'neg')+'" type="button" data-act="sndtoggle">'+(on?'الصوت يعمل (اضغط لكتمه)':'الصوت مكتوم (اضغط لتشغيله)')+'</button></div>'
+   +'<label class="lbl" for="volFx">المؤثرات الصوتية</label><p class="sub" style="margin:0 4px">أصوات الأزرار والنقاط والاحتفالات.</p>'
+   +'<div class="vol"><span class="ico i-mute"></span><input type="range" id="volFx" min="0" max="100" step="5" value="'+VOL.fx+'" aria-label="مستوى المؤثرات الصوتية"><span class="ico i-sound"></span><b id="volFxN">'+VOL.fx+'</b></div>'
+   +'<label class="lbl" for="volBg">صوت الخلفية</label><p class="sub" style="margin:0 4px">البحر والرياح وأصوات كل خريطة.</p>'
+   +'<div class="vol"><span class="ico i-mute"></span><input type="range" id="volBg" min="0" max="100" step="5" value="'+VOL.bg+'" aria-label="مستوى صوت الخلفية"><span class="ico i-sound"></span><b id="volBgN">'+VOL.bg+'</b></div>'
+   +'<p class="sub">حرّك الشريط يمينًا لرفع الصوت ويسارًا لتقليله.</p><div class="row"><button class="btn gold" type="button" data-act="sndtest">تجربة الصوت</button></div>';
+}
+function ptsSec(){return '<p class="sub">السلوك الإيجابي يرفع الابن مستويات على الخريطة، والسلبي ينزله. عدّل النقاط بالأزرار + و −، أو احذف السلوك أو أضف غيره.</p><div class="bgrid" style="margin-top:6px">'+behCol('pos')+behCol('neg')+'</div>';}
+function pwSec(){
+  const has=hasPw();
+  return (has?'<p class="sub">كلمة السر مفعّلة: لا أحد يفتح الإعدادات ولا يعدّل الأبناء إلا بها.</p>':'<p class="sub">ضع كلمة سر تحمي الإعدادات وتعديل الأبناء من العبث. (على هذا الجهاز فقط)</p>')
+   +'<form id="pwSetForm" autocomplete="off"><label class="lbl" for="pwA">'+(has?'كلمة السر الجديدة':'كلمة السر')+'</label><input class="field" id="pwA" type="password" maxlength="40" autocomplete="new-password" placeholder="4 أحرف أو أرقام على الأقل">'
+   +'<label class="lbl" for="pwB">أعد كتابتها</label><input class="field" id="pwB" type="password" maxlength="40" autocomplete="new-password">'
+   +'<div class="row" style="margin-top:8px"><button class="btn primary" type="submit">'+(has?'تغيير كلمة السر':'حفظ كلمة السر')+'</button>'+(has?'<button class="btn neg" type="button" data-act="pwoff" data-confirm>إزالة كلمة السر</button>':'')+'</div></form>';
+}
+function resetSec(){return '<p class="sub">يحذف كل شيء: الأبناء والنقاط والشهادات والمكافآت وكلمة السر، وترجع اللعبة كأنها جديدة. استخدمه فقط إذا بغيت تبدأ من الصفر.</p><div class="row"><button class="btn neg" type="button" data-act="pwforgot">الرجوع إلى الإعدادات الأصلية</button></div>';}
+function secHtml(id,title,sub,body){return '<details class="panel set" data-sec="'+id+'"'+(SETOPEN[id]?' open':'')+'><summary><span>'+title+'</span><small>'+sub+'</small></summary><div class="setbody">'+body+'</div></details>';}
+function renderSettings(){
+  if(!pwOK()){
+    V.innerHTML='<div class="view"><div class="panel lockp"><span class="ico i-lock"></span><h2>الإعدادات مقفلة</h2><p class="sub">اكتب كلمة السر لتفتحها.</p>'
+     +'<form id="pwForm" autocomplete="off"><input class="field" id="pwIn" type="password" autocomplete="off" maxlength="40" placeholder="كلمة السر" aria-label="كلمة السر"><div class="row" style="justify-content:center"><button class="btn primary" type="submit">فتح</button></div></form>'
+     +'<p style="margin-top:6px"><button class="btn small" type="button" data-act="pwforgot">نسيت كلمة السر؟</button></p></div></div>';
+    return;
+  }
+  const g=isGuest();
+  V.innerHTML='<div class="view"><h2>الإعدادات</h2><p class="sub">'+esc(famName(g?me.uid:''))+'</p>'
+   +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
+   +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
+   +secHtml('pts','نظام النقاط','تعديل السلوكيات الإيجابية والسلبية ونقاطها',ptsSec())
+   +(g?'':secHtml('round','الجولة','الخريطة والفترة والهدف والمكافآت وتصفير النقاط',roundBody()))
+   +(g||db?'':secHtml('bk','نسخة احتياطية','حفظ نسخة من بيانات اللعبة أو استعادتها',backupPanel().replace(/<section class="panel" style="margin-top:14px">/,'<section>')))
+   +secHtml('pw','كلمة السر',hasPw()?'مفعّلة · غيّرها أو أزلها':'غير مفعّلة · ضع كلمة تحمي الإعدادات',pwSec())
+   +(g?'':secHtml('rst','الرجوع إلى الإعدادات الأصلية','حذف كل شيء وبدء اللعبة من جديد',resetSec()))
+   +'</div>';
+  if(SETOPEN.round)paintMaps();
+}
 
 /* ================= certificates ================= */
 function renderCerts(){
@@ -3023,20 +3139,25 @@ const ACT={
   give(el){give(el.dataset.id,el.dataset.bid,el.dataset.t);},
   undo(el){undoLast(el.dataset.id);},
   close(){closeSheet();},
-  addkid(){openKidEditor();},
-  editkid(el){openKidEditor(el.dataset.id);},
+  addkid(){guardPw(()=>openKidEditor());},
+  editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
+  sndtoggle(){toggleSound();render();},
+  sndtest(){if(!soundOn()){toast('الصوت مكتوم، شغّله أولًا');return;}tone(SND.pos);AMB.gest=true;AMB.testUntil=Date.now()+5000;ambSync();toast('تسمع الآن صوت خلفية الخريطة الحالية');},
+  pwforgot(){closeSheet();forgotSheet();},
+  wipego(){wipeAll();},
+  pwoff(){try{localStorage.removeItem('kafo.pw');}catch(e){}pwUntil=0;pwActUntil=0;render();toast('أُزيلت كلمة السر');},
   delkid(){delKid();},
   photodel(){if(!draft)return;draft.photo=null;$('#photoPrev').innerHTML=photoPrevHtml();},
   avg(el){if(!draft)return;const g=el.dataset.v==='f'?'f':'m';if(draft.av.g!==g){draft.av.g=g;if(HEADS[draft.av.st].g!==g)draft.av.st=defHead(g);$('#builder').innerHTML=builderHtml();$('#photoPrev').innerHTML=photoPrevHtml();}},
   av(el){if(!draft)return;draft.av[el.dataset.k]=+el.dataset.v;$('#builder').innerHTML=builderHtml();$('#photoPrev').innerHTML=photoPrevHtml();},
   gobeh(){closeSheet();go('beh');},
   gotoround(){go('round');},
-  sugg(el){const t=el.dataset.type,s=SUGG[t][+el.dataset.i];(t==='pos'?BH().pos:BH().neg).push({id:uid(),t:s[0],p:s[1]});persistBH();renderBehaviors();},
-  bp(el){const l=el.dataset.type==='pos'?BH().pos:BH().neg,b=l.find(x=>x.id===el.dataset.id);if(!b)return;b.p=clamp(b.p+(+el.dataset.d),1,100);persistBH();renderBehaviors();},
-  bdel(el){const t=el.dataset.type,h=BH();if(t==='pos')h.pos=h.pos.filter(x=>x.id!==el.dataset.id);else h.neg=h.neg.filter(x=>x.id!==el.dataset.id);persistBH();renderBehaviors();},
+  sugg(el){const t=el.dataset.type,s=SUGG[t][+el.dataset.i];(t==='pos'?BH().pos:BH().neg).push({id:uid(),t:s[0],p:s[1]});persistBH();render();},
+  bp(el){const l=el.dataset.type==='pos'?BH().pos:BH().neg,b=l.find(x=>x.id===el.dataset.id);if(!b)return;b.p=clamp(b.p+(+el.dataset.d),1,100);persistBH();render();},
+  bdel(el){const t=el.dataset.type,h=BH();if(t==='pos')h.pos=h.pos.filter(x=>x.id!==el.dataset.id);else h.neg=h.neg.filter(x=>x.id!==el.dataset.id);persistBH();render();},
   pickmap(el){S.cfg.mapId=el.dataset.id;persistCfg();$$('.map-card').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===S.cfg.mapId)));toast('الخريطة الآن: '+mapOf().name+' — '+mapOf().feat);tone(SND.pos);},
   prevcert(){showCert({mapId:S.cfg.mapId,name:'اسم البطل',av:avatarFrom(2),photo:null,goal:goal(),period:S.cfg.period,ts:Date.now()},'معاينة الشهادة');},
-  pclear(){S.cfg.period=null;persistCfg();renderRound();toast('أُلغيت الفترة');},
+  pclear(){S.cfg.period=null;persistCfg();render();toast('أُلغيت الفترة');},
   newround(){newRound();},
   cert(el){const k=kidById(el.dataset.id);if(!k)return;const ct=k.certs.slice().reverse().find(c=>c.round===curRound())||k.certs[k.certs.length-1];if(!ct)return;closeSheet();showCert(certOpts(k,ct),'شهادة '+k.name);},
   certshow(el){const k=kidById(el.dataset.id);if(!k)return;const ct=k.certs.find(c=>c.id===el.dataset.cid);if(!ct)return;showCert(certOpts(k,ct),'شهادة '+(ct.name||k.name),el.dataset.back?k.id:null);},
@@ -3058,7 +3179,7 @@ document.addEventListener('click',e=>{
   if(el.hasAttribute('data-confirm')&&!el.classList.contains('armed')){arm(el);return;}
   if(ACT[a])ACT[a](el,e);
 });
-document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;if(f.id==='kidForm')saveKid();else if(f.id==='joinForm')joinFamily();else if(f.id==='invForm')createInvite();else if(f.dataset&&f.dataset.form==='beh')addBeh(f);});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;if(f.id==='kidForm')saveKid();else if(f.id==='joinForm')joinFamily();else if(f.id==='invForm')createInvite();else if(f.id==='pwForm')doUnlock();else if(f.id==='pwSetForm')setPwFromForm();else if(f.dataset&&f.dataset.form==='beh')addBeh(f);});
 document.addEventListener('change',async e=>{
   const t=e.target;
   if(t.id==='kPhoto'&&t.files&&t.files[0]&&draft){try{draft.photo=await resizePhoto(t.files[0]);$('#photoPrev').innerHTML=photoPrevHtml();}catch(err){toast('تعذّر قراءة الصورة');}t.value='';}
@@ -3066,11 +3187,29 @@ document.addEventListener('change',async e=>{
   else if(t.id==='goalIn'){S.cfg.goal=clamp(Math.round(+t.value)||100,10,5000);t.value=S.cfg.goal;persistCfg();toast('الهدف الآن '+S.cfg.goal+' نقطة');}
   else if(t.dataset&&t.dataset.rw){S.cfg.rewards[t.dataset.rw]=t.value.trim();persistCfg();}
 });
+async function setPwFromForm(){
+  const a=$('#pwA').value,b=$('#pwB').value;
+  if(a.length<4){toast('كلمة السر لازم تكون 4 أحرف أو أرقام على الأقل');return;}
+  if(a!==b){toast('الكلمتان غير متطابقتين');return;}
+  if(await pwSave(a)){pwUntil=Date.now()+3*3600e3;render();toast('تم حفظ كلمة السر');tone(SND.lvl);}else toast('تعذّر حفظ كلمة السر على هذا الجهاز');
+}
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='volFx'){VOL.fx=clamp(+t.value|0,0,100);volSave();const n=$('#volFxN');if(n)n.textContent=VOL.fx;}
+  else if(t.id==='volBg'){VOL.bg=clamp(+t.value|0,0,100);volSave();volApply();const n=$('#volBgN');if(n)n.textContent=VOL.bg;}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='volFx'){tone(SND.pos);}
+  else if(t.id==='volBg'){if(soundOn()&&VOL.bg>0){AMB.gest=true;AMB.testUntil=Date.now()+4500;ambSync();}}
+  else if(t.id==='famIn'){const v=t.value.trim().slice(0,24);if(isGuest()){const f=myFam();if(f){f.name=v||'عائلة';persistFam(f);}}else{S.cfg.famName=v;persistCfg();}toast('تم حفظ اسم العائلة');const sb=$('#view .sub');if(sb&&view==='settings')sb.textContent=famName(isGuest()?me.uid:'');}
+});
+document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.classList&&d.classList.contains('set')){SETOPEN[d.dataset.sec]=d.open;if(d.open&&d.dataset.sec==='round')paintMaps();}},true);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(sheetOpen)closeSheet();else if(popCtx)closePop();else if(sel){sel=null;renderSel();}}
   else if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('actor')){e.preventDefault();selectKid(e.target.dataset.id);}
 });
-$('#soundBtn').addEventListener('click',()=>{if(isGuest()){try{localStorage.setItem('kafo.snd',soundOn()?'0':'1');}catch(e){}}else{S.cfg.sound=!S.cfg.sound;persistCfg();}updateSound();if(soundOn())tone(SND.pos);});
+$('#soundBtn').addEventListener('click',()=>{toggleSound();if(view==='settings'&&pwOK())render();});
 function updateSound(){const b=$('#soundBtn');b.setAttribute('aria-pressed',String(soundOn()));b.setAttribute('aria-label',soundOn()?'إيقاف الصوت':'تشغيل الصوت');b.firstElementChild.className='ico '+(soundOn()?'i-sound':'i-mute');}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&db&&ready&&!pendingWrites&&$('#splash').classList.contains('gone'))resync();});
 let rzT;window.addEventListener('resize',()=>{if(!$('#splash').classList.contains('gone')){drawSplash();return;}clearTimeout(rzT);rzT=setTimeout(fitHome,200);});

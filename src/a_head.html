@@ -271,6 +271,28 @@ body.is-home .top .iconbtn{width:44px;height:44px;--line:#0e2a33}
 .step{width:34px;min-height:34px;padding:0;margin:2px;font-size:18px}
 .sugg{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .sugg .btn{min-height:34px;padding:2px 10px;font-size:13px;font-weight:700}
+
+/* settings */
+.panel.set{padding:0;margin:14px 4px}
+.set>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:14px 46px 14px 18px;font:800 18px/1.3 var(--f-body);position:relative;min-height:56px;justify-content:center}
+.set>summary::-webkit-details-marker{display:none}
+.set>summary small{font:500 13px/1.4 var(--f-body);color:var(--muted)}
+.set>summary::after{content:"\25BE";position:absolute;inset-inline-end:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px}
+.set[open]>summary::after{content:"\25B4"}
+.set[open]>summary{box-shadow:0 3px 0 0 var(--soft)}
+.setbody{padding:6px 14px 16px}
+.setbody .panel{box-shadow:none;background:var(--surface2);margin:12px 0 0}
+.srow{display:flex;align-items:center;gap:12px;margin:10px 0}
+.srow .grow{flex:1;min-width:0}.srow b{overflow-wrap:anywhere}
+.srow .av{width:50px;height:50px;display:grid;place-items:center;background:var(--sky);overflow:hidden;flex:none;box-shadow:0 -3px 0 0 var(--line),0 3px 0 0 var(--line),-3px 0 0 0 var(--line),3px 0 0 0 var(--line)}
+.vol{display:flex;align-items:center;gap:10px;direction:ltr;margin:6px 4px 12px}
+.vol input[type=range]{flex:1;min-width:0;height:36px;accent-color:var(--brand)}
+.vol b{min-width:38px;text-align:center;font:400 12px/1 var(--f-pixel)}
+.vol .ico{width:22px;height:22px;color:var(--muted)}
+.lockp{text-align:center;padding:30px 18px;margin-top:20px}
+.lockp .ico{width:54px;height:54px;color:var(--gold)}
+.lockp .field{text-align:center;max-width:260px;margin:10px auto}
+.dangerp{border:0}
 .panel.posp h3{color:var(--pos)}.panel.negp h3{color:var(--neg)}
 .panel.posp{box-shadow:0 -4px 0 0 var(--pos),0 4px 0 0 var(--pos),-4px 0 0 0 var(--pos),4px 0 0 0 var(--pos),0 8px 0 0 var(--shade)}
 .panel.negp{box-shadow:0 -4px 0 0 var(--neg),0 4px 0 0 var(--neg),-4px 0 0 0 var(--neg),4px 0 0 0 var(--neg),0 8px 0 0 var(--shade)}
@@ -350,9 +372,8 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
   <nav class="tabs" role="tablist" aria-label="الأقسام">
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
-    <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>السلوكيات</span></button>
-    <button class="tab" role="tab" data-tab="round"><span class="ico i-flag"></span><span>الجولة</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
+    <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
   <main id="view"></main>
 </div>

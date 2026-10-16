@@ -4,7 +4,7 @@
 const AMB={run:null,master:null,an:null,gest:false,nb:{}};
 const ambCtx=()=>{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;};
 function ambMaster(){
-  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.22;
+  if(AMB.master)return AMB.master;const c=ambCtx();AMB.master=c.createGain();AMB.master.gain.value=.22*(typeof volBg==='function'?volBg():1);
   AMB.an=c.createAnalyser();AMB.an.fftSize=1024;AMB.master.connect(AMB.an);AMB.an.connect(c.destination);return AMB.master;
 }
 function ambNoise(kind){
@@ -139,7 +139,7 @@ const SCAPES={
 };
 
 /* start / stop follows what is on screen: the adventure view, sound on, page visible, after the first tap */
-const ambWant=()=>{try{return soundOn()&&AMB.gest&&!document.hidden&&typeof view==='string'&&view==='home'&&!!MAPS[S.cfg.mapId];}catch(e){return false;}};
+const ambWant=()=>{try{return soundOn()&&AMB.gest&&!document.hidden&&typeof view==='string'&&(view==='home'||Date.now()<(AMB.testUntil||0))&&!!MAPS[S.cfg.mapId];}catch(e){return false;}};
 function ambSync(){
   try{
     if(!ambWant()){if(AMB.run)ambStop();return;}
