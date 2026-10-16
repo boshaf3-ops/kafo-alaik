@@ -5,8 +5,9 @@ head=open(K+'a_head.html').read()
 head=re.sub(r'<title>.*?</title>\n','',head,count=1)
 head=re.sub(r'<link rel="preconnect"[^\n]*\n<link rel="preconnect"[^\n]*\n<link href="https://fonts.googleapis.com[^\n]*\n','',head,count=1)
 assert 'fonts.googleapis' not in head
-scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','l_ambient.js','e_app.js'])
-fontcss='''@font-face{font-family:Tajawal;font-weight:400 500;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Regular.woff) format("woff")}
+scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','l_ambient.js','m_i18n.js','e_app.js'])
+fontcss='''@font-face{font-family:HJ;font-weight:800;font-style:normal;font-display:swap;src:url(fonts/Handjet-800.woff) format("woff")}
+@font-face{font-family:Tajawal;font-weight:400 500;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Regular.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:600 700;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Bold.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:800 900;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Black.woff) format("woff")}
 @font-face{font-family:Lalezar;font-weight:400;font-style:normal;font-display:swap;src:url(fonts/Lalezar-Regular.woff) format("woff")}
@@ -29,7 +30,7 @@ page=f'''<!doctype html>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_AR">
 <meta property="og:title" content="كفو عليك">
-<meta property="og:description" content="كل سلوك طيب خطوة جديدة نحو القمة. تطبيق عائلي لتحفيز الأبناء بخرائط مغامرة وشارات وشهادات.">
+<meta property="og:description" content="رحلة الأخلاق تبدأ بخطوة. تطبيق عائلي لتحفيز الأبناء بخرائط مغامرة وشارات وشهادات.">
 <meta property="og:image" content="https://boshaf3-ops.github.io/kafo-alaik/og.png">
 <meta property="og:url" content="https://boshaf3-ops.github.io/kafo-alaik/">
 <meta name="twitter:card" content="summary_large_image">
@@ -70,7 +71,7 @@ manifest={
 open('dist/manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
 sw=f'''/* كفو عليك: خدمة العمل دون إنترنت. غيّر رقم النسخة عند كل تحديث ليصل الجهاز للنسخة الجديدة. */
 const VERSION='kafo-{VER}';
-const CORE=['./','index.html','manifest.webmanifest','fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
+const CORE=['./','index.html','manifest.webmanifest','fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kafo-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));}});
 self.addEventListener('fetch',e=>{{

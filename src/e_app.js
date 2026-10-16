@@ -740,6 +740,11 @@ function pwSec(){
 }
 function resetSec(){return '<p class="sub">يحذف كل شيء: الأبناء والنقاط والشهادات والمكافآت وكلمة السر، وترجع اللعبة كأنها جديدة. استخدمه فقط إذا بغيت تبدأ من الصفر.</p><div class="row"><button class="btn neg" type="button" data-act="pwforgot">الرجوع إلى الإعدادات الأصلية</button></div>';}
 function secHtml(id,title,sub,body){return '<details class="panel set" data-sec="'+id+'"'+(SETOPEN[id]?' open':'')+'><summary><span>'+title+'</span><small>'+sub+'</small></summary><div class="setbody">'+body+'</div></details>';}
+function langSec(){
+  const en=I18N.lang==='en';
+  return '<div class="row"><button class="btn opt" type="button" data-act="setlang" data-v="ar" aria-pressed="'+(!en)+'" data-nt>العربية</button><button class="btn opt" type="button" data-act="setlang" data-v="en" aria-pressed="'+en+'" data-nt>English</button></div>'
+   +'<p class="sub" data-nt>'+(en?'The whole game switches to English. Kids\' names and the behaviors you typed yourself stay as you wrote them.':'تتحول اللعبة كلها للإنجليزية. أسماء الأبناء والسلوكيات اللي كتبتها بنفسك تبقى كما هي.')+'</p>';
+}
 function renderSettings(){
   if(!pwOK()){
     V.innerHTML='<div class="view"><div class="panel lockp"><span class="ico i-lock"></span><h2>الإعدادات مقفلة</h2><p class="sub">اكتب كلمة السر لتفتحها.</p>'
@@ -749,6 +754,7 @@ function renderSettings(){
   }
   const g=isGuest();
   V.innerHTML='<div class="view"><h2>الإعدادات</h2><p class="sub">'+esc(famName(g?me.uid:''))+'</p>'
+   +secHtml('lang','Language / اللغة','العربية · English',langSec()).replace('<summary><span>','<summary data-nt><span>')
    +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
    +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
    +secHtml('pts','نظام النقاط','اختصار لتبويب النقاط في الشريط',ptsSec())
@@ -847,6 +853,7 @@ const ACT={
   close(){closeSheet();},
   addkid(){guardPw(()=>openKidEditor());},
   editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
+  setlang(el){if(el.dataset.v!==I18N.lang)setLang(el.dataset.v);},
   ptsunlock(){guardPw(()=>render());},
   sndtoggle(){toggleSound();render();},
   sndtest(){if(!soundOn()){toast('الصوت مكتوم، شغّله أولًا');return;}tone(SND.pos);AMB.gest=true;AMB.testUntil=Date.now()+5000;ambSync();toast('تسمع الآن صوت خلفية الخريطة الحالية');},
@@ -922,6 +929,12 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 let rzT,wasWide=innerWidth>=760;window.addEventListener('resize',()=>{const w=innerWidth>=760;if(w!==wasWide){wasWide=w;if(view==='kids'&&!sheetOpen)render();}if(!$('#splash').classList.contains('gone')){drawSplash();return;}clearTimeout(rzT);rzT=setTimeout(fitHome,200);});
 
 /* ================= start ================= */
+(function(){const b=$('#langBtn'),m=$('#langMenu');if(!b||!m)return;
+  const set=o=>{m.hidden=!o;b.setAttribute('aria-expanded',String(o));};
+  b.addEventListener('click',e=>{e.stopPropagation();set(m.hidden);});
+  document.addEventListener('click',e=>{if(!m.hidden&&!m.contains(e.target))set(false);});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){set(false);b.focus();}});
+})();
 $('#goBtn').addEventListener('click',()=>{
   if(!ready)return;
   $('#splash').classList.add('gone');stopSplash();tone(SND.lvl);
@@ -929,7 +942,7 @@ $('#goBtn').addEventListener('click',()=>{
   if(!own.length){go('kids');if(!needJoin())openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
 });
 (async function init(){
-  drawSplash();$('#goBtn').disabled=true;
+  i18nStart();$$('.langmenu button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===I18N.lang)));drawSplash();$('#goBtn').disabled=true;
   await Promise.race([initStore(),new Promise(r=>setTimeout(r,7000))]);
   await Promise.race([loadAll(),new Promise(r=>setTimeout(r,7000))]);
   ready=true;if(db)subscribe();$('#goBtn').disabled=false;$('#goHint').textContent=db?(isGuest()?'مرحبًا بك في تحدي العائلة':'مرحبًا بك'):'يحفظ بياناتك على هذا الجهاز';

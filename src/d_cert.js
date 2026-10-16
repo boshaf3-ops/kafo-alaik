@@ -1,12 +1,12 @@
 /* ---------- certificate (A4 portrait, drawn on canvas, themed by the map) ---------- */
 function fontsReady(){
-  const loads=[document.fonts.load('80px Lalezar','كفو عليك'),document.fonts.load('800 30px Tajawal','شهادة'),document.fonts.load('500 30px Tajawal','شهادة')];
+  const loads=[document.fonts.load('80px Lalezar','كفو عليك'),document.fonts.load('800 30px HJ','Proud of you'),document.fonts.load('800 30px Tajawal','شهادة'),document.fonts.load('500 30px Tajawal','شهادة')];
   return Promise.race([Promise.all(loads).catch(()=>{}),new Promise(r=>setTimeout(r,2500))]);
 }
 function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
 function wrapLines(c,text,maxW){const words=text.split(' '),lines=[];let cur='';for(const w of words){const t=cur?cur+' '+w:w;if(c.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t;}if(cur)lines.push(cur);return lines;}
-function fmtDate(d){try{return new Date(d).toLocaleDateString('ar-u-nu-latn',{day:'numeric',month:'long',year:'numeric'});}catch(e){return String(d);}}
-function fmtDay(s){try{const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('ar-u-nu-latn',{day:'numeric',month:'long'});}catch(e){return s;}}
+function fmtDate(d){try{return new Date(d).toLocaleDateString(dateLoc(),{day:'numeric',month:'long',year:'numeric'});}catch(e){return String(d);}}
+function fmtDay(s){try{const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString(dateLoc(),{day:'numeric',month:'long'});}catch(e){return s;}}
 
 function pxFrame(c,x,y,w,h,col,t,corner){
   c.fillStyle=col;c.fillRect(x+t,y,w-2*t,t);c.fillRect(x+t,y+h-t,w-2*t,t);c.fillRect(x,y+t,t,h-2*t);c.fillRect(x+w-t,y+t,t,h-2*t);
@@ -21,9 +21,10 @@ async function makeCert(o){
   c.fillStyle=cp.bg;c.fillRect(0,0,W,H);
   c.globalAlpha=.08;c.fillStyle=cp.f2;for(let y=70;y<H-70;y+=24)for(let x=70+((y/24)%2)*12;x<W-70;x+=24)c.fillRect(x,y,6,6);c.globalAlpha=1;
   pxFrame(c,26,26,W-52,H-52,cp.f1,16,cp.f2);pxFrame(c,56,56,W-112,H-112,cp.f2,6,cp.f1);
-  c.textAlign='center';c.textBaseline='alphabetic';c.direction='rtl';
-  pixText(c,'كفو عليك',W/2,152,'400 92px Lalezar, Tajawal, sans-serif',cp.acc,cp.f1,5);
-  c.fillStyle=cp.ink;c.font='800 36px Tajawal, sans-serif';c.fillText('شهادة اجتياز المغامرة',W/2,208);
+  c.textAlign='center';c.textBaseline='alphabetic';c.direction=I18N.lang==='en'?'ltr':'rtl';
+  pixText(c,'كفو عليك',W/2,132,'400 80px Lalezar, Tajawal, sans-serif',cp.acc,cp.f1,5);
+  c.direction='ltr';pixText(c,'Proud of you',W/2,178,'800 36px HJ, sans-serif',cp.ink,null,0);c.direction=I18N.lang==='en'?'ltr':'rtl';
+  c.fillStyle=cp.ink;c.font='800 36px Tajawal, sans-serif';c.fillText(TR('شهادة اجتياز المغامرة'),W/2,222);
   // scene panel: the top of the map, with the child standing at the finish
   const px=96,py=236,pw=685,ph=380,sc=pw/MW,cvw=certView(o.mapId||'peak');
   const tmp=mk(MW,MH),tc=tmp.getContext('2d');tc.imageSmoothingEnabled=false;tc.drawImage(cvw.cv,0,0);
@@ -42,20 +43,20 @@ async function makeCert(o){
   if(!o.photo){c.fillStyle='#bfe6f7';c.fillRect(cx-ps/2,cy-ps/2,ps,ps);const big=mk(CH_W,CH_H);drawChar(big.getContext('2d'),av,false);c.imageSmoothingEnabled=false;c.drawImage(big,cx-42,cy-ps/2+10,84,116);}
   c.restore();
   // text
-  c.fillStyle=cp.ink;c.font='700 30px Tajawal, sans-serif';c.fillText('تُمنح هذه الشهادة إلى',cx,cy+ps/2+56);
-  let fs=84,name=o.name||'اسم البطل';c.font='400 '+fs+'px Lalezar, Tajawal, sans-serif';while(c.measureText(name).width>640&&fs>40){fs-=4;c.font='400 '+fs+'px Lalezar, Tajawal, sans-serif';}
+  c.fillStyle=cp.ink;c.font='700 30px Tajawal, sans-serif';c.fillText(TR('تُمنح هذه الشهادة إلى'),cx,cy+ps/2+56);
+  let fs=84,name=o.name||TR('اسم البطل');c.font='400 '+fs+'px Lalezar, Tajawal, sans-serif';while(c.measureText(name).width>640&&fs>40){fs-=4;c.font='400 '+fs+'px Lalezar, Tajawal, sans-serif';}
   pixText(c,name,cx,cy+ps/2+138,'400 '+fs+'px Lalezar, Tajawal, sans-serif',cp.acc,cp.f2,4);
   c.fillStyle=cp.f2;for(let i=0;i<11;i++)c.fillRect(cx-110+i*20,cy+ps/2+158,10,6);
-  c.fillStyle=cp.ink;c.font='500 27px Tajawal, sans-serif';
+  const EN=I18N.lang==='en';c.fillStyle=cp.ink;c.font='500 '+(EN?23:27)+'px Tajawal, sans-serif';
   const goal=o.goal||100;
   let body='لأنك '+m.act+' وأنهيت مغامرة «'+m.name+'» بنجاح، وبلغت المستوى 100 بسلوكك الطيب وأخلاقك الحسنة، فكفو عليك! نفخر بك ونسأل الله أن يزيدك صلاحًا وتوفيقًا.';
-  const lines=wrapLines(c,body,640);let ly=cy+ps/2+202;for(const ln of lines){c.fillText(ln,cx,ly);ly+=40;}
-  let info='عدد النقاط: '+goal;if(o.period&&o.period.start&&o.period.end)info+='  |  الفترة: من '+fmtDay(o.period.start)+' إلى '+fmtDay(o.period.end);
+  body=TR(body);const lines=wrapLines(c,body,EN?690:640);let ly=cy+ps/2+202;for(const ln of lines){c.fillText(ln,cx,ly);ly+=EN?34:40;}
+  let info=TR('عدد النقاط: '+goal);if(o.period&&o.period.start&&o.period.end)info+='  |  '+TR('الفترة: من '+fmtDay(o.period.start)+' إلى '+fmtDay(o.period.end));
   c.font='700 24px Tajawal, sans-serif';c.fillStyle=cp.acc;c.fillText(info,cx,ly+10);
   // footer
   const fy=H-100;c.fillStyle=cp.ink;c.font='700 24px Tajawal, sans-serif';
-  c.textAlign='right';c.fillText('ولي الأمر:',W-110,fy);c.fillRect(W-420,fy+8,300,3);
-  c.textAlign='left';c.fillText('التاريخ: '+fmtDate(o.ts||Date.now()),110,fy);
+  c.textAlign='right';c.fillText(TR('ولي الأمر:'),W-110,fy);c.fillRect(W-420,fy+8,300,3);
+  c.textAlign='left';c.fillText(TR('التاريخ:')+' '+fmtDate(o.ts||Date.now()),110,fy);
   c.textAlign='center';
   return cv;
 }
