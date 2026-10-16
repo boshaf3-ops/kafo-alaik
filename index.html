@@ -442,7 +442,6 @@ const HAIRC=['#2a1b12','#5b3a22','#c9892f','#d6402f','#2a6fdb','#8b44d6','#ee5fa
 /* base colours: shirts have 8 from the start; each map adds its own themed colours (see b2_outfits.js) */
 const SHIRT=['#e24a3b','#ff9a2e','#ffd23f','#3fbf6a','#1fb5ad','#2f7fe0','#8b5cd6','#ee5fa7'];
 const PANTC=['#2b3a5c','#1c1f2b','#6b7380','#b59b66'];
-const STYLES=[['short','شعر قصير'],['long','شعر طويل'],['cap','قبعة'],['ghutra','غترة'],['scarf','طرحة']];
 const CH_W=16,CH_H=22,DK='#1b2233';
 function adj(h,f){const n=parseInt(h.slice(1),16),m=f<1?v=>Math.round(v*f):v=>Math.round(v+(255-v)*(f-1));
   return '#'+[(n>>16)&255,(n>>8)&255,n&255].map(v=>clamp(m(v),0,255).toString(16).padStart(2,'0')).join('');}
@@ -456,23 +455,8 @@ function torso(c,col,up,skin,lg){
     if(lg){R(c,2,13,2,2,lg);R(c,12,13,2,2,lg);R(c,2,15,2,1,skin);R(c,12,15,2,1,skin);}else{R(c,2,13,2,3,skin);R(c,12,13,2,3,skin);}}
 }
 function legs(c,col,sh){R(c,5,17,3,3,col);R(c,8,17,3,3,col);R(c,4,20,4,2,sh||DK);R(c,8,20,4,2,sh||DK);}
-function drawChar(c,av,up){
-  const o=OUT[av.m]||OUT.peak,skin=SKIN[av.sk]||SKIN[1],hc=HAIRC[av.hc]||HAIRC[0],shc=o.sc[av.sh|0]||SHIRT[0],pcc=o.pcl[av.pc|0]||PANTC[0];
-  const S=o.shirts[av.ss|0]||o.shirts[0],P=o.pants[av.ps|0]||o.pants[0],base=S.col?shc:S.fix;
-  P.d(c,pcc,skin);
-  torso(c,base,up,skin,S.lg===true?base:S.lg);if(S.d)S.d(c,base,up,skin);
-  R(c,4,3,8,8,skin);R(c,5,8,1,1,'rgba(255,90,100,.45)');R(c,10,8,1,1,'rgba(255,90,100,.45)');
-  R(c,6,6,1,2,'#1b1b2f');R(c,9,6,1,2,'#1b1b2f');R(c,7,9,2,1,'#b3453c');
-  const st=STYLES[av.st]?STYLES[av.st][0]:'short';
-  if(st==='short'){R(c,4,2,8,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,5,4,2,1,hc);}
-  else if(st==='long'){R(c,4,2,8,3,hc);R(c,3,3,2,10,hc);R(c,11,3,2,10,hc);R(c,5,4,3,1,hc);}
-  else if(st==='cap'){R(c,4,2,8,3,hc);R(c,3,5,10,1,'rgba(0,0,0,.35)');R(c,3,4,10,1,hc);R(c,7,2,2,1,'rgba(255,255,255,.4)');}
-  else if(st==='ghutra'){R(c,3,1,10,2,'#ffffff');R(c,3,3,10,1,'#1b1b2f');R(c,3,4,10,1,'#ffffff');R(c,3,5,2,6,'#ffffff');R(c,11,5,2,6,'#ffffff');R(c,3,11,1,2,'#ffffff');R(c,12,11,1,2,'#ffffff');}
-  else if(st==='scarf'){R(c,3,1,10,4,hc);R(c,3,5,2,7,hc);R(c,11,5,2,7,hc);R(c,3,12,10,2,hc);R(c,4,2,3,1,'rgba(255,255,255,.35)');}
-}
 const _avCache={};
 function avatarURL(av,up){const key=JSON.stringify(av)+(up?'u':'');if(_avCache[key])return _avCache[key];const cv=mk(CH_W,CH_H);drawChar(cv.getContext('2d'),av,up);return(_avCache[key]=cv.toDataURL());}
-function avatarFrom(i){return{sk:i%SKIN.length,st:i%2?1:0,hc:(i*2)%HAIRC.length,sh:(i*3)%8,ss:0,ps:0,pc:0};}
 
 /* ---------- tiny pixel icons used as masks ---------- */
 const ICONS={
@@ -621,6 +605,178 @@ const OUT={};
     OUT[id]={shirts,pants,sc:SHIRT.concat(T.c),st:[0,0,0,0,0,0,0,0,25,25,50,50,75,75],pcl:PANTC.concat(T.pc),pt:[0,0,0,0,25,25,50,50,75,75]};
   }
 })();
+
+/* ---------- boys & girls: heads, girls' wardrobe, full-character special suits ----------
+   av = {g:'m'|'f', sk, st (index in HEADS), hc, sh, ss, ps, pc, m (map id), hr (special suit id or '')} */
+const HEADS=[
+  {n:'شعر قصير',g:'m'},{n:'شعر طويل',g:'f'},{n:'قبعة',g:'m'},{n:'غترة',g:'m'},{n:'طرحة',g:'f'},
+  {n:'شعر مسنّن',g:'m'},{n:'شعر مجعّد',g:'m'},{n:'كمّة',g:'m'},{n:'شماغ أحمر',g:'m'},{n:'رباط رأس',g:'m'},{n:'قبعة صوف',g:'m'},
+  {n:'قصير بناتي',g:'f'},{n:'ذيل حصان',g:'f'},{n:'ضفيرتان',g:'f'},{n:'فيونكة',g:'f'},{n:'قبعة وشعر طويل',g:'f'},{n:'قبعة وشعر قصير',g:'f'},{n:'طرحة مزخرفة',g:'f'}
+];
+const headsOf=g=>HEADS.map((h,i)=>({h,i})).filter(x=>x.h.g===(g==='f'?'f':'m'));
+const defHead=g=>g==='f'?1:0;
+const hairHi=hc=>adj(hc,1.3);
+/* hc = hair (or hat / scarf) colour, sc = the shirt colour (matching caps) */
+const HD=[
+  /*0 short*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,5,4,2,1,hc);R(c,5,2,3,1,hairHi(hc));},
+  /*1 long*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,3,3,2,10,hc);R(c,11,3,2,10,hc);R(c,5,4,3,1,hc);R(c,5,2,3,1,hairHi(hc));R(c,3,5,1,6,hairHi(hc));},
+  /*2 cap*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,3,5,10,1,'rgba(0,0,0,.35)');R(c,3,4,10,1,hc);R(c,7,2,2,1,'rgba(255,255,255,.4)');},
+  /*3 ghutra*/(c)=>{R(c,3,1,10,2,'#ffffff');R(c,3,3,10,1,'#1b1b2f');R(c,3,4,10,1,'#ffffff');R(c,3,5,2,6,'#ffffff');R(c,11,5,2,6,'#ffffff');R(c,3,11,1,2,'#ffffff');R(c,12,11,1,2,'#ffffff');R(c,4,2,3,1,'#e8eef5');},
+  /*4 tarha*/(c,hc)=>{R(c,3,1,10,4,hc);R(c,3,5,2,7,hc);R(c,11,5,2,7,hc);R(c,3,12,10,2,hc);R(c,4,2,3,1,'rgba(255,255,255,.35)');},
+  /*5 spiky*/(c,hc)=>{R(c,4,3,8,2,hc);R(c,4,1,2,3,hc);R(c,7,0,2,4,hc);R(c,10,1,2,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,6,2,1,2,hc);R(c,9,2,1,2,hc);R(c,7,1,1,2,hairHi(hc));},
+  /*6 curly*/(c,hc)=>{const L=hairHi(hc);R(c,4,1,8,4,hc);R(c,3,2,10,3,hc);R(c,3,5,2,3,hc);R(c,11,5,2,3,hc);R(c,5,2,1,1,L);R(c,8,1,1,1,L);R(c,10,3,1,1,L);R(c,4,4,1,1,L);R(c,12,6,1,1,L);},
+  /*7 kuma*/(c,hc)=>{R(c,4,5,1,2,'#2a1b12');R(c,11,5,1,2,'#2a1b12');R(c,4,2,8,3,'#f6f6f6');for(let x=4;x<12;x+=2)R(c,x,3,1,1,hc);R(c,4,4,8,1,'#d6d6d6');R(c,5,1,6,1,'#f6f6f6');},
+  /*8 shemagh*/(c)=>{R(c,3,1,10,4,'#ffffff');R(c,3,5,2,8,'#ffffff');R(c,11,5,2,8,'#ffffff');for(let y=1;y<13;y++)for(let x=3;x<13;x++)if(((x+y)&1)===0&&(y<5||x<5||x>10))R(c,x,y,1,1,'#e24a3b');R(c,3,3,10,1,'#1b1b2f');R(c,3,4,10,1,'#ffffff');},
+  /*9 headband*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,4,4,8,1,'#e24a3b');R(c,12,4,2,1,'#e24a3b');R(c,13,5,1,2,'#e24a3b');R(c,5,2,3,1,hairHi(hc));},
+  /*10 beanie*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,3,4,10,2,adj(hc,.78));R(c,4,2,8,1,hairHi(hc));for(let x=4;x<12;x+=2)R(c,x,5,1,1,adj(hc,.6));R(c,7,0,2,2,'#ffffff');},
+  /*11 bob*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,3,3,2,7,hc);R(c,11,3,2,7,hc);R(c,5,4,6,1,hc);R(c,4,9,1,1,hc);R(c,11,9,1,1,hc);R(c,5,2,3,1,hairHi(hc));R(c,3,4,1,4,hairHi(hc));},
+  /*12 ponytail*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,5,4,2,1,hc);R(c,5,2,3,1,hairHi(hc));R(c,12,3,2,2,hc);R(c,13,5,2,7,hc);R(c,12,4,2,1,'#ee5fa7');R(c,14,6,1,4,hairHi(hc));},
+  /*13 braids*/(c,hc)=>{R(c,4,2,8,3,hc);R(c,4,5,1,2,hc);R(c,11,5,1,2,hc);R(c,5,4,2,1,hc);R(c,5,2,3,1,hairHi(hc));for(const x of [3,11]){R(c,x,5,2,9,hc);for(let y=6;y<13;y+=2)R(c,x,y,2,1,adj(hc,.7));R(c,x,13,2,1,'#ee5fa7');}},
+  /*14 bow*/(c,hc)=>{HD[1](c,hc);R(c,9,0,2,3,'#ee5fa7');R(c,11,1,1,2,'#b3306e');R(c,12,0,2,3,'#ee5fa7');},
+  /*15 cap + long hair*/(c,hc,sc)=>{R(c,3,3,2,10,hc);R(c,11,3,2,10,hc);R(c,3,5,1,6,hairHi(hc));R(c,4,2,8,3,sc);R(c,3,5,10,1,'rgba(0,0,0,.35)');R(c,3,4,10,1,sc);R(c,7,2,2,1,'rgba(255,255,255,.4)');},
+  /*16 cap + short hair*/(c,hc,sc)=>{R(c,3,4,2,6,hc);R(c,11,4,2,6,hc);R(c,4,9,1,1,hc);R(c,11,9,1,1,hc);R(c,4,2,8,3,sc);R(c,3,5,10,1,'rgba(0,0,0,.35)');R(c,3,4,10,1,sc);R(c,7,2,2,1,'rgba(255,255,255,.4)');},
+  /*17 decorated tarha*/(c,hc)=>{HD[4](c,hc);for(let y=5;y<12;y++){if(y&1){R(c,5,y,1,1,'#ffd23f');R(c,10,y,1,1,'#ffd23f');}}for(let x=3;x<13;x+=2)R(c,x,13,1,1,'#ffd23f');R(c,7,1,2,1,'#ffd23f');}
+];
+/* the face; girls get lashes and rosier lips */
+function drawFace(c,skin,f){
+  R(c,4,3,8,8,skin);R(c,5,8,1,1,'rgba(255,90,100,.45)');R(c,10,8,1,1,'rgba(255,90,100,.45)');
+  R(c,6,6,1,2,'#1b1b2f');R(c,9,6,1,2,'#1b1b2f');
+  if(f){R(c,5,5,1,1,'#1b1b2f');R(c,10,5,1,1,'#1b1b2f');R(c,7,9,2,1,'#d9506a');}else R(c,7,9,2,1,'#b3453c');
+}
+
+/* ---------- girls' wardrobe: same themes and unlock levels, but long sleeves, tunics and skirts ---------- */
+const SF={
+  ruffle:(a,b)=>c=>{R(c,6,11,4,1,b);R(c,3,17,10,1,a);for(let x=3;x<13;x++)if(x&1)R(c,x,18,1,1,a);},
+  cardi:(a,b)=>c=>{R(c,4,11,2,7,a);R(c,10,11,2,7,a);R(c,6,12,4,5,b);R(c,3,17,1,1,a);R(c,12,17,1,1,a);},
+  bow:(a,b)=>c=>{R(c,6,11,4,1,b);R(c,5,12,2,2,a);R(c,9,12,2,2,a);R(c,7,12,2,2,b);},
+  pinafore:(a,b)=>c=>{R(c,5,12,6,5,a);R(c,5,11,1,1,a);R(c,10,11,1,1,a);R(c,3,16,10,2,a);R(c,7,14,2,1,b);}
+};
+const SKT={
+  skirt:(s,a,b)=>c=>{R(c,4,17,8,3,s);R(c,3,19,10,2,s);R(c,3,20,10,1,a);R(c,5,21,2,1,b);R(c,9,21,2,1,b);},
+  pleat:(s,a,b)=>c=>{SKT.skirt(s,a,b)(c);const d=adj(s,.8);for(let x=4;x<12;x+=2)R(c,x,17,1,3,d);R(c,3,19,1,1,d);R(c,12,19,1,1,d);R(c,4,20,1,1,d);R(c,7,20,1,1,d);R(c,10,20,1,1,d);},
+  skirtS:(s,a,b)=>c=>{const dk=adj(s,.55);R(c,5,19,3,3,dk);R(c,8,19,3,3,dk);R(c,4,21,4,1,b);R(c,8,21,4,1,b);R(c,4,17,8,1,s);R(c,3,18,10,2,s);R(c,3,19,10,1,a);},
+  armorSk:(s,a,b)=>c=>{SKT.skirt(s,a,b)(c);R(c,3,18,10,1,a);R(c,5,19,1,1,a);R(c,10,19,1,1,a);},
+  beltSk:(s,a,b)=>c=>{SKT.skirt(s,a,b)(c);R(c,4,17,8,1,a);R(c,7,17,2,1,'#ffffff');},
+  scaleSk:(s,a,b)=>c=>{SKT.skirt(s,a,b)(c);for(let y=17;y<20;y++)for(let x=4;x<12;x++)if((x+y)%2===0)R(c,x,y,1,1,a);},
+  goldSk:(s,a,b)=>c=>{SKT.skirt(s,s,b)(c);R(c,3,18,10,1,a);R(c,3,20,10,1,a);R(c,7,17,2,3,a);}
+};
+const PF=Object.assign({},PT,SKT);
+const GS={band:'ruffle',vest:'cardi',sash:'bow',emb:'emb',scale:'scale',belt:'belt',hood:'hood',gold:'gold',combo:'pinafore'};
+const GP={cuff:'skirt',knee:'pleat',short:'skirtS',boots:'boots',stripe:'stripe',armor:'armorSk',belt:'beltSk',scale:'scaleSk',wide:'wide',gold:'goldSk'};
+const GTH={peak:'الجبل',snow:'الثلج',volcano:'الحمم',river:'النهر',desert:'الصحراء',jungle:'الغابة',lake:'البحيرة',island:'الجزيرة',space:'الفضاء'};
+const GPN={skirt:t=>'تنورة '+t,pleat:t=>'تنورة '+t+' المطوية',skirtS:t=>'تنورة '+t+' والليقنز',boots:t=>'بنطال '+t+' بجزمة',stripe:t=>'بنطال '+t+' الرياضي',armorSk:t=>'تنورة درع '+t,beltSk:t=>'تنورة حزام '+t,wide:t=>'سروال '+t+' الواسع',scaleSk:t=>'تنورة قشور '+t,goldSk:t=>'تنورة '+t+' الذهبية'};
+const GSN={
+  peak:['متسلقة','كشّافة الجبل','معطف الصقر','حارسة القمة','بطلة الصخور','حاملة الراية','نسرة الجبال','فاتحة القمم','ملكة القمة'],
+  snow:['دفء الشتاء','معطف القطب','صائدة الثلج','متزلجة','راعية الجليد','حارسة البلّور','ملكة الثلج','الدبّة القطبية','أميرة الجليد'],
+  volcano:['شرارة','درع الحمم','عاملة المنجم','صائدة النار','حارسة البركان','فارسة اللهب','سيّدة الحمم','تنّينة الرماد','ملكة النار'],
+  river:['موج النهر','قشور التمساح','صيّادة السمك','حارسة النهر','مستكشفة المستنقع','فارسة التمساح','قبطانة القارب','ملكة التماسيح','بطلة النهر الذهبي'],
+  desert:['ظل الواحة','ثوب الكثبان','مستكشفة الرمال','حارسة الصبّار','صائدة الكنز','ابنة الفراعنة','أميرة الشمس','سيّدة الأهرام','فرعونة الذهب'],
+  jungle:['ورقة الغابة','قنّاصة الأوراق','مستكشفة الأدغال','نمرة الأدغال','حارسة الأسرار','صاحبة الأثر','ساحرة الغابة','روح الغابة','حارسة الكنز الأخضر'],
+  lake:['ماء البحيرة','زنبقة','غوّاصة اللؤلؤ','صيّادة البحيرة','عروس الماء','حارسة اللؤلؤة','سيّدة الضفاف','فارسة الزنبق','أميرة اللؤلؤ'],
+  island:['بحّارة','مساعدة القبطان','قرصانة صغيرة','حارسة المرساة','صائدة الكنوز','قبطانة الجزيرة','الراية السوداء','ملكة القراصنة','صاحبة الكنز'],
+  space:['متدرّبة فضاء','طيّارة المركبة','مهندسة المحطة','حارسة الكواكب','صائدة النجوم','قائدة المركبة','رائدة القمر','درع المجرة','سيّدة الكون']
+};
+const OUTF={};
+(function(){
+  for(const id in THEME){
+    const T=THEME[id],em=T.e.map(n=>EM[n]),th=GTH[id],o=OUT[id];
+    const shirts=[{n:'سادة',t:0,col:1}],pants=[{n:'تنورة عادية',t:0,col:1,d:(c,col)=>SKT.skirt(col,adj(col,.8),DK)(c)}];
+    T.s.forEach((r,i)=>{const fixed=r[2]!=='*',g=GS[r[1]]||r[1],mkf=(SF[g]||ST[g])(r[3],r[4],em[r[5]]);
+      shirts.push({n:GSN[id][i],t:25*(1+Math.floor(i/3)),col:fixed?0:1,fix:fixed?r[2]:undefined,lg:true,d:(c)=>mkf(c)});});
+    T.p.forEach((r,i)=>{const fixed=r[2]!=='*',g=GP[r[1]]||r[1];
+      pants.push({n:(GPN[g]||(t=>r[0]))(th),t:25*(1+Math.floor(i/3)),col:fixed?0:1,d:(c,col,skin)=>PF[g](fixed?r[2]:col,r[3],r[4])(c,col,skin)});});
+    OUTF[id]={shirts,pants,sc:o.sc,st:o.st,pcl:o.pcl,pt:o.pt};
+  }
+})();
+const outOf=(m,g)=>g==='f'?(OUTF[m]||OUTF.peak):(OUT[m]||OUT.peak);
+
+/* ---------- the character ---------- */
+function drawChar(c,av,up){
+  const skin=SKIN[av.sk]||SKIN[1];
+  if(av.hr&&HERO[av.hr]){HERO[av.hr](c,!!up,skin);return;}
+  const f=av.g==='f',o=outOf(av.m,av.g),hc=HAIRC[av.hc]||HAIRC[0],shc=o.sc[av.sh|0]||SHIRT[0],pcc=o.pcl[av.pc|0]||PANTC[0];
+  const S=o.shirts[av.ss|0]||o.shirts[0],P=o.pants[av.ps|0]||o.pants[0],base=S.col?shc:S.fix;
+  P.d(c,pcc,skin);
+  torso(c,base,up,skin,f?base:(S.lg===true?base:S.lg));
+  if(f){R(c,3,16,10,2,base);R(c,3,17,10,1,'rgba(0,0,0,.18)');}
+  if(S.d)S.d(c,base,up,skin);
+  drawFace(c,skin,f);
+  const h=HEADS[av.st]&&HEADS[av.st].g===(f?'f':'m')?av.st:defHead(av.g);
+  HD[h](c,hc,base);
+}
+function avatarFrom(i){const g=i%2?'f':'m';return{g,sk:i%SKIN.length,st:defHead(g),hc:(i*2)%HAIRC.length,sh:(i*3)%8,ss:0,ps:0,pc:0};}
+
+/* ---------- special suits: a whole new character, open in every adventure ---------- */
+const hArms=(c,up,sl,sk,gl,wide)=>{
+  if(up){R(c,2,10,2,2,sl);R(c,12,10,2,2,sl);R(c,1,7,2,4,sl);R(c,13,7,2,4,sl);R(c,1,6,2,1,gl||sk);R(c,13,6,2,1,gl||sk);}
+  else{R(c,2,11,2,2,sl);R(c,12,11,2,2,sl);R(c,2,13,2,2,sl);R(c,12,13,2,2,sl);if(wide){R(c,1,13,1,3,sl);R(c,14,13,1,3,sl);}R(c,2,15,2,1,gl||sk);R(c,12,15,2,1,gl||sk);}
+};
+const hLegs=(c,col,sh,a)=>{R(c,5,17,3,3,col);R(c,8,17,3,3,col);R(c,4,20,4,2,sh);R(c,8,20,4,2,sh);if(a){R(c,5,19,3,1,a);R(c,8,19,3,1,a);}};
+const hTunic=(c,col)=>{R(c,3,16,10,2,col);R(c,3,17,10,1,'rgba(0,0,0,.18)');};
+const HERO={
+  /* ---- boys ---- */
+  nj:(c,up,sk)=>{const N='#1d2a44',D='#121a2b',T='#2fb5c4',G='#aab8c8';
+    hLegs(c,N,D,G);R(c,11,9,3,1,T);R(c,13,10,2,3,T);R(c,12,13,2,1,T);
+    R(c,4,11,8,6,N);R(c,4,15,8,1,T);R(c,7,15,2,2,G);R(c,4,16,8,1,'rgba(0,0,0,.25)');hArms(c,up,N,sk,G);
+    R(c,4,2,8,9,N);R(c,5,5,6,3,sk);R(c,6,6,1,2,'#1b1b2f');R(c,9,6,1,2,'#1b1b2f');R(c,4,3,8,2,T);R(c,6,3,4,2,G);R(c,7,4,2,1,N);R(c,3,3,1,3,T);},
+  sm:(c,up,sk)=>{const K='#2a3f7a',H='#1c2342',O='#c0392b',W='#f4f4ee',B='#1b1b2f';
+    R(c,4,16,8,4,H);R(c,3,19,10,1,H);R(c,7,17,2,3,adj(H,.75));R(c,4,20,3,2,'#e8d3a0');R(c,9,20,3,2,'#e8d3a0');
+    R(c,4,11,8,6,K);R(c,6,11,4,1,W);R(c,7,12,2,2,W);R(c,4,15,8,1,O);R(c,7,15,2,2,'#ffd23f');hArms(c,up,K,sk,null,1);
+    drawFace(c,sk,false);R(c,4,2,8,3,B);R(c,4,5,1,3,B);R(c,11,5,1,3,B);R(c,5,4,2,1,B);R(c,7,0,2,3,B);R(c,6,3,1,1,'#3a3a5a');
+    if(!up){R(c,14,8,1,11,'#cfd6de');R(c,14,19,1,2,'#6b4a2b');R(c,13,19,3,1,'#ffd23f');}},
+  cp:(c,up,sk)=>{const NV='#1f4a8f',HT='#1f2a5a',G='#ffd23f',BK='#222831',BR='#4a3320';
+    R(c,5,17,3,3,BK);R(c,8,17,3,3,BK);R(c,5,18,3,4,BR);R(c,8,18,3,4,BR);R(c,4,21,4,1,'#2a1c10');R(c,8,21,4,1,'#2a1c10');R(c,5,18,3,1,G);R(c,8,18,3,1,G);
+    R(c,4,11,8,6,NV);R(c,7,11,2,6,'#ffffff');R(c,6,12,1,1,G);R(c,9,13,1,1,G);R(c,6,14,1,1,G);R(c,4,15,8,1,BK);R(c,7,15,2,1,G);R(c,4,16,8,1,'rgba(0,0,0,.2)');R(c,11,12,1,3,G);hArms(c,up,NV,sk,G);
+    drawFace(c,sk,false);R(c,4,5,1,2,'#5b3a22');R(c,11,5,1,2,'#5b3a22');R(c,5,10,6,1,'#7a4a2a');
+    R(c,5,0,6,2,HT);R(c,3,2,10,2,HT);R(c,2,3,1,1,HT);R(c,13,3,1,1,HT);R(c,3,4,10,1,G);R(c,7,1,2,1,'#ffffff');R(c,6,2,4,1,'#ffffff');R(c,7,2,2,1,BK);if(!up){R(c,13,15,1,5,'#cfd6de');R(c,12,14,3,1,G);}},
+  ma:(c,up,sk)=>{const W='#f4f4ee',CR='#c0392b',B='#1b1b2f';
+    for(const [x,y] of [[0,9],[0,13],[15,10],[15,14],[1,3],[14,2],[2,19],[13,18],[0,17],[15,7]])R(c,x,y,1,1,'#7ae8ff');R(c,0,10,1,5,'rgba(122,232,255,.4)');R(c,15,9,1,5,'rgba(122,232,255,.4)');
+    R(c,4,17,4,3,W);R(c,8,17,4,3,W);R(c,3,19,5,1,W);R(c,8,19,5,1,W);R(c,4,20,4,2,'#d6d6cc');R(c,8,20,4,2,'#d6d6cc');
+    R(c,4,11,8,6,W);R(c,6,11,4,1,'#e0dfd2');R(c,7,12,2,3,'#e0dfd2');R(c,4,15,8,1,CR);R(c,7,15,2,2,CR);R(c,4,16,8,1,'rgba(0,0,0,.15)');hArms(c,up,W,sk,CR);
+    drawFace(c,sk,false);R(c,4,2,8,3,B);R(c,4,5,1,2,B);R(c,11,5,1,2,B);R(c,5,1,2,1,B);R(c,8,1,2,1,B);R(c,10,0,2,2,B);R(c,4,4,8,1,CR);R(c,12,4,2,1,CR);R(c,13,5,1,2,CR);},
+  wz:(c,up,sk)=>{const P='#5a3a9a',D='#3a2278',Y='#ffd23f';
+    R(c,4,11,8,7,P);R(c,3,17,10,4,P);R(c,3,20,10,1,Y);R(c,4,15,8,1,Y);R(c,7,15,2,5,D);R(c,5,12,1,1,Y);R(c,10,13,1,1,Y);R(c,6,18,1,1,Y);R(c,10,18,1,1,Y);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,P,sk,null,1);
+    R(c,13,6,1,15,'#8a5a2b');R(c,12,3,3,3,Y);R(c,13,2,1,1,Y);R(c,13,3,1,1,'#fff');
+    drawFace(c,sk,false);R(c,5,9,6,2,'#eeeeee');R(c,6,11,4,1,'#eeeeee');R(c,4,5,1,3,'#eeeeee');R(c,11,5,1,3,'#eeeeee');
+    R(c,7,0,2,1,P);R(c,6,1,4,1,P);R(c,5,2,6,1,P);R(c,4,3,8,1,P);R(c,3,4,10,1,D);R(c,7,2,2,1,Y);R(c,6,3,1,1,Y);},
+  hk:(c,up,sk)=>{const BL='#1f4a8f',G='#ffd23f',CR='#c0392b',B='#3a2416';
+    R(c,2,10,12,10,CR);R(c,2,19,12,1,adj(CR,.7));hLegs(c,BL,CR,G);
+    R(c,4,11,8,6,BL);R(c,6,12,4,1,G);R(c,7,13,2,2,G);R(c,4,15,8,1,G);R(c,4,16,8,1,'rgba(0,0,0,.2)');hArms(c,up,BL,sk,G);
+    drawFace(c,sk,false);R(c,4,5,8,2,'#222831');R(c,6,6,1,1,'#ffffff');R(c,9,6,1,1,'#ffffff');R(c,4,2,8,3,B);R(c,4,5,1,1,B);R(c,11,5,1,1,B);R(c,6,1,2,1,B);R(c,9,1,2,1,B);},
+  /* ---- girls (modest: long sleeves, long skirts or trousers) ---- */
+  njf:(c,up,sk)=>{const N='#5a2a6a',D='#3a1a48',T='#ee5fa7',G='#ffc7de';
+    hLegs(c,D,'#2a1236',T);R(c,11,10,3,1,T);R(c,13,11,2,3,T);R(c,12,14,2,1,T);
+    R(c,4,11,8,6,N);hTunic(c,N);R(c,4,14,8,1,T);R(c,7,14,2,2,G);hArms(c,up,N,sk,T);
+    R(c,4,2,8,9,N);R(c,5,5,6,3,sk);R(c,6,6,1,2,'#1b1b2f');R(c,9,6,1,2,'#1b1b2f');R(c,5,5,1,1,'#1b1b2f');R(c,10,5,1,1,'#1b1b2f');R(c,4,3,8,2,T);R(c,6,3,4,2,G);R(c,7,4,2,1,N);R(c,3,3,1,3,T);},
+  smf:(c,up,sk)=>{const K='#e57fa0',H='#7a2a4a',O='#8a1f3a',W='#f4f4ee',B='#1b1b2f';
+    R(c,4,16,8,5,H);R(c,3,19,10,2,H);R(c,3,20,10,1,'#c9a96a');R(c,5,21,2,1,'#e8d3a0');R(c,9,21,2,1,'#e8d3a0');
+    R(c,4,11,8,6,K);hTunic(c,K);R(c,6,11,4,1,W);R(c,7,12,2,2,W);R(c,5,13,1,1,W);R(c,10,14,1,1,W);R(c,4,15,8,1,O);R(c,11,14,3,3,O);hArms(c,up,K,sk,null,1);
+    R(c,3,3,2,9,B);R(c,11,3,2,9,B);drawFace(c,sk,true);R(c,4,2,8,3,B);R(c,5,4,2,1,B);R(c,6,0,4,2,B);R(c,10,1,2,1,'#ee5fa7');R(c,5,0,1,1,'#ee5fa7');},
+  cpf:(c,up,sk)=>{const TL='#1fb5ad',HT='#16807b',G='#ffd23f',NV='#2b3a5c',BR='#4a3320',HR='#6b3a22';
+    R(c,5,17,3,3,NV);R(c,8,17,3,3,NV);R(c,5,19,3,3,BR);R(c,8,19,3,3,BR);R(c,4,21,4,1,'#2a1c10');R(c,8,21,4,1,'#2a1c10');
+    R(c,3,3,2,10,HR);R(c,11,3,2,10,HR);R(c,4,11,8,6,TL);hTunic(c,TL);R(c,7,11,2,6,'#ffffff');R(c,6,12,1,1,G);R(c,9,13,1,1,G);R(c,4,15,8,1,G);hArms(c,up,TL,sk,G);
+    drawFace(c,sk,true);R(c,4,5,1,2,HR);R(c,11,5,1,2,HR);R(c,5,0,6,2,HT);R(c,3,2,10,2,HT);R(c,2,3,1,1,HT);R(c,13,3,1,1,HT);R(c,3,4,10,1,G);R(c,7,1,2,1,'#ffffff');R(c,6,2,4,1,'#ffffff');R(c,7,2,2,1,'#222831');},
+  maf:(c,up,sk)=>{const W='#f4f4ee',TL='#1fb5ad',B='#2a1b12';
+    for(const [x,y] of [[0,9],[0,13],[15,10],[15,14],[1,3],[14,2],[2,19],[13,18],[0,17],[15,7]])R(c,x,y,1,1,'#a9f0ea');R(c,0,10,1,5,'rgba(169,240,234,.4)');R(c,15,9,1,5,'rgba(169,240,234,.4)');
+    R(c,4,17,4,3,W);R(c,8,17,4,3,W);R(c,3,19,5,2,W);R(c,8,19,5,2,W);R(c,4,21,4,1,'#d6d6cc');R(c,8,21,4,1,'#d6d6cc');R(c,3,20,10,1,TL);
+    R(c,4,11,8,6,W);hTunic(c,W);R(c,6,11,4,1,'#dfeceb');R(c,4,15,8,1,TL);R(c,7,15,2,2,TL);hArms(c,up,W,sk,TL);
+    drawFace(c,sk,true);R(c,4,2,8,3,B);R(c,4,5,1,2,B);R(c,11,5,1,2,B);R(c,6,0,4,3,B);R(c,10,1,2,2,TL);R(c,4,4,8,1,TL);R(c,12,4,2,1,TL);R(c,13,5,1,3,TL);},
+  wzf:(c,up,sk)=>{const P='#2a3f9a',D='#1f2d70',Y='#ffd23f',S='#d9e0f0';
+    R(c,3,3,2,10,S);R(c,11,3,2,10,S);R(c,4,11,8,7,P);R(c,3,17,10,4,P);R(c,3,20,10,1,Y);R(c,7,13,2,6,D);R(c,5,12,1,1,Y);R(c,10,14,1,1,Y);R(c,6,18,1,1,Y);R(c,10,18,1,1,Y);R(c,5,21,2,1,'#2a1c10');R(c,9,21,2,1,'#2a1c10');hArms(c,up,P,sk,null,1);
+    R(c,13,6,1,15,'#8a5a2b');R(c,12,3,3,1,Y);R(c,12,4,1,2,Y);R(c,14,4,1,2,Y);R(c,13,6,1,1,Y);
+    drawFace(c,sk,true);R(c,4,5,1,3,S);R(c,11,5,1,3,S);
+    R(c,7,0,2,1,P);R(c,6,1,4,1,P);R(c,5,2,6,1,P);R(c,4,3,8,1,P);R(c,3,4,10,1,D);R(c,6,1,2,1,Y);R(c,6,2,1,1,Y);R(c,7,2,1,1,P);},
+  hkf:(c,up,sk)=>{const V='#8b5cd6',G='#ffd23f',CP='#e0a800',B='#3a1a48';
+    R(c,2,10,12,11,CP);R(c,2,20,12,1,adj(CP,.7));R(c,3,3,2,10,B);R(c,11,3,2,10,B);
+    R(c,5,17,3,3,V);R(c,8,17,3,3,V);R(c,4,20,4,2,G);R(c,8,20,4,2,G);
+    R(c,4,11,8,6,V);hTunic(c,V);R(c,7,13,2,2,G);R(c,6,13,1,1,G);R(c,9,13,1,1,G);R(c,7,12,1,1,G);R(c,8,15,1,1,G);R(c,4,15,8,1,G);hArms(c,up,V,sk,G);
+    drawFace(c,sk,true);R(c,4,2,8,3,B);R(c,4,5,1,2,B);R(c,11,5,1,2,B);R(c,4,3,8,1,G);R(c,7,2,2,1,'#ee5fa7');}
+};
+const HEROES={
+  m:[{id:'nj',n:'نينجا الظل',need:2},{id:'sm',n:'ساموراي الفجر',need:4},{id:'cp',n:'قبطان العاصفة',need:6},{id:'ma',n:'سيّد القتال',need:9},{id:'wz',n:'ساحر النجوم',need:13},{id:'hk',n:'فارس الصقر',need:18}],
+  f:[{id:'njf',n:'نينجا الورد',need:2},{id:'smf',n:'ساموراي الزهر',need:4},{id:'cpf',n:'قبطانة البحار',need:6},{id:'maf',n:'سيّدة القتال',need:9},{id:'wzf',n:'ساحرة القمر',need:13},{id:'hkf',n:'بطلة الشروق',need:18}]
+};
+const heroList=g=>HEROES[g==='f'?'f':'m'];
 
 /* ---------- maps: nine pixel worlds, each with a 100-step path ---------- */
 const MW=200,MH=280;
@@ -1245,35 +1401,72 @@ function stopLive(){if(LV)LV.on=false;LV=null;}
 /* ---------- wardrobe: every map has its own outfits, opening at 25%, 50% and 75% of the climb ----------
    Progress belongs to (map + round): a new map or a new round starts again in plain clothes. */
 let wd=null;
-const OU=m=>OUT[m||S.cfg.mapId]||OUT.peak;
+const OU=(m,g)=>outOf(m||S.cfg.mapId,g);
 const tierKey=()=>(MAPS[S.cfg.mapId]?S.cfg.mapId:'peak')+'#'+curRound();
 function tierOf(k){const base=isDone(k)?100:milestone(lvl(k.pts));return k.tk===tierKey()?Math.max(+k.tier||0,base):base;}
 function wearOf(k,m){return(k.wear&&k.wear[m||S.cfg.mapId])||{};}
 /* the look of a kid on a given map (default: the current one); tier 100 is used for finished certificates */
 function effAv(k,m,tier){
-  m=MAPS[m||S.cfg.mapId]?(m||S.cfg.mapId):'peak';const o=OU(m),w=wearOf(k,m),t=tier==null?tierOf(k):tier;
+  m=MAPS[m||S.cfg.mapId]?(m||S.cfg.mapId):'peak';const o=OU(m,k.av.g),w=wearOf(k,m),t=tier==null?tierOf(k):tier;
   const okI=(list,i)=>i>0&&list[i]&&list[i].t<=t?i:0,okC=(ts,i,def)=>(i!=null&&ts[i]!=null&&ts[i]<=t)?i:def;
-  return{sk:k.av.sk,st:k.av.st,hc:k.av.hc,sh:okC(o.st,w.sh,(k.av.sh|0)<8?(k.av.sh|0):0),ss:okI(o.shirts,w.ss),ps:okI(o.pants,w.ps),pc:okC(o.pt,w.pc,(k.av.pc|0)<4?(k.av.pc|0):0),m};
+  return{sk:k.av.sk,st:k.av.st,hc:k.av.hc,sh:okC(o.st,w.sh,(k.av.sh|0)<8?(k.av.sh|0):0),ss:okI(o.shirts,w.ss),ps:okI(o.pants,w.ps),pc:okC(o.pt,w.pc,(k.av.pc|0)<4?(k.av.pc|0):0),m,g:k.av.g,hr:heroOK(k,k.av.hr)?k.av.hr:''};
 }
 const thumb=(k,over)=>avatarURL(Object.assign({},effAv(k),over),false);
-function wdCount(k){const t=tierOf(k),o=OU();return{s:o.shirts.filter(x=>x.t<=t).length,p:o.pants.filter(x=>x.t<=t).length};}
+function wdCount(k){const t=tierOf(k),o=OU(null,k.av.g);return{s:o.shirts.filter(x=>x.t<=t).length,p:o.pants.filter(x=>x.t<=t).length};}
+/* ---- special suits: opened by achievement stars (1 per badge, 2 per finished map) ---- */
+const mapsDone=k=>new Set((k.certs||[]).map(c=>c.mapId)).size;
+const ach=k=>BADGES.filter(b=>hasBadge(k,b.id)).length+2*mapsDone(k);
+const heroOK=(k,id)=>{if(!id)return false;const h=heroList(k.av.g).find(x=>x.id===id);return !!h&&ach(k)>=h.need;};
+function heroTabHtml(k){
+  const hl=heroList(k.av.g),a=ach(k),nx=hl.find(h=>h.need>a),base=Object.assign({},effAv(k),{hr:''});
+  const items='<button class="wd-item" type="button" data-act="wdhero" data-v="" aria-pressed="'+(!k.av.hr)+'"><img alt="" src="'+avatarURL(base,false)+'"><span>بدلتي العادية</span></button>'
+   +hl.map(h=>{const lock=a<h.need;
+     return '<button class="wd-item'+(lock?' locked':'')+'" type="button" data-act="wdhero" data-v="'+h.id+'" aria-pressed="'+(k.av.hr===h.id)+'" aria-label="'+esc(h.n)+(lock?'، تُفتح عند '+h.need+' نجوم إنجاز':'')+'">'
+      +'<img alt="" src="'+avatarURL({sk:k.av.sk,hr:h.id},false)+'"><span>'+esc(h.n)+'</span>'+(lock?'<span class="lk"><span class="ico i-lock"></span>'+h.need+'</span>':'')+'</button>';}).join('');
+  const pc=nx?Math.round(Math.min(a,nx.need)*100/nx.need):100;
+  return '<div class="sheet-head"><div class="av">'+avHtml(k)+'</div><div class="grow"><h2>بدلات '+esc(k.name)+' الخاصة</h2><div class="sub">'+heroList(k.av.g).filter(h=>a>=h.need).length+' من '+hl.length+' بدلات مفتوحة · نجوم الإنجاز: '+a+'</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
+   +'<div class="wd-prev"><img alt="معاينة" src="'+avatarURL(effAv(k),false)+'"></div>'
+   +'<div class="row" style="justify-content:center"><button class="btn opt" type="button" data-act="wdtab" data-v="shirt" aria-pressed="false">القميص</button><button class="btn opt" type="button" data-act="wdtab" data-v="pants" aria-pressed="false">البنطلون</button><button class="btn opt" type="button" data-act="wdtab" data-v="hero" aria-pressed="true">بدلات خاصة</button></div>'
+   +'<div class="wd-grid">'+items+'</div>'
+   +(nx?'<div class="prog" style="margin:6px 4px"><i style="width:'+pc+'%"></i></div><p class="sub">البدلة القادمة «'+esc(nx.n)+'» تُفتح عند '+nx.need+' نجوم إنجاز (عنده '+a+').</p>':'<p class="sub ok">فتح كل البدلات الخاصة، ما شاء الله!</p>')
+   +'<p class="sub" style="margin-top:8px">كل شارة تعطي نجمة إنجاز، وكل خريطة يكملها تعطيه نجمتين. البدلة الخاصة تحوّل شخصيته كلها وتمشي معه في كل الخرائط.</p>';
+}
 function wardrobeHtml(k){
-  const o=OU(),m=mapOf(),tier=tierOf(k),shirt=wd.tab!=='pants',list=shirt?o.shirts:o.pants,key=shirt?'ss':'ps',ckey=shirt?'sh':'pc',cols=shirt?o.sc:o.pcl,ct=shirt?o.st:o.pt,n=wdCount(k),av=effAv(k);
+  if(wd.tab==='hero')return heroTabHtml(k);
+  const o=OU(null,k.av.g),m=mapOf(),tier=tierOf(k),shirt=wd.tab!=='pants',list=shirt?o.shirts:o.pants,key=shirt?'ss':'ps',ckey=shirt?'sh':'pc',cols=shirt?o.sc:o.pcl,ct=shirt?o.st:o.pt,n=wdCount(k),av=effAv(k);
   const cur=list[av[key]]||list[0];
   const items=list.map((it,i)=>{const lock=it.t>tier;
     return '<button class="wd-item'+(lock?' locked':'')+'" type="button" data-act="wdpick" data-k="'+key+'" data-v="'+i+'" aria-pressed="'+(av[key]===i)+'" aria-label="'+esc(it.n)+(lock?'، يُفتح عند '+it.t+'%':'')+'">'
-      +'<img alt="" src="'+thumb(k,{[key]:i})+'"><span>'+esc(it.n)+'</span>'+(lock?'<span class="lk"><span class="ico i-lock"></span>'+it.t+'%</span>':'')+'</button>';}).join('');
+      +'<img alt="" src="'+thumb(k,{[key]:i,hr:''})+'"><span>'+esc(it.n)+'</span>'+(lock?'<span class="lk"><span class="ico i-lock"></span>'+it.t+'%</span>':'')+'</button>';}).join('');
   const sw=cols.map((c,i)=>{const lock=ct[i]>tier;return '<button type="button" class="sw'+(lock?' locked':'')+'" style="background:'+c+'" data-act="wdpick" data-k="'+ckey+'" data-v="'+i+'" aria-pressed="'+(av[ckey]===i)+'" aria-label="لون '+(i+1)+(lock?'، يُفتح عند '+ct[i]+'%':'')+'"></button>';}).join('');
-  return '<div class="sheet-head"><div class="av">'+avHtml(k)+'</div><div class="grow"><h2>ملابس '+esc(k.name)+'</h2><div class="sub">مغامرة «'+esc(m.name)+'»: مفتوح له '+(n.s-1)+' من '+(o.shirts.length-1)+' قميصًا و'+(n.p-1)+' من '+(o.pants.length-1)+' بنطلونًا</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
-   +'<div class="wd-prev"><img alt="معاينة" src="'+avatarURL(av,false)+'"></div>'
-   +'<div class="row" style="justify-content:center"><button class="btn opt" type="button" data-act="wdtab" data-v="shirt" aria-pressed="'+shirt+'">القميص</button><button class="btn opt" type="button" data-act="wdtab" data-v="pants" aria-pressed="'+!shirt+'">البنطلون</button></div>'
+  const girl=k.av.g==='f';
+  return '<div class="sheet-head"><div class="av">'+avHtml(k)+'</div><div class="grow"><h2>ملابس '+esc(k.name)+'</h2><div class="sub">مغامرة «'+esc(m.name)+'»: مفتوح له '+(n.s-1)+' من '+(o.shirts.length-1)+' '+(girl?'قمصان':'قمصان')+' و'+(n.p-1)+' من '+(o.pants.length-1)+' '+(girl?'تنانير وبناطيل':'بناطيل')+'</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
+   +'<div class="wd-prev"><img alt="معاينة" src="'+avatarURL(Object.assign({},av,{hr:''}),false)+'"></div>'
+   +'<div class="row" style="justify-content:center"><button class="btn opt" type="button" data-act="wdtab" data-v="shirt" aria-pressed="'+shirt+'">القميص</button><button class="btn opt" type="button" data-act="wdtab" data-v="pants" aria-pressed="'+!shirt+'">'+(girl?'التنورة والبنطلون':'البنطلون')+'</button><button class="btn opt" type="button" data-act="wdtab" data-v="hero" aria-pressed="false">بدلات خاصة</button></div>'
+   +(av.hr?'<p class="sub ok" style="text-align:center">يلبس الحين بدلة خاصة. اختر «بدلتي العادية» من تبويب البدلات الخاصة ليرجع للملابس العادية.</p>':'')
    +'<div class="wd-grid">'+items+'</div>'
    +'<div class="lbl">اللون</div><div>'+sw+'</div>'+(cur.col?'':'<p class="sub">هذا الزي بألوانه الخاصة، واللون ينطبق على النوع العادي وبعض الأزياء.</p>')
    +'<p class="sub" style="margin-top:10px">ملابس هذه الخريطة لها وحدها. عند المحطات 25% و50% و75% تنفتح ملابس وألوان جديدة بثيم «'+esc(m.name)+'»، وإذا بدأت خريطة أو جولة جديدة ترجع ملابس ذلك الدور من البداية.</p>';
 }
-function openWardrobe(id){const k=kidById(id);if(!k||!canCtl(k))return;wd={id,tab:'shirt'};openSheet(wardrobeHtml(k),{wd:1});}
+function wdHero(id){
+  const k=wd&&kidById(wd.id);if(!k||!canCtl(k))return;
+  if(id&&!heroOK(k,id)){toast('تُفتح بنجوم الإنجاز');tone(SND.neg);return;}
+  k.av=Object.assign({},k.av,{hr:id||''});persistKid(k);tone(SND.pos);setSheet(wardrobeHtml(k));
+  if(view==='home')placeActors();else if(view==='kids')renderKids();
+}
+/* new suits since the last announcement */
+function evalHeroes(k){const n=heroList(k.av.g).filter(h=>ach(k)>=h.need).length;if(n>(k.hs|0)){const ids=heroList(k.av.g).filter(h=>ach(k)>=h.need).slice(k.hs|0).map(h=>h.id);k.hs=n;return ids;}return [];}
+function openHeroWin(id,ids){
+  const k=kidById(id);if(!k||!ids.length)return;const hs=ids.map(i=>heroList(k.av.g).find(h=>h.id===i)).filter(Boolean);
+  openSheet('<div class="empty"><div class="big" style="font-size:38px;color:var(--brand)">'+(hs.length>1?'بدلات خاصة جديدة':'بدلة خاصة جديدة')+' يا '+esc(k.name)+'!</div>'
+   +'<div class="wd-new">'+hs.map(h=>'<img alt="'+esc(h.n)+'" src="'+avatarURL({sk:k.av.sk,hr:h.id},false)+'" style="height:120px">').join('')+'</div>'
+   +'<p style="margin-top:6px"><b>'+hs.map(h=>esc(h.n)).join('، ')+'</b><br><span class="sub">فتحها بإنجازاته. تحوّل شخصيته كلها وتمشي معه في كل الخرائط.</span></p>'
+   +'<div class="row" style="justify-content:center;margin-top:14px">'+(canCtl(k)?'<button class="btn gold" type="button" data-act="wardrobe" data-id="'+k.id+'" data-hero="1">البسها الآن</button>':'')+'<button class="btn" type="button" data-act="close">تم</button></div></div>',{});
+  confetti(innerWidth*.3,innerHeight*.55,50,1.2);confetti(innerWidth*.7,innerHeight*.55,50,1.2);
+}
+function openWardrobe(id,tab){const k=kidById(id);if(!k||!canCtl(k))return;wd={id,tab:tab||'shirt'};openSheet(wardrobeHtml(k),{wd:1});}
 function wdPick(key,v){
-  const k=wd&&kidById(wd.id);if(!k||!canCtl(k))return;const o=OU(),mid=S.cfg.mapId;
+  const k=wd&&kidById(wd.id);if(!k||!canCtl(k))return;const o=OU(null,k.av.g),mid=S.cfg.mapId;
   const t=key==='ss'?o.shirts[v].t:key==='ps'?o.pants[v].t:key==='sh'?o.st[v]:o.pt[v];
   if(t>tierOf(k)){toast('يُفتح عند المستوى '+t+'%');tone(SND.neg);return;}
   k.wear=Object.assign({},k.wear);k.wear[mid]=Object.assign({},k.wear[mid],{[key]:v});persistKid(k);tone(SND.pos);setSheet(wardrobeHtml(k));
@@ -1281,7 +1474,7 @@ function wdPick(key,v){
 }
 /* shown right after a child reaches 25%, 50% or 75% */
 function openUnlock(id,tier){
-  const k=kidById(id);if(!k)return;const o=OU(),m=mapOf();
+  const k=kidById(id);if(!k)return;const o=OU(null,k.av.g),m=mapOf();
   const ns=o.shirts.map((s,i)=>({s,i})).filter(x=>x.s.t===tier),np=o.pants.map((s,i)=>({s,i})).filter(x=>x.s.t===tier);
   const nc=o.st.filter(t=>t===tier).length+o.pt.filter(t=>t===tier).length,rw=(S.cfg.rewards[tier]||'').trim();
   openSheet('<div class="empty"><div class="big" style="font-size:38px;color:var(--brand)">فتحت ملابس «'+esc(m.name)+'» يا '+esc(k.name)+'!</div>'
@@ -1399,7 +1592,8 @@ const behFor=k=>(k.fam&&S.fams[k.fam])?S.fams[k.fam].cfg:S.cfg;
 const BH=()=>isGuest()?((myFam()||{}).cfg||{pos:[],neg:[]}):S.cfg;
 const soundOn=()=>isGuest()?(function(){try{return localStorage.getItem('kafo.snd')!=='0';}catch(e){return true;}})():S.cfg.sound;
 
-function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},k.av||{}),pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
+function normAv(a){const o=Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},a||{});if(o.g!=='m'&&o.g!=='f')o.g=(o.st===1||o.st===4)?'f':'m';if(!HEADS[o.st]||HEADS[o.st].g!==o.g)o.st=defHead(o.g);if(typeof o.hr!=='string')o.hr='';return o;}
+function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:normAv(k.av),hs:+k.hs||0,pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
     tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null};}
 function normFam(uid,o){return{uid,name:o.name||'عائلة',code:o.code||'',expected:+o.expected||0,ts:+o.ts||0,cfg:{pos:Array.isArray(o.cfg&&o.cfg.pos)?o.cfg.pos:[],neg:Array.isArray(o.cfg&&o.cfg.neg)?o.cfg.neg:[]}};}
 const milestone=L=>L>=75?75:L>=50?50:L>=25?25:0;
@@ -1530,20 +1724,57 @@ function fxLoop(){const c=fx.cv.getContext('2d');c.clearRect(0,0,fx.cv.width,fx.
 function burstAtKid(id,n){const el=$('#actors .actor[data-id="'+id+'"]');let x=innerWidth/2,y=innerHeight/3;if(el){const r=el.getBoundingClientRect();x=r.left+r.width/2;y=r.top;}confetti(x,y,n,1);}
 
 /* ================= title screen ================= */
+let SPL=null;
+function stopSplash(){if(SPL&&SPL.raf)cancelAnimationFrame(SPL.raf);SPL=null;}
 function drawSplash(){
+  stopSplash();
   const cv=$('#splashCv'),sc=Math.max(5,innerWidth/360,innerHeight/260),W=Math.round(innerWidth/sc),H=Math.round(innerHeight/sc);
   cv.width=W;cv.height=H;const c=cv.getContext('2d');c.imageSmoothingEnabled=false;const r=rng(7);
-  sky(c,W,H,['#2d62c4','#3f7dd8','#5f9fe6','#8bc3f0','#bfe0f7','#ffe9ae'],H*.82);
-  disc(c,W*.8,H*.2,9,'#fff3b0');disc(c,W*.8,H*.2,6,'#ffe27a');
-  cloud(c,W*.08,H*.14,2);cloud(c,W*.62,H*.3,1);cloud(c,W*.3,H*.42,1);bird(c,W*.22,H*.3);bird(c,W*.3,H*.26);bird(c,W*.7,H*.2);
+  /* background: sky and sun (clouds and birds are recorded, then animated) */
+  const bg=mk(W,H),bc=bg.getContext('2d');bc.imageSmoothingEnabled=false;
+  REC={sky:[],clouds:[],birds:[]};
+  sky(bc,W,H,['#2d62c4','#3f7dd8','#5f9fe6','#8bc3f0','#bfe0f7','#ffe9ae'],H*.82);
+  disc(bc,W*.8,H*.2,9,'#fff3b0');disc(bc,W*.8,H*.2,6,'#ffe27a');
+  cloud(bc,W*.08,H*.14,2);cloud(bc,W*.62,H*.3,1);cloud(bc,W*.3,H*.42,1);cloud(bc,W*.9,H*.08,1);
+  bird(bc,W*.22,H*.3);bird(bc,W*.3,H*.26);bird(bc,W*.7,H*.2);bird(bc,W*.5,H*.34);
+  const rec=REC;REC=null;
+  /* foreground: mountain, path, trees, flag pole (transparent elsewhere) */
+  const fg=mk(W,H),fc=fg.getContext('2d');fc.imageSmoothingEnabled=false;
   const o={cx:W*.5,peakY:H*.47,slope:.78,snowDepth:11,snowCols:['#ffffff','#d9e8f4'],rockDepth:8,rockCols:['#9aa6b2','#76828f'],bodyCols:['#7ccf55','#6bbd4a','#4fa043','#438f3a'],speck:90,speckCols:['#a0e07a','#2f7f33'],noHills:true};
-  tri(c,W*.1,H*.62,H*.16,H*.2,'#a9c6e4','#94b3d6');tri(c,W*.92,H*.58,H*.2,H*.22,'#a9c6e4','#94b3d6');
-  mountain(c,W,H,r,o);R(c,0,H*.95,W,H*.05+1,'#3f9a3f');
+  tri(fc,W*.1,H*.62,H*.16,H*.2,'#a9c6e4','#94b3d6');tri(fc,W*.92,H*.58,H*.2,H*.22,'#a9c6e4','#94b3d6');
+  mountain(fc,W,H,r,o);R(fc,0,H*.95,W,H*.05+1,'#3f9a3f');
   const path=buildPath(zig(5,.5,.2,.6,.95,.5,.5,.5),W,H),T=MAPS.peak.tile;
-  for(let i=1;i<100;i++){const p=path.lv[i];drawTile(c,p[0],p[1],i,T,i%10===0);}
-  EMB.flag(c,Math.round(path.lv[100][0]),Math.round(path.lv[100][1]));
-  const kid=mk(CH_W,CH_H);drawChar(kid.getContext('2d'),{sk:1,st:2,hc:3,sh:0},true);const q=path.lv[38];c.fillStyle='rgba(0,0,0,.28)';c.fillRect(Math.round(q[0])-6,Math.round(q[1])+1,12,2);c.drawImage(kid,Math.round(q[0])-8,Math.round(q[1])-CH_H+2);
-  for(const [x,y,h] of [[.08,.97,18],[.17,.99,14],[.9,.98,18],[.82,.99,13],[.03,.99,12],[.96,.99,12]])pine(c,Math.round(W*x),Math.round(H*y),h,'#2f8f45','#4cb35c');
+  for(let i=1;i<100;i++){const p=path.lv[i];drawTile(fc,p[0],p[1],i,T,i%10===0);}
+  const gx=Math.round(path.lv[100][0]),gy=Math.round(path.lv[100][1]);
+  EMB.flag(fc,gx,gy,true);
+  for(const [x,y,h] of [[.08,.97,18],[.17,.99,14],[.9,.98,18],[.82,.99,13],[.03,.99,12],[.96,.99,12]])pine(fc,Math.round(W*x),Math.round(H*y),h,'#2f8f45','#4cb35c');
+  /* the two kids waiting at the start */
+  const sprite=av=>{const d=mk(CH_W,CH_H),u=mk(CH_W,CH_H);drawChar(d.getContext('2d'),av,false);drawChar(u.getContext('2d'),av,true);return{d,u};};
+  const kids=[{s:sprite({g:'m',sk:1,st:2,hc:3,sh:0}),p:path.lv[38],ph:0,dir:1},{s:sprite({g:'f',sk:2,st:14,hc:1,sh:4}),p:path.lv[55],ph:.55,dir:-1}];
+  const dt=[];for(let i=0;i<7;i++)dt.push(1);
+  const CL=rec.clouds.map((q,i)=>({x:q[0],y:q[1],s:q[2],sp:1.6+q[2]*1.2+(i%3)*.7})),BD=rec.birds.map((q,i)=>({x:q[0],y:q[1],col:q[2],sp:5+(i%3)*2.2,ph:i*1.7}));
+  const flagH=[];for(let dx=0;dx<11;dx++){let h=0;for(let i=0;i<7;i++)if(Math.round(11-i*1.5)>dx)h=i+1;flagH.push(h);}
+  const frame=t=>{
+    c.clearRect(0,0,W,H);c.drawImage(bg,0,0);
+    /* the sky was painted without clouds and birds (recorded), so draw them moving */
+    for(const q of CL){const x=((q.x+t*q.sp+20)%(W+40))-20;cloud(c,x,q.y,q.s);}
+    for(const q of BD){const x=((q.x+t*q.sp+10)%(W+20))-10,y=q.y+Math.sin(t*1.6+q.ph)*2,up=Math.sin(t*9+q.ph)>0;
+      c.fillStyle=q.col;(up?BIRD_A:BIRD_B).forEach(p=>c.fillRect(Math.round(x)+p[0],Math.round(y)+p[1],1,1));}
+    c.drawImage(fg,0,0);
+    /* flag cloth waving */
+    for(let dx=0;dx<11;dx++){const amp=Math.min(1.6,dx*.22),off=Math.round(Math.sin(t*6.5-dx*.75)*amp);
+      for(let i=0;i<7;i++){if(Math.round(11-i*1.5)<=dx)continue;R(c,gx+1+dx,gy-22+i+off,1,1,i<2?'#ff7a6a':'#e24a3b');}}
+    R(c,gx,gy-23,1,1,'#ffd23f');
+    /* kids bouncing happily */
+    for(const k of kids){const ph=((t/1.25+k.ph)%1),air=ph<.62,h=air?Math.sin(Math.PI*ph/.62)*5:0,x=Math.round(k.p[0]),y=Math.round(k.p[1]);
+      c.fillStyle='rgba(0,0,0,.28)';const sw=Math.round(6-h*.4);c.fillRect(x-sw,y+1,sw*2,2);
+      c.drawImage(h>1.4?k.s.u:k.s.d,x-8,Math.round(y-CH_H+2-h));}
+  };
+  SPL={W,H,raf:0,last:-1};
+  if(REDUCED){frame(0);return;}
+  const t0=performance.now();
+  const loop=ts=>{if(!SPL)return;SPL.raf=requestAnimationFrame(loop);if(ts-SPL.last<62)return;SPL.last=ts;frame((ts-t0)/1000);};
+  SPL.raf=requestAnimationFrame(loop);
 }
 
 /* ================= navigation ================= */
@@ -1766,7 +1997,7 @@ function give(kidId,bid,type){
   k.log.unshift(ent);if(k.log.length>40)k.log.length=40;tally(k,ent,1);
   let finished=false;
   if(to>=goal()){k.tier=100;k.certs.push({id:uid(),ts:Date.now(),mapId:S.cfg.mapId,round:curRound(),pts:to,goal:goal(),name:k.name,period:S.cfg.period||null});finished=true;}
-  const gotB=evalBadges(k);
+  const gotB=evalBadges(k);const gotH=evalHeroes(k);
   persistKid(k);closePop();
   if(view==='home'){
     if(thrown)throwKid(k.id,dispTarget(k));else animateKid(k.id,dispTarget(k));
@@ -1782,6 +2013,7 @@ function give(kidId,bid,type){
   else if(mileHit){tone(SND.mile);const rw=(S.cfg.rewards[mileHit]||'').trim();toast(k.name+' وصل المحطة '+mileHit+'!'+(rw?' المكافأة: '+rw:''));setTimeout(()=>burstAtKid(k.id,46),400);badgeLater();}
   else if(newL>oldL){tone(SND.lvl);setTimeout(()=>burstAtKid(k.id,18),350);setTimeout(()=>{badgeLater();},wait);}
   else{tone(delta<0?SND.neg:SND.pos);badgeLater();}
+  if(gotH.length){const tryH=n=>setTimeout(()=>{if(!sheetOpen)openHeroWin(k.id,gotH);else if(n<4)tryH(n+1);},n?2500:wait+(gotB.length||finished||newTier>oldTier?3200:1200));tryH(0);}
   if(asked&&!finished&&view==='home')setTimeout(()=>{if(!sheetOpen&&needsFork(k))openFork(k.id);},wait+(newTier>oldTier?1400:350));
 }
 function undoLast(id){
@@ -1884,8 +2116,10 @@ function openFeed(){
 function photoPrevHtml(){return draft&&draft.photo?'<img alt="" src="'+draft.photo+'">':'<img class="sp" alt="" src="'+avatarURL(draft.av,false)+'">';}
 function swatches(key,list){return list.map((c,i)=>'<button type="button" class="sw" style="background:'+c+'" data-act="av" data-k="'+key+'" data-v="'+i+'" aria-pressed="'+(draft.av[key]===i)+'" aria-label="خيار '+(i+1)+'"></button>').join('');}
 function builderHtml(){
-  return '<div class="bigav"><img alt="معاينة الشخصية" src="'+avatarURL(draft.av,false)+'"></div><div><div class="lbl" style="margin-top:0">البشرة</div><div>'+swatches('sk',SKIN)+'</div>'
-   +'<div class="lbl">الرأس</div><div class="row">'+STYLES.map((s,i)=>'<button type="button" class="btn opt" data-act="av" data-k="st" data-v="'+i+'" aria-pressed="'+(draft.av.st===i)+'">'+s[1]+'</button>').join('')+'</div>'
+  const g=draft.av.g==='f'?'f':'m';
+  return '<div class="bigav"><img alt="معاينة الشخصية" src="'+avatarURL(draft.av,false)+'"></div><div><div class="lbl" style="margin-top:0">النوع</div><div class="row"><button type="button" class="btn opt" data-act="avg" data-v="m" aria-pressed="'+(g==='m')+'">ولد</button><button type="button" class="btn opt" data-act="avg" data-v="f" aria-pressed="'+(g==='f')+'">بنت</button></div>'
+   +'<div class="lbl">البشرة</div><div>'+swatches('sk',SKIN)+'</div>'
+   +'<div class="lbl">الرأس</div><div class="row">'+headsOf(g).map(x=>'<button type="button" class="btn opt" data-act="av" data-k="st" data-v="'+x.i+'" aria-pressed="'+(draft.av.st===x.i)+'">'+x.h.n+'</button>').join('')+'</div>'
    +'<div class="lbl">لون الشعر أو القبعة أو الطرحة</div><div>'+swatches('hc',HAIRC)+'</div><div class="lbl">لون القميص</div><div>'+swatches('sh',SHIRT.slice(0,8))+'</div></div>';
 }
 function openKidEditor(id){
@@ -2011,7 +2245,8 @@ const ACT={
   bkexp(){exportBackup();},
   bkgo(){applyBackup();},
   forkgo(el){forkChoose(el.dataset.id,el.dataset.v);},
-  wardrobe(el){closePop();openWardrobe(el.dataset.id);},
+  wardrobe(el){closePop();openWardrobe(el.dataset.id,el.dataset.hero?'hero':null);},
+  wdhero(el){wdHero(el.dataset.v);},
   wdtab(el){if(wd){wd.tab=el.dataset.v;setSheet(wardrobeHtml(kidById(wd.id)));}},
   wdpick(el){wdPick(el.dataset.k,+el.dataset.v);},
   wdlater(){closeSheet();},
@@ -2024,6 +2259,7 @@ const ACT={
   editkid(el){openKidEditor(el.dataset.id);},
   delkid(){delKid();},
   photodel(){if(!draft)return;draft.photo=null;$('#photoPrev').innerHTML=photoPrevHtml();},
+  avg(el){if(!draft)return;const g=el.dataset.v==='f'?'f':'m';if(draft.av.g!==g){draft.av.g=g;if(HEADS[draft.av.st].g!==g)draft.av.st=defHead(g);$('#builder').innerHTML=builderHtml();$('#photoPrev').innerHTML=photoPrevHtml();}},
   av(el){if(!draft)return;draft.av[el.dataset.k]=+el.dataset.v;$('#builder').innerHTML=builderHtml();$('#photoPrev').innerHTML=photoPrevHtml();},
   gobeh(){closeSheet();go('beh');},
   gotoround(){go('round');},
@@ -2073,7 +2309,7 @@ let rzT;window.addEventListener('resize',()=>{if(!$('#splash').classList.contain
 /* ================= start ================= */
 $('#goBtn').addEventListener('click',()=>{
   if(!ready)return;
-  $('#splash').classList.add('gone');tone(SND.lvl);
+  $('#splash').classList.add('gone');stopSplash();tone(SND.lvl);
   const own=isGuest()?myKids():S.kids;
   if(!own.length){go('kids');if(!needJoin())openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
 });
