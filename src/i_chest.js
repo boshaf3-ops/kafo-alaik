@@ -2,9 +2,6 @@
    A chest only exists on the map when the parent wrote a reward for that station.
    Every adventure has its own chest. When a child reaches one it bursts open and shows the reward. */
 const CH_BX=14,CH_BY=13;
-/* each child opens each chest only once per map and round, even if he drops below it and climbs again */
-const chestGot=(k,m)=>!!(k.ck&&k.ck.tk===tierKey()&&k.ck.m&&k.ck.m[m]);
-const chestMark=(k,m)=>{const tk=tierKey();k.ck={tk,m:Object.assign({},k.ck&&k.ck.tk===tk?k.ck.m:{},{[m]:1})};};
 const rewardOf=m=>((S.cfg.rewards&&S.cfg.rewards[m])||'').trim();
 function chClassic(c,P){
   R(c,3,0,8,1,P.o);R(c,2,1,10,1,P.o);R(c,1,2,12,3,P.o);
@@ -74,7 +71,8 @@ const CH_BG={peak:['#2d62c4','#bfe0f7','#4fa043'],snow:['#5a7fb8','#e8f4ff','#f4
 
 /* ---------- chests standing on the map ---------- */
 const chestHold={};let chestVis={};
-function chestVisible(m){return !!rewardOf(m)&&(!S.kids.length||S.kids.some(k=>tierOf(k)<m)||!!chestHold[m]);}
+/* a chest stays on the map for as long as it has a reward; it opens every time a child reaches it again */
+function chestVisible(m){return !!rewardOf(m);}
 function renderChests(){
   const host=$('#actors');if(!host||!curScene)return;const id=MAPS[S.cfg.mapId]?S.cfg.mapId:'peak',W=curScene.W,P=curScene.path;
   const want={};[25,50,75].forEach(m=>{want[m]=chestVisible(m);});
@@ -88,6 +86,7 @@ function renderChests(){
     el.setAttribute('aria-label','صندوق كنز عند '+m+'%: '+rewardOf(m));chestVis[m]=true;});
 }
 
+function bumpChest(m){const el=$('#actors .chest[data-m="'+m+'"]');if(!el||REDUCED)return;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),700);}
 /* ---------- opening a chest ---------- */
 function openChests(id,list,done){
   const k=kidById(id);const m=list.shift();
@@ -118,7 +117,7 @@ function chestAnim(k,m,id){
   const boomNow=()=>{if(boomed)return;boomed=true;
     for(let i=0;i<54;i++){const a=seed()*Math.PI*2,sp=22+seed()*58;parts.push({x:CX+14,y:CY+13,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-26,c:pal[Math.floor(seed()*pal.length)],s:1+Math.floor(seed()*2.4),l:.8+seed()*.7});}
     for(let i=0;i<7;i++)smoke.push({x:CX+14+(seed()-.5)*14,y:CY+16+(seed()-.5)*8,r:3,vr:9+seed()*6,vy:-8-seed()*8,l:.9});
-    tone(SND.win);if(boom)boom.classList.add('go');chestHold[m]=false;renderChests();
+    tone(SND.win);if(boom)boom.classList.add('go');chestHold[m]=false;renderChests();bumpChest(m);
     try{const r=cv.getBoundingClientRect();confetti(r.left+r.width*.62,r.top+r.height*.55,60,1.3);}catch(e){}
     if(navigator.vibrate)try{navigator.vibrate([40,30,80]);}catch(e){}
     setTimeout(show,350);};

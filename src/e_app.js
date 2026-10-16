@@ -419,7 +419,7 @@ function give(kidId,bid,type){
   const newL=lvl(to),delta=to-from,newTier=Math.max(oldTier,milestone(newL));k.tier=newTier;k.tk=tierKey();
   const ent={id:uid(),t:b.t,p:delta-bonus,k:type,from,to,ts:Date.now()};if(m.fork){ent.fk=fk0;if(bonus)ent.bonus=bonus;}
   k.log.unshift(ent);if(k.log.length>40)k.log.length=40;tally(k,ent,1);
-  const chests=[25,50,75].filter(x=>oldL<x&&newL>=x&&rewardOf(x)&&!chestGot(k,x));chests.forEach(x=>{chestMark(k,x);chestHold[x]=true;});
+  const chests=[25,50,75].filter(x=>oldL<x&&newL>=x&&rewardOf(x));chests.forEach(x=>{chestHold[x]=true;});
   let finished=false;
   if(to>=goal()){k.tier=100;k.certs.push({id:uid(),ts:Date.now(),mapId:S.cfg.mapId,round:curRound(),pts:to,goal:goal(),name:k.name,period:S.cfg.period||null});finished=true;}
   k.sad=type==='neg'&&!finished;
