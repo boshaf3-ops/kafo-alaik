@@ -111,6 +111,8 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 .iconbtn{width:48px;height:48px;padding:0;min-height:0}
 .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:flex;gap:6px;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);box-shadow:0 -4px 0 0 var(--line)}
 .tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:0;background:transparent;color:var(--muted);font:800 12px/1.2 var(--f-body)}
+.tabs .tab span:last-child{white-space:nowrap}
+@media(max-width:480px){.tabs{gap:3px;padding-inline:6px}.tab{font-size:11px}html[dir=ltr] .tab{font-size:10px}}
 .tab[aria-selected="true"]{background:var(--brand);color:var(--brand-ink);box-shadow:0 -3px 0 0 var(--line),0 3px 0 0 var(--line),-3px 0 0 0 var(--line),3px 0 0 0 var(--line)}
 .view{animation:rise .25s steps(4) both}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -429,6 +431,7 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
     <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>النقاط</span></button>
+    <button class="tab" role="tab" data-tab="round"><span class="ico i-map"></span><span>الجولة</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
     <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
@@ -555,6 +558,7 @@ const ICONS={
   down:['############','.##########.','..########..','...######...','....####....','.....##.....'],
   zoom:['..######....','.########...','###....###..','##......##..','##......##..','###....###..','.########...','..#######...','......####..','.......####.','........####','.........###'],
   gear:['.....##.....','.#..####..#.','.##########.','..###..###..','.####..####.','####....####','####....####','.####..####.','..###..###..','.##########.','.#..####..#.','.....##.....'],
+  map:['...######...','..########..','.####..####.','.###....###.','.###....###.','.####..####.','..########..','...######...','....####....','.....##.....'],
   house:['.....##.....','....####....','...######...','..########..','.##########.','############','.##########.','.####..####.','.####..####.','.####..####.'],
   lock:['..######..','.##....##.','.##....##.','##########','##########','####..####','####..####','##########'],
   crown:['#....#....#','##..###..##','###########','###########','###########','###########']
@@ -2637,8 +2641,8 @@ function drawSplash(){
 
 /* ================= navigation ================= */
 const V=$('#view');
-function go(tab){let sec=null;if(tab==='round'){tab='settings';sec='round';}if(sec)SETOPEN[sec]=true;if(tab==='beh'&&!pwActOK()){guardPw(()=>go('beh'));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
-function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderSettings,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
+function go(tab){if((tab==='beh'||tab==='round')&&!isGuest()&&!pwActOK()){guardPw(()=>go(tab));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
+function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderRound,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
 const needJoin=()=>isGuest()&&!myFam();
 function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">':'<img class="sp" alt="" src="'+avatarURL(effAv(k),false)+'">';}
 
@@ -3132,6 +3136,10 @@ function langSec(){
   return '<div class="row"><button class="btn opt" type="button" data-act="setlang" data-v="ar" aria-pressed="'+(!en)+'" data-nt>العربية</button><button class="btn opt" type="button" data-act="setlang" data-v="en" aria-pressed="'+en+'" data-nt>English</button></div>'
    +'<p class="sub" data-nt>'+(en?'The whole game switches to English. Kids\' names and the behaviors you typed yourself stay as you wrote them.':'تتحول اللعبة كلها للإنجليزية. أسماء الأبناء والسلوكيات اللي كتبتها بنفسك تبقى كما هي.')+'</p>';
 }
+function renderRound(){
+  V.innerHTML='<div class="view"><h2>الجولة</h2><p class="sub">'+(isGuest()?'تفاصيل الجولة الحالية.':'الخريطة والفترة والهدف والمكافآت وتصفير النقاط.')+'</p>'+roundBody()+'</div>';
+  paintMaps();
+}
 function renderSettings(){
   if(!pwOK()){
     V.innerHTML='<div class="view"><div class="panel lockp"><span class="ico i-lock"></span><h2>الإعدادات مقفلة</h2><p class="sub">اكتب كلمة السر لتفتحها.</p>'
@@ -3145,12 +3153,10 @@ function renderSettings(){
    +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
    +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
    +secHtml('pts','نظام النقاط','اختصار لتبويب النقاط في الشريط',ptsSec())
-   +(g?'':secHtml('round','الجولة','الخريطة والفترة والهدف والمكافآت وتصفير النقاط',roundBody()))
    +(g||db?'':secHtml('bk','نسخة احتياطية','حفظ نسخة من بيانات اللعبة أو استعادتها',backupPanel().replace(/<section class="panel" style="margin-top:14px">/,'<section>')))
    +secHtml('pw','كلمة السر',hasPw()?'مفعّلة · غيّرها أو أزلها':'غير مفعّلة · ضع كلمة تحمي الإعدادات',pwSec())
    +(g?'':secHtml('rst','الرجوع إلى الإعدادات الأصلية','حذف كل شيء وبدء اللعبة من جديد',resetSec()))
    +'</div>';
-  if(SETOPEN.round)paintMaps();
 }
 
 /* ================= certificates ================= */

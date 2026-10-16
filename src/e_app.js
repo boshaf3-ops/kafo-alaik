@@ -250,8 +250,8 @@ function drawSplash(){
 
 /* ================= navigation ================= */
 const V=$('#view');
-function go(tab){let sec=null;if(tab==='round'){tab='settings';sec='round';}if(sec)SETOPEN[sec]=true;if(tab==='beh'&&!pwActOK()){guardPw(()=>go('beh'));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
-function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderSettings,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
+function go(tab){if((tab==='beh'||tab==='round')&&!isGuest()&&!pwActOK()){guardPw(()=>go(tab));return;}if(view==='settings'&&tab!=='settings')pwUntil=0;view=tab;closePop();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();window.scrollTo(0,0);}
+function render(){document.body.classList.toggle('is-home',view==='home'&&!needJoin());if(view!=='home'||needJoin())stopLive();if(needJoin()){renderJoin();return;}({home:renderHome,kids:renderKids,beh:renderBehaviors,round:renderRound,certs:renderCerts,settings:renderSettings}[view]||renderHome)();}
 const needJoin=()=>isGuest()&&!myFam();
 function avHtml(k){return k.photo?'<img class="photo" alt="" src="'+k.photo+'">':'<img class="sp" alt="" src="'+avatarURL(effAv(k),false)+'">';}
 
@@ -745,6 +745,10 @@ function langSec(){
   return '<div class="row"><button class="btn opt" type="button" data-act="setlang" data-v="ar" aria-pressed="'+(!en)+'" data-nt>العربية</button><button class="btn opt" type="button" data-act="setlang" data-v="en" aria-pressed="'+en+'" data-nt>English</button></div>'
    +'<p class="sub" data-nt>'+(en?'The whole game switches to English. Kids\' names and the behaviors you typed yourself stay as you wrote them.':'تتحول اللعبة كلها للإنجليزية. أسماء الأبناء والسلوكيات اللي كتبتها بنفسك تبقى كما هي.')+'</p>';
 }
+function renderRound(){
+  V.innerHTML='<div class="view"><h2>الجولة</h2><p class="sub">'+(isGuest()?'تفاصيل الجولة الحالية.':'الخريطة والفترة والهدف والمكافآت وتصفير النقاط.')+'</p>'+roundBody()+'</div>';
+  paintMaps();
+}
 function renderSettings(){
   if(!pwOK()){
     V.innerHTML='<div class="view"><div class="panel lockp"><span class="ico i-lock"></span><h2>الإعدادات مقفلة</h2><p class="sub">اكتب كلمة السر لتفتحها.</p>'
@@ -758,12 +762,10 @@ function renderSettings(){
    +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
    +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
    +secHtml('pts','نظام النقاط','اختصار لتبويب النقاط في الشريط',ptsSec())
-   +(g?'':secHtml('round','الجولة','الخريطة والفترة والهدف والمكافآت وتصفير النقاط',roundBody()))
    +(g||db?'':secHtml('bk','نسخة احتياطية','حفظ نسخة من بيانات اللعبة أو استعادتها',backupPanel().replace(/<section class="panel" style="margin-top:14px">/,'<section>')))
    +secHtml('pw','كلمة السر',hasPw()?'مفعّلة · غيّرها أو أزلها':'غير مفعّلة · ضع كلمة تحمي الإعدادات',pwSec())
    +(g?'':secHtml('rst','الرجوع إلى الإعدادات الأصلية','حذف كل شيء وبدء اللعبة من جديد',resetSec()))
    +'</div>';
-  if(SETOPEN.round)paintMaps();
 }
 
 /* ================= certificates ================= */

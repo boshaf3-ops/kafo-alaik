@@ -81,6 +81,8 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 .iconbtn{width:48px;height:48px;padding:0;min-height:0}
 .tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:flex;gap:6px;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);box-shadow:0 -4px 0 0 var(--line)}
 .tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:0;background:transparent;color:var(--muted);font:800 12px/1.2 var(--f-body)}
+.tabs .tab span:last-child{white-space:nowrap}
+@media(max-width:480px){.tabs{gap:3px;padding-inline:6px}.tab{font-size:11px}html[dir=ltr] .tab{font-size:10px}}
 .tab[aria-selected="true"]{background:var(--brand);color:var(--brand-ink);box-shadow:0 -3px 0 0 var(--line),0 3px 0 0 var(--line),-3px 0 0 0 var(--line),3px 0 0 0 var(--line)}
 .view{animation:rise .25s steps(4) both}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -399,6 +401,7 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
     <button class="tab" role="tab" data-tab="home"><span class="ico i-mountain"></span><span>المغامرة</span></button>
     <button class="tab" role="tab" data-tab="kids"><span class="ico i-kids"></span><span>الأبناء</span></button>
     <button class="tab" role="tab" data-tab="beh"><span class="ico i-star"></span><span>النقاط</span></button>
+    <button class="tab" role="tab" data-tab="round"><span class="ico i-map"></span><span>الجولة</span></button>
     <button class="tab" role="tab" data-tab="certs"><span class="ico i-trophy"></span><span>الشهادات</span></button>
     <button class="tab" role="tab" data-tab="settings"><span class="ico i-gear"></span><span>الإعدادات</span></button>
   </nav>
