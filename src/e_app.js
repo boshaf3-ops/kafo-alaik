@@ -139,6 +139,45 @@ function toast(msg){const t=$('#toast');if(!msg){return;}t.innerHTML='<div>'+esc
 let ac=null;
 function tone(seq){if(!soundOn())return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();let t=ac.currentTime+.01;for(const n of seq){const o=ac.createOscillator(),g=ac.createGain();o.type=n[2]||'square';o.frequency.value=n[0];g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(.001,t+n[1]);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+n[1]+.02);t+=n[1]*.92;}}catch(e){}}
 const SND={pos:[[523,.07],[659,.07],[784,.12]],neg:[[247,.12,'sawtooth'],[185,.22,'sawtooth']],lvl:[[523,.07],[659,.07],[784,.07],[1047,.18]],mile:[[523,.09],[659,.09],[784,.09],[1047,.09],[784,.09],[1047,.09],[1319,.3]],win:[[523,.1],[523,.1],[523,.1],[659,.14],[784,.1],[659,.1],[784,.1],[1047,.4]]};
+/* ---------- interface sounds: every tap makes a small game-like sound; muting silences them all (tone() checks soundOn) ---------- */
+const UIS={
+  tick:[[760,.03,'triangle']],
+  up:[[400,.03,'triangle'],[500,.03,'triangle'],[620,.03,'triangle'],[780,.06,'triangle']],
+  down:[[780,.03,'triangle'],[620,.03,'triangle'],[500,.03,'triangle'],[400,.06,'triangle']],
+  back:[[520,.03,'sine'],[340,.07,'sine']],
+  plus:[[600,.04,'square'],[900,.08,'square']],
+  minus:[[420,.05,'square'],[270,.09,'square']],
+  swoosh:[[300,.04,'sawtooth'],[450,.04,'sawtooth'],[700,.07,'sawtooth']],
+  undo:[[620,.05,'sine'],[470,.05,'sine'],[320,.09,'sine']],
+  chime:[[784,.05,'sine'],[1047,.09,'sine']],
+  thud:[[220,.09,'square']],
+  zin:[[500,.04,'sine'],[1000,.09,'sine']],
+  zout:[[1000,.04,'sine'],[500,.09,'sine']]
+};
+function uiSound(el){
+  if(!el||el.disabled)return;const a=el.dataset.act,t=el.dataset.tab;
+  if(a==='give')return;
+  let s=UIS.tick;
+  if(t){const tabs=$$('[data-tab]').map(b=>b.dataset.tab),ni=tabs.indexOf(t),oi=tabs.indexOf(typeof view==='string'?view:''),up=ni>=oi,b=440+Math.max(0,ni)*55;
+    s=up?[[b,.04,'triangle'],[b*1.5,.07,'triangle']]:[[b*1.5,.04,'triangle'],[b,.07,'triangle']];}
+  else if(a==='pm')s=el.dataset.t==='neg'?UIS.minus:UIS.plus;
+  else if(a==='pick'){const i=Math.max(0,(S.kids||[]).findIndex(k=>k.id===el.dataset.id));s=[[500+i*70,.04,'sine'],[750+i*70,.07,'sine']];}
+  else if(a==='camtop')s=UIS.up;
+  else if(a==='cambot')s=UIS.down;
+  else if(a==='camzoom')s=camZoom?UIS.zin:UIS.zout;
+  else if(a==='popclose'||a==='close'||a==='backdrop')s=UIS.back;
+  else if(a==='wdpick'||a==='wdhero'||a==='wdtab'||a==='av'||a==='avg'){const v=parseInt(el.dataset.v,10);s=[[700+((isNaN(v)?0:v)%9)*55,.03,'triangle'],[1000+((isNaN(v)?0:v)%9)*40,.04,'triangle']];}
+  else if(a==='pickmap'||a==='fork'||a==='forkgo')s=UIS.swoosh;
+  else if(a==='undo')s=UIS.undo;
+  else if(a==='bp'||a==='sugg'||a==='cert'||a==='certshow'||a==='kcerts'||a==='badges')s=UIS.chime;
+  else if(a==='bdel'||a==='rwdel'||a==='invdel'||a==='famdel')s=UIS.thud;
+  tone(s);
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest&&e.target.closest('#soundBtn'))return;
+  const el=e.target.closest&&e.target.closest('[data-act],[data-tab],button,.map-card,.actor');
+  if(el)uiSound(el);
+},true);
 const fx={cv:$('#fx'),parts:[],on:false};
 function confetti(x,y,n,spread){
   if(REDUCED)return;fx.cv.width=innerWidth;fx.cv.height=innerHeight;const cols=['#ffd23f','#ff7eb6','#43c6e8','#58c15a','#ff9a2e','#ffffff'];
