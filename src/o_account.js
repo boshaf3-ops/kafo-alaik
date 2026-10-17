@@ -19,26 +19,28 @@ function acctGate(next){
    +'<button class="btn gold forkopt" type="button" data-act="authmode" data-v="signup"><b>إنشاء حساب جديد</b></button>'
    +'<button class="btn forkopt" type="button" data-act="authmode" data-v="login"><b>تسجيل الدخول</b></button>'
    +'<div class="row" style="justify-content:center;margin-top:12px">'+(inGame?'<button class="btn" type="button" data-act="close">إغلاق</button>':'<button class="btn" type="button" data-act="authskip">العب بدون حساب</button>')+'</div>'
-   +'<p style="margin-top:6px"><a class="btn small" href="'+esc(cloudSupportHref())+'">نسيت الإيميل أو كلمة السر؟ تواصل معنا</a></p>'
+   +'<p style="margin-top:6px"><a class="btn small" href="'+esc(cloudSupportHref())+'">نسيت اسم المستخدم أو كلمة السر؟ تواصل معنا</a></p>'
    +'<p class="sub" style="margin-top:10px">تنبيه: بدون حساب تنحفظ بيانات الأبناء على هذا الجهاز فقط، وقد تضيع إذا انمسح المتصفح أو تغيّر الجهاز.</p></div>');
 }
 function acctForm(mode){
   const su=mode==='signup',fg=mode==='forgot';
   let h='<form id="authForm" data-cform="auth" data-mode="'+mode+'" autocomplete="on"><h2>'+(su?'إنشاء حساب':fg?'نسيت كلمة السر':'تسجيل الدخول')+'</h2>'
-   +'<p class="sub">'+(su?'هذا الحساب لولي الأمر فقط، والأبناء يلعبون من خلاله.':fg?'اكتب إيميل حسابك ونرسل لك رمزًا من 6 أرقام.':'ادخل بإيميلك وكلمة سرك.')+'</p>'
-   +acctField('aEmail','الإيميل','email','name="email" dir="ltr" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" maxlength="120" required value="'+esc(AF.email||clLS.get(CL_EMAIL)||'')+'"');
+   +'<p class="sub">'+(su?'اختر اسم مستخدم وكلمة سر. الحساب لولي الأمر فقط، والأبناء يلعبون من خلاله.':fg?'اكتب اسم المستخدم.':'ادخل باسم المستخدم وكلمة السر.')+'</p>'
+   +acctField('aUser','اسم المستخدم','text','name="username" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="mohammed.ali" value="'+esc(su?(AF.email||''):(AF.email||clLS.get(CL_EMAIL)||''))+'"');
+  if(su)h+='<p class="sub" style="margin:2px 6px 0">بالإنجليزي، وفيه نقطة بين جزئين. مثال: <b dir="ltr">mohammed.ali</b></p><div class="uhint" id="aUserMsg" aria-live="polite"></div>';
+  if(mode==='login')h+='<p class="sub" style="margin:2px 6px 0">إذا سجّلت قبل بإيميل، اكتب إيميلك في نفس الخانة.</p>';
   if(!fg)h+=acctField('aPw','كلمة السر','password','name="password" dir="ltr" autocomplete="'+(su?'new-password':'current-password')+'" maxlength="72" required'+(su?' minlength="8" placeholder="8 أحرف أو أرقام على الأقل"':''));
   if(su)h+=acctField('aPw2','أعد كتابة كلمة السر','password','dir="ltr" autocomplete="new-password" maxlength="72" required');
   if(su)h+=acctField('aFam','اسم العائلة (اختياري)','text','name="family" maxlength="24" autocomplete="off" placeholder="مثال: عائلة الشافعي" value="'+esc(AF.fam)+'"')
    +'<label class="chk"><input type="checkbox" id="aOk" required><span>أنا ولي أمر، وأوافق على <a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>.</span></label>';
   if(CLOUD_RECOVERY&&(su||fg))h+='<p class="sub" style="margin-top:10px">يوصلك رمز التأكيد على إيميلك خلال دقيقة تقريبًا. إذا ما لقيته، شوف مجلد الرسائل غير المرغوبة (Spam).</p>';
-  if(!CLOUD_RECOVERY&&su)h+='<p class="sub" style="margin-top:10px"><b>مهم:</b> احفظ الإيميل وكلمة السر في مكان آمن. حاليًا ما فيه طريقة لاسترجاع كلمة السر إذا نسيتها.</p>';
+  if(!CLOUD_RECOVERY&&su)h+='<p class="sub" style="margin-top:10px"><b>مهم:</b> احفظ اسم المستخدم وكلمة السر في مكان آمن. حاليًا ما فيه طريقة لاسترجاع كلمة السر إذا نسيتها.</p>';
   h+='<div class="row" style="margin-top:14px"><button class="btn primary" type="submit">'+(su?'إنشاء الحساب':fg?'إرسال الرمز':'دخول')+'</button><button class="btn" type="button" data-act="authgate">رجوع</button></div>';
   if(mode==='login'&&CLOUD_RECOVERY)h+='<p style="margin-top:10px"><button class="btn small" type="button" data-act="authmode" data-v="forgot">نسيت كلمة السر؟</button></p>';
-  if(mode==='login')h+='<p style="margin-top:6px"><a class="btn small" href="'+esc(cloudSupportHref())+'">نسيت الإيميل أو كلمة السر؟ تواصل معنا</a></p>';
+  if(mode==='login')h+='<p style="margin-top:6px"><a class="btn small" href="'+esc(cloudSupportHref())+'">نسيت اسم المستخدم أو كلمة السر؟ تواصل معنا</a></p>';
   return h+'</form>';
 }
-function acctFocus(id){setTimeout(()=>{let i=$('#'+id);if(id==='aEmail'&&i&&i.value&&$('#aPw'))i=$('#aPw');if(i)i.focus();},60);}
+function acctFocus(id){setTimeout(()=>{let i=$('#'+id);if(id==='aUser'&&i&&i.value&&$('#aPw'))i=$('#aPw');if(i)i.focus();},60);}
 function acctCode(){
   acctShow('<form id="codeForm" data-cform="code" autocomplete="off"><h2>اكتب الرمز</h2><p class="sub">أرسلنا رمزًا من 6 أرقام إلى <b dir="ltr">'+esc(AF.email)+'</b>. إذا ما وصل خلال دقيقة، شيّك على الرسائل غير المرغوبة (Spam).</p>'
    +'<input class="field code-in" id="aCode" dir="ltr" inputmode="numeric" autocomplete="one-time-code" maxlength="8" required placeholder="000000" aria-label="رمز التأكيد" style="text-align:center;letter-spacing:6px;font-size:26px">'
@@ -58,7 +60,7 @@ async function acctLoggedIn(ses){
   if(ses&&ses.user)CL.user=ses.user;
   else{try{const g=await CL.sb.auth.getSession();CL.user=g.data&&g.data.session?g.data.session.user:null;}catch(e){}}
   if(!CL.user){toast('تعذّر تسجيل الدخول، حاول مرة ثانية');return;}
-  if(CL.user.email)clLS.set(CL_EMAIL,CL.user.email);
+  if(CL.user.email)clLS.set(CL_EMAIL,clShowName(CL.user.email));
   acctShow('<div class="empty"><p class="sub">جارٍ تجهيز حسابك…</p></div>');
   let r;try{r=await cloudBegin();}catch(e){console.warn(e);toast(clErrText(e));acctDone(true);return;}
   acctNext(r);
@@ -75,7 +77,8 @@ function acctDone(failed){
   if(!failed&&!isStandalone()&&!clLS.get('kafo.inst')){clLS.set('kafo.inst','1');setTimeout(()=>{if(!sheetOpen)openInstall();},1100);}
   if(failed)toast('سجّلت دخولك، لكن تعذّرت مزامنة البيانات الآن');else{toast('تم تسجيل الدخول');tone(SND.lvl);}
   if(view==='settings')render();
-  if(nx)setTimeout(nx,320);
+  if(!failed&&acctRealEmail())setTimeout(()=>acctMigrate(nx),300);      /* the username screen comes first; the rest of the flow waits for it */
+  else if(nx)setTimeout(nx,320);
 }
 async function acctChoose(v){
   acctShow('<div class="empty"><p class="sub">جارٍ الحفظ…</p></div>');
@@ -108,6 +111,7 @@ function acctSec(){
     +'<p class="sub"><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>';
   return '<div class="srow"><div class="grow"><b dir="ltr">'+esc(cloudEmail())+'</b><div class="sub" id="acctStat">'+esc(cloudStatus())+'</div></div></div>'
    +'<p class="sub">يُحفظ في حسابك: أسماء الأبناء وأعمارهم ونقاطهم وإعدادات اللعبة. صور الأبناء تبقى على هذا الجهاز فقط.</p>'
+   +(acctRealEmail()?'<div class="row"><button class="btn gold" type="button" data-act="acctmig">اختر اسم مستخدم وامسح إيميلك</button></div>':'')
    +'<div class="row"><button class="btn gold" type="button" data-act="acctsync">مزامنة الآن</button><button class="btn" type="button" data-act="acctpw">تغيير كلمة السر</button><button class="btn" type="button" data-act="acctoutask">تسجيل الخروج</button></div>'
    +'<p class="sub" style="margin-top:14px">حذف الحساب يمسح كل ما حُفظ في السحابة نهائيًا.</p><div class="row"><button class="btn neg" type="button" data-act="acctdel">حذف الحساب وبياناته</button></div>'
    +'<p class="sub"><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></p>';
@@ -144,17 +148,18 @@ async function acctSubmit(f){
   const k=f.dataset.cform,v=id=>{const el=$('#'+id);return el?el.value:'';};
   try{
     if(k==='auth'){
-      const mode=f.dataset.mode,email=v('aEmail').trim().toLowerCase();AF.email=email;
+      const mode=f.dataset.mode,email=v('aUser').trim().toLowerCase();AF.email=email;
       if(mode==='forgot'){acctBusy(f,true);const r=await clAuth.forgot(email);acctBusy(f,false);if(r.error){toast(clErrText(r.error));return;}AF.type='recovery';acctCode();return;}
       const pw=v('aPw');
       if(mode==='signup'){
+        const bad=clNameCheck(email);if(bad){toast(clNameMsg(bad));return;}
         if(pw.length<8){toast('كلمة السر لازم تكون 8 أحرف أو أرقام على الأقل');return;}
         if(pw!==v('aPw2')){toast('الكلمتان غير متطابقتين');return;}
         AF.fam=v('aFam').trim().slice(0,24);
         acctBusy(f,true);const r=await clAuth.signUp(email,pw);acctBusy(f,false);
         if(r.error){toast(clErrText(r.error));return;}
         const u=r.data&&r.data.user;
-        if(u&&u.identities&&u.identities.length===0){toast('هذا الإيميل مسجل مسبقًا، سجّل دخولك');acctShow(acctForm('login'));return;}
+        if(u&&u.identities&&u.identities.length===0){toast('هذا الاسم مستخدم، اختر اسمًا ثانيًا');return;}
         if(r.data&&r.data.session){await acctLoggedIn(r.data.session);return;}
         AF.type='signup';acctCode();return;}
       acctBusy(f,true);const r=await clAuth.signIn(email,pw);acctBusy(f,false);
@@ -178,6 +183,14 @@ async function acctSubmit(f){
       toast('تم حفظ كلمة السر');
       if(k==='newpw')await acctLoggedIn(null);else closeSheet();
       return;}
+    if(k==='mig'){
+      const name=v('aUser').trim().toLowerCase(),bad=clNameCheck(name);if(bad){toast(clNameMsg(bad));return;}
+      acctBusy(f,true);const r=await CL.sb.auth.updateUser({email:clUserEmail(name)});
+      if(r.error){acctBusy(f,false);toast(clErrText(r.error));return;}
+      try{await CL.sb.auth.refreshSession();const g=await CL.sb.auth.getSession();if(g.data&&g.data.session)CL.user=g.data.session.user;}catch(e){}
+      acctBusy(f,false);
+      if(acctRealEmail()){toast('تعذّر تغيير الاسم الآن، حاول لاحقًا أو تواصل معنا');return;}
+      clLS.set(CL_EMAIL,name);closeSheet();refreshHud();if(view==='settings')render();toast('تم! من الآن تدخل باسم المستخدم: '+name);tone(SND.lvl);return;}
     if(k==='del'){
       const w=v('dConf').trim().toLowerCase();if(w!=='احذف'&&w!=='delete'){toast('اكتب كلمة: احذف');return;}
       acctBusy(f,true);const r=await clAuth.del();acctBusy(f,false);
@@ -190,12 +203,13 @@ async function acctSubmit(f){
 
 /* ---------- buttons (merged into ACT by e_app.js) ---------- */
 const CLOUD_ACT={
+  acctmig(){closeSheet();setTimeout(acctMigrate,200);},
   install(){openInstall();},
   instgo(){instGo();},
   acctgate2(){acctGate();},
   acctmenu(){acctMenu();},
-  authmode(el){const e=$('#aEmail');if(e&&e.value)AF.email=e.value.trim();acctShow(acctForm(el.dataset.v));acctFocus('aEmail');},
-  acctopen(el){AF.next=null;acctShow(acctForm(el.dataset.v));acctFocus('aEmail');},
+  authmode(el){const e=$('#aUser');if(e&&e.value)AF.email=e.value.trim();acctShow(acctForm(el.dataset.v));acctFocus('aUser');},
+  acctopen(el){AF.next=null;acctShow(acctForm(el.dataset.v));acctFocus('aUser');},
   authgate(){acctGate();},
   authskip(){CL.gateDone=true;closeSheet();const nx=AF.next;AF.next=null;if(nx)nx();},
   async authresend(){
@@ -223,6 +237,7 @@ function acctMenu(){
   if(!cloudSignedIn())return acctGate();
   closePop();
   openSheet('<div class="sheet-head"><div class="grow"><h2>حسابي</h2>'+(S.cfg.famName?'<div><b>'+esc(S.cfg.famName)+'</b></div>':'')+'<div class="sub" dir="ltr" style="text-align:start">'+esc(cloudEmail())+'</div><div class="sub" id="acctStat">'+esc(cloudStatus())+'</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
+   +(acctRealEmail()?'<div class="row"><button class="btn gold" type="button" data-act="acctmig">اختر اسم مستخدم وامسح إيميلك</button></div>':'')
    +'<div class="row"><button class="btn gold" type="button" data-act="acctsync">مزامنة الآن</button><button class="btn" type="button" data-act="acctpw">تغيير كلمة السر</button></div>'
    +'<div class="row"><button class="btn" type="button" data-act="acctoutask">تسجيل الخروج</button><button class="btn neg" type="button" data-act="acctdel">حذف الحساب وبياناته</button></div>',{});
 }
@@ -253,4 +268,35 @@ function cloudNag(){
   const last=+clLS.get('kafo.nag')||0;if(Date.now()-last<3*864e5)return;
   clLS.set('kafo.nag',String(Date.now()));
   setTimeout(()=>{if(!sheetOpen&&!cloudSignedIn())toast('بياناتك على هذا الجهاز فقط. اضغط «غير مسجّل» فوق لحفظ تقدّم أبنائك بحساب.');},3800);
+}
+
+/* ---------- live username check while typing (rules, then "is it free?") ---------- */
+let unT=0,unSeq=0;
+document.addEventListener('input',e=>{
+  const inp=e.target;if(!inp||inp.id!=='aUser')return;
+  const v=inp.value.toLowerCase().replace(/\s+/g,'');if(v!==inp.value)inp.value=v;     /* capitals and spaces are fixed for you */
+  const f=inp.closest('form'),msg=$('#aUserMsg');if(!f||f.dataset.mode!=='signup'||!msg)return;
+  clearTimeout(unT);const seq=++unSeq;
+  if(!v){msg.className='uhint';msg.textContent='';return;}
+  const bad=clNameCheck(v);if(bad){msg.className='uhint bad';msg.textContent=clNameMsg(bad);return;}
+  msg.className='uhint';msg.textContent='جارٍ التحقق من الاسم…';
+  unT=setTimeout(async()=>{
+    try{const r=await clAuth.avail(v);if(seq!==unSeq)return;if(r.error)throw r.error;
+      msg.className='uhint '+(r.data?'ok':'bad');msg.textContent=r.data?'✓ الاسم متاح':'✗ هذا الاسم مستخدم، جرّب اسمًا ثانيًا (مثال: '+v+'2)';}
+    catch(err){if(seq===unSeq){msg.className='uhint';msg.textContent='تعذّر التحقق من الاسم الآن';}}
+  },450);
+});
+
+/* ---------- accounts that signed up with a real email: pick a username, the email is removed from the system ---------- */
+const acctRealEmail=()=>{const u=cloudUser();return !!(u&&u.email&&u.email.indexOf('@'+CLOUD_DOMAIN)<0);};
+async function acctMigrate(next){
+  if(!cloudSignedIn()||!acctRealEmail()){if(next)next();return;}
+  if(!navigator.onLine){if(next)next();return;}
+  try{const g=await CL.sb.auth.getUser();if(g&&g.data&&g.data.user){CL.user=g.data.user;if(!acctRealEmail()){clLS.set(CL_EMAIL,cloudEmail());refreshHud();if(next)next();return;}}}catch(e){}
+  openSheet('<form id="migForm" data-cform="mig" data-mode="signup" autocomplete="off"><h2>اختر اسم مستخدم</h2>'
+   +'<p class="sub">ما عدنا نطلب الإيميل. اختر اسم مستخدم بالإنجليزي وتدخل به من الآن. بعد ما تحفظه نمسح إيميلك من النظام، وبيانات أبنائك ونقاطهم تبقى كما هي.</p>'
+   +acctField('aUser','اسم المستخدم','text','name="username" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="mohammed.ali"')
+   +'<p class="sub" style="margin:2px 6px 0">بالإنجليزي، وفيه نقطة بين جزئين. مثال: <b dir="ltr">mohammed.ali</b></p><div class="uhint" id="aUserMsg" aria-live="polite"></div>'
+   +'<div class="row" style="margin-top:14px"><button class="btn primary" type="submit">حفظ الاسم ومسح الإيميل</button><button class="btn" type="button" data-act="close">لاحقًا</button></div></form>',{next:next});
+  const b=$('#sheetHost .sheet-back');if(b)b.classList.add('gate');acctFocus('aUser');
 }

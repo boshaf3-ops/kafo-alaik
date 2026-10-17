@@ -18,7 +18,9 @@
 - **URL Configuration:** Site URL = `https://boshaf3-ops.github.io/kafo-alaik/`، وفي Redirect URLs أضف `http://localhost:8765/**`.
 - لا تعدّل قوالب الإيميل ولا SMTP الحين.
 
-## 4) لاحقًا: تشغيل استرجاع كلمة السر (اختياري)
+> **تنبيه:** اللعبة الآن تعتمد **اسم مستخدم** بدل الإيميل (يُخزَّن داخليًا بصيغة `الاسم@kafo.invalid`)، وتحتاج دالة `username_available` من `schema.sql`. وبما أن الحسابات ما فيها إيميل حقيقي، **لا يمكن** تشغيل استرجاع كلمة السر بالإيميل إلا لحسابات قديمة لم تُحوَّل بعد.
+
+## 4) (قديم) تشغيل استرجاع كلمة السر
 1. اضبط SMTP (Gmail أو Resend أو Brevo) في Project Settings ← Authentication ← SMTP.
 2. عدّل قوالب «Reset password» (و«Confirm signup» إذا فعّلت التأكيد) لتعرض `{{ .Token }}`.
 3. في `src/n_cloud.js` غيّر `CLOUD_RECOVERY=false` إلى `true` وابنِ الموقع. يظهر زر «نسيت كلمة السر» ورسالة السبام.

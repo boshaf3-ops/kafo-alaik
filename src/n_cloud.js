@@ -12,14 +12,27 @@ const CLOUD_SUPPORT='kafu.alik.gcc@gmail.com';
 function cloudSupportHref(){
   const en=I18N.lang==='en';
   const sub=en?'Forgot my login details - Kafo Alaik':'نسيت بيانات الدخول - كفو عليك';
-  const body=en?'Hello,\n\nI forgot my login details for my Kafo Alaik account.\n\nKids\' names:\nKids\' ages:\nThe email I remember (if any):\n\nNote: do not send the password in this message.'
-    :'السلام عليكم،\n\nنسيت بيانات الدخول لحسابي في «كفو عليك».\n\nأسماء الأبناء:\nأعمارهم:\nالإيميل اللي أتذكره (إن وجد):\n\nملاحظة: لا ترسل كلمة السر في الرسالة.';
+  const body=en?'Hello,\n\nI forgot my login details for my Kafo Alaik account.\n\nKids\' names:\nKids\' ages:\nThe username I remember (if any):\n\nNote: do not send the password in this message.'
+    :'السلام عليكم،\n\nنسيت بيانات الدخول لحسابي في «كفو عليك».\n\nأسماء الأبناء:\nأعمارهم:\nاسم المستخدم اللي أتذكره (إن وجد):\n\nملاحظة: لا ترسل كلمة السر في الرسالة.';
   return 'mailto:'+CLOUD_SUPPORT+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
 }
 const CLOUD_URL='https://dqowufqtkkwkmebtrskf.supabase.co';
 const CLOUD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxb3d1ZnF0a2t3a21lYnRyc2tmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzE1MTgsImV4cCI6MjEwNzgwNzUxOH0.DPkD_JK6AUa03-9F9f6HDr6kKBNO6Mz9EyyU-3GHjTA';   /* public anon key: safe in the browser, the data is protected by RLS */
 
 const CL={sb:null,user:null,timer:0,retry:0,busy:false,syncing:false,chan:null,err:'',R:null,gateDone:false,lastPull:0,meta:{cfg:false,kids:{},del:{},last:0}};
+/* Accounts use a username, not an email. Supabase Auth needs an email-shaped id, so the username is stored as name@kafo.invalid
+   (".invalid" is a reserved domain: no mail can ever be delivered there, and nothing is ever sent because "Confirm email" is off). */
+const CLOUD_DOMAIN='kafo.invalid';
+const clUserEmail=n=>{n=String(n||'').trim().toLowerCase();return n.indexOf('@')>=0?n:n+'@'+CLOUD_DOMAIN;};   /* an old account that signed up with a real email can still type it */
+const clShowName=e=>String(e||'').replace('@'+CLOUD_DOMAIN,'');
+/* rules: English lowercase letters and digits, starts with a letter, at least one dot between parts (mohammed.ali), 5 to 24 characters */
+function clNameCheck(n){
+  if(!n)return'empty';if(/[^\x00-\x7f]/.test(n))return'english';if(n.length<5)return'short';if(n.length>24)return'long';
+  if(!/^[a-z]/.test(n))return'start';if(n.indexOf('.')<0)return'dot';if(/\.\./.test(n)||/\.$/.test(n))return'dots';
+  if(!/^[a-z][a-z0-9]*(\.[a-z0-9]+)+$/.test(n))return'chars';return'';
+}
+const CL_NAMEMSG={english:'اكتب الاسم بالإنجليزي (حروف a-z فقط)',short:'الاسم قصير، 5 أحرف على الأقل',long:'الاسم طويل، 24 حرف كحد أقصى',start:'لازم يبدأ بحرف إنجليزي',dot:'لازم فيه نقطة بين جزئين، مثل: mohammed.ali',dots:'النقطة ما تكون في الآخر ولا تتكرر',chars:'مسموح حروف إنجليزية وأرقام ونقطة فقط'};
+const clNameMsg=k=>CL_NAMEMSG[k]||'اسم المستخدم غير صالح';
 const CL_SYNC='kafo.sync',CL_OWN='kafo.owner',CL_KEY='kafo.auth',CL_EMAIL='kafo.email';   /* the last email used on this device (never the password) */
 const clLS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}},del:k=>{try{localStorage.removeItem(k);}catch(e){}}};
 function clMetaLoad(){try{const o=JSON.parse(clLS.get(CL_SYNC)||'null');if(o&&typeof o==='object')CL.meta={cfg:!!o.cfg,kids:o.kids||{},del:o.del||{},last:+o.last||0};}catch(e){}}
@@ -32,7 +45,7 @@ const cloudOn=()=>cloudConfigured()&&!db;
 function cloudStoredUser(){try{const o=JSON.parse(clLS.get(CL_KEY)||'null');return o&&o.user?o.user:null;}catch(e){return null;}}
 const cloudUser=()=>CL.user||cloudStoredUser();
 const cloudSignedIn=()=>cloudOn()&&!!cloudUser();
-const cloudEmail=()=>(cloudUser()||{}).email||'';
+const cloudEmail=()=>clShowName((cloudUser()||{}).email||'');
 /* linked: signed in AND this device's data was attached to this very account (so another family's data is never pushed into it) */
 const clLinked=()=>cloudSignedIn()&&clLS.get(CL_OWN)===cloudUser().id;
 const cloudNeedsGate=()=>cloudOn()&&!cloudSignedIn()&&!CL.gateDone;
@@ -42,15 +55,15 @@ function clErrText(e){
   const m=String((e&&(e.message||e.error_description||e.code))||e||'').toLowerCase(),st=e&&e.status;
   if(!navigator.onLine||m.indexOf('failed to fetch')>=0||m.indexOf('networkerror')>=0||m.indexOf('network request failed')>=0||m.indexOf('retryable')>=0)return 'ما فيه اتصال بالإنترنت';
   if(st===401||st===403||m.indexOf('jwt')>=0||m.indexOf('not authenticated')>=0)return 'انتهت الجلسة، سجّل دخولك من الإعدادات';
-  if(m.indexOf('invalid login')>=0)return 'الإيميل أو كلمة السر غير صحيحة';
+  if(m.indexOf('invalid login')>=0)return 'اسم المستخدم أو كلمة السر غير صحيحة';
   if(m.indexOf('not confirmed')>=0)return 'الإيميل لم يؤكَّد بعد';
-  if(m.indexOf('already registered')>=0||m.indexOf('already been registered')>=0)return 'هذا الإيميل مسجل مسبقًا، سجّل دخولك';
+  if(m.indexOf('already registered')>=0||m.indexOf('already been registered')>=0)return 'هذا الاسم مستخدم، اختر اسمًا ثانيًا';
   if(m.indexOf('expired')>=0||m.indexOf('otp')>=0||m.indexOf('invalid token')>=0||m.indexOf('invalid or')>=0)return 'الرمز غير صحيح أو انتهت صلاحيته';
   if(st===429||m.indexOf('rate limit')>=0||m.indexOf('security purposes')>=0||m.indexOf('too many')>=0)return 'محاولات كثيرة، انتظر قليلًا ثم حاول مرة ثانية';
   if(m.indexOf('different from the old')>=0)return 'اختر كلمة سر مختلفة عن القديمة';
   if(m.indexOf('weak')>=0||m.indexOf('at least')>=0||m.indexOf('password should')>=0)return 'كلمة السر ضعيفة، استخدم 8 أحرف أو أكثر';
   if(m.indexOf('signups not allowed')>=0||m.indexOf('signup is disabled')>=0)return 'التسجيل مغلق حاليًا';
-  if(m.indexOf('invalid email')>=0||m.indexOf('unable to validate email')>=0)return 'الإيميل غير صالح';
+  if(m.indexOf('invalid email')>=0||m.indexOf('unable to validate email')>=0)return 'اسم المستخدم غير صالح';
   return 'تعذّر الاتصال بالحساب، حاول مرة ثانية';
 }
 
@@ -216,8 +229,9 @@ function clWipeLocal(){
 
 /* ---------- auth calls ---------- */
 const clAuth={
-  signUp:(email,password)=>CL.sb.auth.signUp({email,password}),
-  signIn:(email,password)=>CL.sb.auth.signInWithPassword({email,password}),
+  signUp:(name,password)=>CL.sb.auth.signUp({email:clUserEmail(name),password}),
+  signIn:(name,password)=>CL.sb.auth.signInWithPassword({email:clUserEmail(name),password}),
+  avail:name=>CL.sb.rpc('username_available',{p_name:name}),
   verify:(email,token,type)=>CL.sb.auth.verifyOtp({email,token,type}),
   resend:(email,type)=>type==='recovery'?CL.sb.auth.resetPasswordForEmail(email):CL.sb.auth.resend({type:'signup',email}),
   forgot:email=>CL.sb.auth.resetPasswordForEmail(email),

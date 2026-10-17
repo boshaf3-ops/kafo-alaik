@@ -1009,6 +1009,7 @@ let rzT,wasWide=innerWidth>=760;window.addEventListener('resize',()=>{const w=in
 })();
 function startGame(){
   $('#splash').classList.add('gone');stopSplash();tone(SND.lvl);
+  if(cloudSignedIn()&&acctRealEmail())setTimeout(()=>{if(!sheetOpen)acctMigrate();},1600);
   const own=isGuest()?myKids():S.kids;
   if(!own.length){go('kids');if(!needJoin()&&!showTip('start'))openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
 }

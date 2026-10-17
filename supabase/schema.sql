@@ -81,6 +81,17 @@ $$;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
 
+-- ───────────── اسم المستخدم: هل هو متاح؟ (تستدعيها اللعبة وأنت تكتب الاسم) ─────────────
+-- يُخزَّن الاسم داخل Supabase Auth بصيغة <الاسم>@kafo.invalid ( .invalid نطاق محجوز لا يصله بريد أبدًا)
+create or replace function public.username_available(p_name text) returns boolean
+language sql security definer stable set search_path = '' as $$
+  select not exists (
+    select 1 from auth.users where lower(email) = lower(coalesce(p_name,'')) || '@kafo.invalid'
+  );
+$$;
+revoke all on function public.username_available(text) from public;
+grant execute on function public.username_available(text) to anon, authenticated;
+
 -- ───────────── التحديث الفوري بين الأجهزة (Realtime) ─────────────
 do $$ begin
   alter publication supabase_realtime add table public.cloud_kids;
