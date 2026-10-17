@@ -782,6 +782,11 @@ function pwSec(){
 }
 function resetSec(){return '<p class="sub">يحذف كل شيء: الأبناء والنقاط والشهادات والمكافآت وكلمة السر، وترجع اللعبة كأنها جديدة. استخدمه فقط إذا بغيت تبدأ من الصفر.</p><div class="row"><button class="btn neg" type="button" data-act="pwforgot">الرجوع إلى الإعدادات الأصلية</button></div>';}
 function secHtml(id,title,sub,body){return '<details class="panel set" data-sec="'+id+'"'+(SETOPEN[id]?' open':'')+'><summary><span>'+title+'</span><small>'+sub+'</small></summary><div class="setbody">'+body+'</div></details>';}
+function eshSec(){
+  return '<div class="esh"><img src="icons/eshraqat.png" alt="" width="191" height="81"><h3>مبادرة إشراقات «للتوعية الأسرية»</h3>'
+   +'<p>وهي مبادرة تطوعية تابعة للجمعية البحرينية لتنمية المرأة.</p>'
+   +'<p>انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».</p></div>';
+}
 function langSec(){
   const en=I18N.lang==='en';
   return '<div class="row"><button class="btn opt" type="button" data-act="setlang" data-v="ar" aria-pressed="'+(!en)+'" data-nt>العربية</button><button class="btn opt" type="button" data-act="setlang" data-v="en" aria-pressed="'+en+'" data-nt>English</button></div>'
@@ -809,6 +814,7 @@ function renderSettings(){
    +(g||db?'':secHtml('bk','نسخة احتياطية','حفظ نسخة من بيانات اللعبة أو استعادتها',backupPanel().replace(/<section class="panel" style="margin-top:14px">/,'<section>')))
    +secHtml('pw','كلمة السر',hasPw()?'مفعّلة · غيّرها أو أزلها':'غير مفعّلة · ضع كلمة تحمي الإعدادات',pwSec())
    +(g?'':secHtml('rst','الرجوع إلى الإعدادات الأصلية','حذف كل شيء وبدء اللعبة من جديد',resetSec()))
+   +secHtml('esh','مبادرة إشراقات','للتوعية الأسرية',eshSec())
    +'</div>';
 }
 

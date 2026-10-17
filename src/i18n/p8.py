@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 # Accounts and cloud sync (n_cloud.js, o_account.js). Keys are text nodes / attributes exactly as they reach the page, trimmed.
 D8 = {
+'مبادرة إشراقات':'Eshraqaat Initiative',
+'للتوعية الأسرية':'For family awareness',
+'مبادرة إشراقات «للتوعية الأسرية»':'Eshraqaat Initiative “for family awareness”',
+'وهي مبادرة تطوعية تابعة للجمعية البحرينية لتنمية المرأة.':'A volunteer initiative of the Bahrain Women’s Development Association.',
+'انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».':'Launched in 2012 to raise family awareness on both the “parenting and marital” sides.',
+'جميع الحقوق محفوظة — كفو عليك — تابع لمبادرة إشراقات للتوعية الأسرية':'All rights reserved — Proud of you — An Eshraqaat family-awareness initiative',
 'ما فيه اتصال بالإنترنت':'No internet connection',
 'انتهت الجلسة، سجّل دخولك من الإعدادات':'Your session expired. Sign in again from Settings',
 'الإيميل أو كلمة السر غير صحيحة':'Wrong email or password',

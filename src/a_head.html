@@ -93,11 +93,11 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 
 /* title screen */
 #splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#4fb8ec;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
-  padding:calc(7vh + env(safe-area-inset-top,0px)) 20px calc(2.5vh + env(safe-area-inset-bottom,0px));text-align:center;transition:opacity .35s steps(5),visibility .35s}
+  padding:calc(4vh + env(safe-area-inset-top,0px)) 20px calc(2.5vh + env(safe-area-inset-bottom,0px));text-align:center;transition:opacity .35s steps(5),visibility .35s}
 #splash.gone{opacity:0;visibility:hidden}
 #splashCv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
 #splash .ttl,#splash .go{position:relative}
-.copy{margin:12px 0 0;font:600 12px/1.4 var(--f-body);color:#fff;opacity:.9;text-shadow:1px 1px 0 #0e2a33;letter-spacing:.01em}
+.copy{margin:12px 0 0;max-width:94%;font:600 11px/1.4 var(--f-body);color:#fff;opacity:.9;text-shadow:1px 1px 0 #0e2a33;letter-spacing:.01em}
 .langpick{position:relative;margin:14px auto 0;width:max-content;max-width:100%}
 #langBtn{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:9px 14px;background:#fff;color:#0e2a33;border:3px solid #0e2a33;box-shadow:0 4px 0 #0e2a33;font:700 14px/1 var(--f-body);white-space:nowrap}
 #langBtn .en{font:800 18px/1 'HJ',sans-serif;direction:ltr;letter-spacing:.02em}
@@ -111,10 +111,12 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 .langmenu button[data-v=en]{font:800 22px/1 'HJ',sans-serif;direction:ltr}
 .langmenu button+button{border-top:3px solid #0e2a33}
 .langmenu button[aria-pressed=true]{background:#ffd23f;cursor:default}
-.ttl h1{margin:0;font:400 clamp(64px,19vw,128px)/1.05 var(--f-display);white-space:nowrap;color:#ffd23f;text-shadow:0 5px 0 #0e2a33,5px 5px 0 #0e2a33,-5px 5px 0 #0e2a33,0 -5px 0 #0e2a33,5px 0 0 #0e2a33,-5px 0 0 #0e2a33,4px 4px 0 #0e2a33,-4px -4px 0 #0e2a33,4px -4px 0 #0e2a33,-4px 4px 0 #0e2a33}
-.ttl .sub-en{margin-top:6px;font:800 clamp(50px,14vw,84px)/1 'HJ',sans-serif;color:#fff;direction:ltr;letter-spacing:.02em;text-shadow:0 4px 0 #0e2a33,4px 4px 0 #0e2a33,-4px 4px 0 #0e2a33,0 -4px 0 #0e2a33,4px 0 0 #0e2a33,-4px 0 0 #0e2a33,3px 3px 0 #0e2a33,-3px -3px 0 #0e2a33,3px -3px 0 #0e2a33,-3px 3px 0 #0e2a33}
-.ttl p{margin:14px auto 0;max-width:86%;font:800 clamp(17px,4.6vw,24px)/1.5 var(--f-body);color:#fff;text-shadow:2px 2px 0 #0e2a33}
-html[dir=ltr] .ttl p{font:800 clamp(20px,5.4vw,28px)/1.15 'HJ',sans-serif;letter-spacing:.02em;max-width:84%}
+.esh{text-align:center;padding:4px 2px}.esh img{display:block;width:150px;height:auto;margin:0 auto 12px}.esh h3{margin:0 0 8px;font:800 18px/1.4 var(--f-body);color:var(--brand)}.esh p{margin:6px 0;font:500 15px/1.8 var(--f-body)}
+.ttl .org{display:block;width:clamp(112px,34vw,180px);height:auto;margin:0 auto clamp(14px,3.4vh,30px);filter:drop-shadow(0 1px 2px rgba(14,42,51,.5))}
+.ttl h1{margin:0;font:400 clamp(50px,15vw,100px)/1.05 var(--f-display);white-space:nowrap;color:#ffd23f;text-shadow:0 5px 0 #0e2a33,5px 5px 0 #0e2a33,-5px 5px 0 #0e2a33,0 -5px 0 #0e2a33,5px 0 0 #0e2a33,-5px 0 0 #0e2a33,4px 4px 0 #0e2a33,-4px -4px 0 #0e2a33,4px -4px 0 #0e2a33,-4px 4px 0 #0e2a33}
+.ttl .sub-en{margin-top:6px;font:800 clamp(40px,11vw,66px)/1 'HJ',sans-serif;color:#fff;direction:ltr;letter-spacing:.02em;text-shadow:0 4px 0 #0e2a33,4px 4px 0 #0e2a33,-4px 4px 0 #0e2a33,0 -4px 0 #0e2a33,4px 0 0 #0e2a33,-4px 0 0 #0e2a33,3px 3px 0 #0e2a33,-3px -3px 0 #0e2a33,3px -3px 0 #0e2a33,-3px 3px 0 #0e2a33}
+.ttl p{margin:14px auto 0;max-width:86%;font:800 clamp(14px,3.8vw,19px)/1.5 var(--f-body);color:#fff;text-shadow:2px 2px 0 #0e2a33}
+html[dir=ltr] .ttl p{font:800 clamp(16px,4.4vw,22px)/1.15 'HJ',sans-serif;letter-spacing:.02em;max-width:84%}
 .go .btn{font-size:22px;padding:12px 34px;min-height:60px;--btn-bg:#ffd23f;--btn-ink:#2e2200;--line:#0e2a33}
 .go small{display:block;margin-top:10px;color:#fff;font-weight:700;text-shadow:2px 2px 0 #0e2a33}
 
@@ -413,8 +415,8 @@ label.chk a,.set a{color:var(--brand);text-decoration:underline}
 <div id="splash">
   <canvas id="splashCv"></canvas>
   
-  <div class="ttl"><h1 data-nt>كفو عليك</h1><div class="sub-en" data-nt>Proud of you</div><p>رحلة الأخلاق تبدأ بخطوة</p></div>
-  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><button class="btn small" id="acctSplash" type="button" data-act="acctopen" data-v="login" hidden>عندي حساب: تسجيل الدخول</button><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div><p class="copy">جميع الحقوق محفوظة — كفو عليك</p></div>
+  <div class="ttl"><img class="org" src="icons/eshraqat.png" alt="مبادرة إشراقات" width="191" height="81"><h1 data-nt>كفو عليك</h1><div class="sub-en" data-nt>Proud of you</div><p>رحلة الأخلاق تبدأ بخطوة</p></div>
+  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><button class="btn small" id="acctSplash" type="button" data-act="acctopen" data-v="login" hidden>عندي حساب: تسجيل الدخول</button><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div><p class="copy">جميع الحقوق محفوظة — كفو عليك — تابع لمبادرة إشراقات للتوعية الأسرية</p></div>
 </div>
 
 <div id="app">
