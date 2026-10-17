@@ -3,7 +3,7 @@ HERE=os.path.dirname(os.path.abspath(__file__))
 K=HERE+'/'
 OUT=os.path.dirname(HERE)+'/'   # repo root (index.html, sw.js ...)
 head=open(K+'a_head.html').read()
-# fonts: replace the Google Fonts links for the Arabic faces with local ones; keep only the optional pixel font from the CDN
+# fonts: replace the Google Fonts links for the Arabic faces with local ones; the pixel font (Latin subset) is local too
 head=re.sub(r'<title>.*?</title>\n','',head,count=1)
 head=re.sub(r'<link rel="preconnect"[^\n]*\n<link rel="preconnect"[^\n]*\n<link href="https://fonts.googleapis.com[^\n]*\n','',head,count=1)
 assert 'fonts.googleapis' not in head
@@ -12,6 +12,7 @@ fontcss='''@font-face{font-family:HJ;font-weight:800;font-style:normal;font-disp
 @font-face{font-family:Tajawal;font-weight:400 500;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Regular.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:600 700;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Bold.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:800 900;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Black.woff) format("woff")}
+@font-face{font-family:'Press Start 2P';font-weight:400;font-style:normal;font-display:swap;src:url(fonts/PressStart2P-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:Lalezar;font-weight:400;font-style:normal;font-display:swap;src:url(fonts/Lalezar-Regular.woff) format("woff")}
 '''
 VENDOR='vendor/supabase.js'
@@ -45,7 +46,7 @@ page=f'''<!doctype html>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 <link rel="preload" href="fonts/Tajawal-Regular.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="fonts/Lalezar-Regular.woff" as="font" type="font/woff" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="preload" href="fonts/PressStart2P-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>{fontcss}</style>
 {head}
 {SB_TAG}<script>
@@ -76,7 +77,7 @@ open(OUT+'manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=Fals
 VC=("'"+VENDOR+"',") if HAS_SB else ''
 sw=f'''/* كفو عليك: خدمة العمل دون إنترنت. غيّر رقم النسخة عند كل تحديث ليصل الجهاز للنسخة الجديدة. */
 const VERSION='kafo-{VER}';
-const CORE=['./','index.html','manifest.webmanifest',{VC}'fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png?v=2','icons/icon-512.png?v=2','icons/apple-touch-icon.png?v=2','icons/favicon-32.png?v=2'];
+const CORE=['./','index.html','manifest.webmanifest',{VC}'fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','fonts/PressStart2P-latin.woff2','icons/icon-192.png?v=2','icons/icon-512.png?v=2','icons/apple-touch-icon.png?v=2','icons/favicon-32.png?v=2'];
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kafo-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));}});
 self.addEventListener('fetch',e=>{{
@@ -84,8 +85,8 @@ self.addEventListener('fetch',e=>{{
   // the page itself: network first so a new version arrives, cache when offline
   if(r.mode==='navigate'){{const app=u.pathname.endsWith('/')||u.pathname.endsWith('/index.html');
     e.respondWith(fetch(r,{{cache:'no-cache'}}).then(res=>{{if(app&&res.ok){{const cp=res.clone();caches.open(VERSION).then(c=>c.put('index.html',cp));}}return res;}}).catch(()=>(app?caches.match('index.html'):caches.match(r).then(h=>h||caches.match('index.html')))));return;}}
-  // same-origin files and the optional pixel font: cache first, fill the cache on first use
-  if(u.origin===location.origin||u.hostname==='fonts.googleapis.com'||u.hostname==='fonts.gstatic.com'){{
+  // same-origin files: cache first, fill the cache on first use
+  if(u.origin===location.origin){{
     e.respondWith(caches.match(r).then(hit=>hit||fetch(r).then(res=>{{if(res&&(res.ok||res.type==='opaque')){{const cp=res.clone();caches.open(VERSION).then(c=>c.put(r,cp));}}return res;}}).catch(()=>hit)));}}
 }});
 '''
