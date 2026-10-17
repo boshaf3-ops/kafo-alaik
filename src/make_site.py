@@ -7,13 +7,16 @@ head=open(K+'a_head.html').read()
 head=re.sub(r'<title>.*?</title>\n','',head,count=1)
 head=re.sub(r'<link rel="preconnect"[^\n]*\n<link rel="preconnect"[^\n]*\n<link href="https://fonts.googleapis.com[^\n]*\n','',head,count=1)
 assert 'fonts.googleapis' not in head
-scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','l_ambient.js','m_i18n.js','e_app.js'])
+scripts=''.join(open(K+f).read()+'\n' for f in ['b_core.js','b2_outfits.js','b3_chars.js','c_maps.js','k_worlds.js','d_cert.js','f_anim.js','g_wear.js','h_badges.js','i_chest.js','j_move.js','l_ambient.js','n_cloud.js','o_account.js','m_i18n.js','e_app.js'])
 fontcss='''@font-face{font-family:HJ;font-weight:800;font-style:normal;font-display:swap;src:url(fonts/Handjet-800.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:400 500;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Regular.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:600 700;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Bold.woff) format("woff")}
 @font-face{font-family:Tajawal;font-weight:800 900;font-style:normal;font-display:swap;src:url(fonts/Tajawal-Black.woff) format("woff")}
 @font-face{font-family:Lalezar;font-weight:400;font-style:normal;font-display:swap;src:url(fonts/Lalezar-Regular.woff) format("woff")}
 '''
+VENDOR='vendor/supabase.js'
+HAS_SB=os.path.exists(OUT+VENDOR)
+SB_TAG=f'<script src="{VENDOR}"></script>\n' if HAS_SB else ''
 DESC='«كفو عليك»: تطبيق عائلي يحفّز الأبناء على السلوك الطيب. كل سلوك إيجابي يرفع شخصيتهم خطوة في خريطة مغامرة بمسار خاص، ويحصلون على ملابس وشارات وشهادة جاهزة للطباعة.'
 page=f'''<!doctype html>
 <html lang="ar" dir="rtl">
@@ -45,7 +48,7 @@ page=f'''<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>{fontcss}</style>
 {head}
-<script>
+{SB_TAG}<script>
 {scripts}
 </script>
 <noscript><p style="font:16px sans-serif;padding:24px;text-align:center">يحتاج «كفو عليك» إلى تفعيل جافاسكربت ليعمل.</p></noscript>
@@ -70,21 +73,24 @@ manifest={
           {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
           {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
 open(OUT+'manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
+VC=("'"+VENDOR+"',") if HAS_SB else ''
 sw=f'''/* كفو عليك: خدمة العمل دون إنترنت. غيّر رقم النسخة عند كل تحديث ليصل الجهاز للنسخة الجديدة. */
 const VERSION='kafo-{VER}';
-const CORE=['./','index.html','manifest.webmanifest','fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
+const CORE=['./','index.html','manifest.webmanifest',{VC}'fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kafo-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));}});
 self.addEventListener('fetch',e=>{{
   const r=e.request;if(r.method!=='GET')return;const u=new URL(r.url);
   // the page itself: network first so a new version arrives, cache when offline
-  if(r.mode==='navigate'){{e.respondWith(fetch(r,{{cache:'no-cache'}}).then(res=>{{const cp=res.clone();caches.open(VERSION).then(c=>c.put('index.html',cp));return res;}}).catch(()=>caches.match('index.html')));return;}}
+  if(r.mode==='navigate'){{const app=u.pathname.endsWith('/')||u.pathname.endsWith('/index.html');
+    e.respondWith(fetch(r,{{cache:'no-cache'}}).then(res=>{{if(app&&res.ok){{const cp=res.clone();caches.open(VERSION).then(c=>c.put('index.html',cp));}}return res;}}).catch(()=>(app?caches.match('index.html'):caches.match(r).then(h=>h||caches.match('index.html')))));return;}}
   // same-origin files and the optional pixel font: cache first, fill the cache on first use
   if(u.origin===location.origin||u.hostname==='fonts.googleapis.com'||u.hostname==='fonts.gstatic.com'){{
     e.respondWith(caches.match(r).then(hit=>hit||fetch(r).then(res=>{{if(res&&(res.ok||res.type==='opaque')){{const cp=res.clone();caches.open(VERSION).then(c=>c.put(r,cp));}}return res;}}).catch(()=>hit)));}}
 }});
 '''
 open(OUT+'sw.js','w').write(sw)
+open(OUT+'privacy.html','w').write(open(K+'privacy.html').read())
 open(OUT+'robots.txt','w').write('User-agent: *\nAllow: /\n')
 open(OUT+'_headers','w').write('''/*
   X-Content-Type-Options: nosniff

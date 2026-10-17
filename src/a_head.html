@@ -387,13 +387,23 @@ body.sheet-open #toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))
 .steps{margin:6px 22px 14px;line-height:1.9}.steps li{margin:4px 0}
 .feed{display:grid;gap:6px;margin-top:10px}.frow{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2)}.frow i{width:10px;height:10px}
 .join{max-width:560px;margin-inline:auto}.code-in{font:400 20px/1.3 var(--f-pixel);text-transform:uppercase;letter-spacing:2px}
+.sheet-back.gate{z-index:110}
+body.sheet-open:has(.sheet-back.gate) #toast{z-index:120}
+label.chk{display:flex;gap:10px;align-items:flex-start;margin:14px 4px 4px;font-weight:700;line-height:1.7}
+label.chk input{width:22px;height:22px;flex:none;margin-top:3px;accent-color:var(--brand)}
+label.chk a,.set a{color:var(--brand);text-decoration:underline}
+.go .btn.small{font-size:15px;min-height:40px;padding:4px 16px;--btn-bg:#ffffff;--btn-ink:#10303a;margin-top:12px}
+#acctSplash[hidden]{display:none}
+.hud .pill.acct{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hud .pill.acct i{display:inline-block;width:9px;height:9px;margin-inline-end:7px;background:#58c15a;vertical-align:0}
+.hud .pill.acct i.wait{background:#ffb02e}.hud .pill.acct i.err{background:#e24a3b}
 </style>
 
 <div id="splash">
   <canvas id="splashCv"></canvas>
   
   <div class="ttl"><h1 data-nt>كفو عليك</h1><div class="sub-en" data-nt>Proud of you</div><p>رحلة الأخلاق تبدأ بخطوة</p></div>
-  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div><p class="copy">جميع الحقوق محفوظة · إعداد محمد الشافعي</p></div>
+  <div class="go"><button class="btn" id="goBtn" type="button">ابدأ المغامرة</button><small id="goHint">جارٍ تجهيز المغامرة…</small><button class="btn small" id="acctSplash" type="button" data-act="acctopen" data-v="login" hidden>عندي حساب: تسجيل الدخول</button><div class="langpick" data-nt><button type="button" id="langBtn" aria-haspopup="true" aria-expanded="false"><span>اختر اللغة</span><i>·</i><span class="en">Choose your language</span><b aria-hidden="true">▴</b></button><div class="langmenu" id="langMenu" role="menu" hidden><button type="button" role="menuitem" data-act="setlang" data-v="ar" aria-pressed="true">عربي</button><button type="button" role="menuitem" data-act="setlang" data-v="en" aria-pressed="false">English</button></div></div><p class="copy">جميع الحقوق محفوظة · إعداد محمد الشافعي</p></div>
 </div>
 
 <div id="app">

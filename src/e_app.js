@@ -26,7 +26,7 @@ function volApply(){try{if(AMB.master)AMB.master.gain.value=.22*volBg();}catch(e
 
 function normAv(a){const o=Object.assign({sk:1,st:0,hc:0,sh:0,ss:0,ps:0,pc:0},a||{});if(o.g!=='m'&&o.g!=='f')o.g=(o.st===1||o.st===4)?'f':'m';if(!HEADS[o.st]||HEADS[o.st].g!==o.g)o.st=defHead(o.g);if(typeof o.hr!=='string')o.hr='';return o;}
 function normKid(k){return{id:k.id,fam:k.fam||'',name:k.name||'',age:k.age==null?'':k.age,photo:k.photo||null,av:normAv(k.av),hs:+k.hs||0,pts:+k.pts||0,log:Array.isArray(k.log)?k.log:[],certs:Array.isArray(k.certs)?k.certs:[],order:+k.order||0,
-    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null,sad:!!k.sad,ck:(k.ck&&typeof k.ck==='object')?k.ck:null};}
+    tier:+k.tier||0,tk:k.tk||'',wear:(k.wear&&typeof k.wear==='object')?k.wear:{},badges:(k.badges&&typeof k.badges==='object')?k.badges:{},cnt:Object.assign({pos:0,neg:0},k.cnt||{}),days:(k.days&&typeof k.days==='object')?k.days:{},fork:(k.fork&&typeof k.fork==='object')?k.fork:null,sad:!!k.sad,ck:(k.ck&&typeof k.ck==='object')?k.ck:null,mt:+k.mt||0};}
 function normFam(uid,o){return{uid,name:o.name||'عائلة',code:o.code||'',expected:+o.expected||0,ts:+o.ts||0,cfg:{pos:Array.isArray(o.cfg&&o.cfg.pos)?o.cfg.pos:[],neg:Array.isArray(o.cfg&&o.cfg.neg)?o.cfg.neg:[]}};}
 const milestone=L=>L>=75?75:L>=50?50:L>=25?25:0;
 const goal=()=>clamp(Math.round(+S.cfg.goal)||100,10,5000);
@@ -77,10 +77,10 @@ async function loadAll(){
 let wq=Promise.resolve();
 function enqueue(fn){pendingWrites++;wq=wq.then(fn).catch(e=>{console.warn(e);toast(isGuest()?'ما تقدر تعدّل هذا، أو تعذّر الحفظ':'تعذّر الحفظ، حاول مرة أخرى');}).then(()=>{pendingWrites--;if(!pendingWrites&&needResync){needResync=false;resync();}});return wq;}
 function persistLocal(){try{localStorage.setItem(LS,JSON.stringify({cfg:S.cfg,kids:S.kids}));}catch(e){toast('مساحة التخزين ممتلئة');}}
-function persistCfg(){if(isGuest())return;if(db){const d=J(S.cfg);enqueue(()=>db.doc('app/config').set(d));}else persistLocal();}
+function persistCfg(){if(isGuest())return;if(db){const d=J(S.cfg);enqueue(()=>db.doc('app/config').set(d));}else{S.cfg.mt=Date.now();persistLocal();cloudCfg();}}
 function stripKid(k){const d=J(k);delete d.id;delete d.fam;return d;}
-function persistKid(k){if(db){const d=stripKid(k);enqueue(()=>kRef(k).set(d));}else persistLocal();}
-function persistRemove(k){if(db)enqueue(()=>kRef(k).delete());else persistLocal();}
+function persistKid(k){if(db){const d=stripKid(k);enqueue(()=>kRef(k).set(d));}else{k.mt=Date.now();persistLocal();cloudKid(k);}}
+function persistRemove(k){if(db)enqueue(()=>kRef(k).delete());else{persistLocal();cloudDel(k.id);}}
 function persistFam(f){if(!db)return;const d={name:f.name,code:f.code,expected:f.expected,ts:f.ts,cfg:J(f.cfg)};enqueue(()=>db.doc('fam/'+f.uid).set(d));}
 function persistBH(){if(isGuest()){const f=myFam();if(f)persistFam(f);}else persistCfg();}
 function persistInv(){if(db)enqueue(()=>db.doc('app/inv').set({codes:J(S.inv)}));}
@@ -288,7 +288,7 @@ function camFollow(id){
 }
 function hudHtml(){
   const m=mapOf(),st=periodState(),p=S.cfg.period;
-  let h='<button class="pill hm" type="button" data-act="hudtoggle" aria-expanded="'+hudOpen+'">'+esc(m.name)+'</button>';
+  let h=acctPill()+'<button class="pill hm" type="button" data-act="hudtoggle" aria-expanded="'+hudOpen+'">'+esc(m.name)+'</button>';
   if(st.k==='in')h+='<span class="pill">باقي '+daysTxt(st.left)+'</span>';
   else if(st.k==='before')h+='<span class="pill warn">تبدأ بعد '+daysTxt(st.days)+'</span>';
   else if(st.k==='after')h+=isGuest()?'<span class="pill warn">انتهت الفترة</span>':'<button class="pill warn" type="button" data-act="gotoround">انتهت الفترة، مدّدها</button>';
@@ -473,7 +473,7 @@ function give(kidId,bid,type){
   if(to>=goal()){k.tier=100;k.certs.push({id:uid(),ts:Date.now(),mapId:S.cfg.mapId,round:curRound(),pts:to,goal:goal(),name:k.name,period:S.cfg.period||null});finished=true;}
   k.sad=type==='neg'&&!finished;
   const gotB=evalBadges(k);const gotH=evalHeroes(k);
-  persistKid(k);closePop();
+  persistKid(k);closePop();cloudNag();
   if(view==='home'){
     if(thrown)throwKid(k.id,dispTarget(k));else if(Math.abs(dispTarget(k)-(disp[k.id]==null?0:disp[k.id]))<0.01)reactKid(k.id,type!=='neg');else animateKid(k.id,dispTarget(k));
     floatText(k.id,(delta-bonus>0?'+':'')+(delta-bonus),delta-bonus>0?'p':'n');
@@ -739,7 +739,8 @@ async function wipeAll(){
   try{S.kids.forEach(k=>{if(canCtl(k))persistRemove(k);});}catch(e){}
   if(db&&!isGuest()){S.cfg=DEF_CFG();persistCfg();}
   try{await wq;}catch(e){}
-  try{['kafo.v1','kafo.pw','kafo.vol','kafo.snd'].forEach(k=>localStorage.removeItem(k));}catch(e){}
+  if(!(await cloudWipeDone()))return;
+  try{['kafo.v1','kafo.pw','kafo.vol','kafo.snd','kafo.sync','kafo.owner','kafo.auth','kafo.email','kafo.nag'].forEach(k=>localStorage.removeItem(k));}catch(e){}
   S.kids=[];S.cfg=DEF_CFG();pwUntil=0;pwActUntil=0;location.reload();
 }
 function toggleSound(){
@@ -792,6 +793,8 @@ function renderSettings(){
   const g=isGuest();
   V.innerHTML='<div class="view"><h2>الإعدادات</h2><p class="sub">'+esc(famName(g?me.uid:''))+'</p>'
    +secHtml('lang','Language / اللغة','العربية · English',langSec()).replace('<summary><span>','<summary data-nt><span>')
+   +(isStandalone()?'':secHtml('inst','ثبّت اللعبة','أضفها للشاشة الرئيسية لتفتح مثل التطبيق وتحمي بياناتك',instBody()))
+   +(cloudConfigured()&&!db?secHtml('acct','الحساب والمزامنة',acctSub(),acctSec()):'')
    +secHtml('fam','العائلة والأبناء','اسم العائلة، وإضافة الأبناء وتعديلهم',famSec())
    +secHtml('snd','المؤثرات الصوتية','التحكم بصوت المؤثرات وصوت الخلفية',soundSec())
    +secHtml('pts','نظام النقاط','اختصار لتبويب النقاط في الشريط',ptsSec())
@@ -875,9 +878,9 @@ function readBackup(file){
   fr.onerror=()=>toast('تعذّرت قراءة الملف');fr.readAsText(file);
 }
 function applyBackup(){
-  const o=pendingBk;pendingBk=null;if(!o)return;
+  const o=pendingBk;pendingBk=null;if(!o)return;const oldIds=S.kids.map(k=>k.id);
   S.cfg=Object.assign(DEF_CFG(),o.cfg||{});S.cfg.rewards=Object.assign({25:'',50:'',75:'',100:''},S.cfg.rewards||{});
-  S.kids=o.kids.map(normKid);sortKids();persistLocal();closeSheet();go('home');toast('تمت استعادة النسخة');
+  S.kids=o.kids.map(normKid);sortKids();persistLocal();cloudRestored(oldIds);closeSheet();go('home');toast('تمت استعادة النسخة');
 }
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='bkIn'){readBackup(e.target.files&&e.target.files[0]);e.target.value='';}});
 
@@ -910,7 +913,7 @@ const ACT={
   close(){closeSheet();},
   addkid(){guardPw(()=>openKidEditor());},
   editkid(el){const id=el.dataset.id;guardPw(()=>openKidEditor(id));},
-  tohome(){closeSheet();closePop&&closePop();const sp=$('#splash');sp.classList.remove('gone');drawSplash();},
+  tohome(){closeSheet();closePop&&closePop();CL.gateDone=false;const sp=$('#splash');sp.classList.remove('gone');drawSplash();cloudHint();},
   tipkid(){closeSheet();openKidEditor();},
   setlang(el){if(el.dataset.v!==I18N.lang)setLang(el.dataset.v);},
   ptsunlock(){guardPw(()=>render());},
@@ -943,6 +946,7 @@ const ACT={
   invdel(el){delete S.inv[el.dataset.id];persistInv();renderKids();toast('أُلغي الكود');},
   famdel(el){removeFamily(el.dataset.id);}
 };
+Object.assign(ACT,CLOUD_ACT);
 function arm(el){el.classList.add('armed');el.dataset.orig=el.textContent;el.textContent='اضغط للتأكيد';setTimeout(()=>{if(el.isConnected&&el.classList.contains('armed')){el.classList.remove('armed');el.textContent=el.dataset.orig;}},3000);}
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act],[data-tab]');if(!el)return;
@@ -952,7 +956,7 @@ document.addEventListener('click',e=>{
   if(el.hasAttribute('data-confirm')&&!el.classList.contains('armed')){arm(el);return;}
   if(ACT[a])ACT[a](el,e);
 });
-document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;if(f.id==='kidForm')saveKid();else if(f.id==='joinForm')joinFamily();else if(f.id==='invForm')createInvite();else if(f.id==='pwForm')doUnlock();else if(f.id==='pwSetForm')setPwFromForm();else if(f.dataset&&f.dataset.form==='beh')addBeh(f);});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;if(f.dataset&&f.dataset.cform){acctSubmit(f);return;}if(f.id==='kidForm')saveKid();else if(f.id==='joinForm')joinFamily();else if(f.id==='invForm')createInvite();else if(f.id==='pwForm')doUnlock();else if(f.id==='pwSetForm')setPwFromForm();else if(f.dataset&&f.dataset.form==='beh')addBeh(f);});
 document.addEventListener('change',async e=>{
   const t=e.target;
   if(t.id==='kPhoto'&&t.files&&t.files[0]&&draft){try{draft.photo=await resizePhoto(t.files[0]);$('#photoPrev').innerHTML=photoPrevHtml();}catch(err){toast('تعذّر قراءة الصورة');}t.value='';}
@@ -975,7 +979,7 @@ document.addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='volFx'){tone(SND.pos);}
   else if(t.id==='volBg'){if(soundOn()&&VOL.bg>0){AMB.gest=true;AMB.testUntil=Date.now()+4500;ambSync();}}
-  else if(t.id==='famIn'){const v=t.value.trim().slice(0,24);if(isGuest()){const f=myFam();if(f){f.name=v||'عائلة';persistFam(f);}}else{S.cfg.famName=v;persistCfg();}toast('تم حفظ اسم العائلة');const sb=$('#view .sub');if(sb&&view==='settings')sb.textContent=famName(isGuest()?me.uid:'');}
+  else if(t.id==='famIn'){const v=t.value.trim().slice(0,24);if(isGuest()){const f=myFam();if(f){f.name=v||'عائلة';persistFam(f);}}else{S.cfg.famName=v;persistCfg();}refreshHud();toast('تم حفظ اسم العائلة');const sb=$('#view .sub');if(sb&&view==='settings')sb.textContent=famName(isGuest()?me.uid:'');}
 });
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.classList&&d.classList.contains('set')){SETOPEN[d.dataset.sec]=d.open;if(d.open&&d.dataset.sec==='round')paintMaps();}},true);
 document.addEventListener('keydown',e=>{
@@ -994,11 +998,15 @@ let rzT,wasWide=innerWidth>=760;window.addEventListener('resize',()=>{const w=in
   document.addEventListener('click',e=>{if(!m.hidden&&!m.contains(e.target))set(false);});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){set(false);b.focus();}});
 })();
-$('#goBtn').addEventListener('click',()=>{
-  if(!ready)return;
+function startGame(){
   $('#splash').classList.add('gone');stopSplash();tone(SND.lvl);
   const own=isGuest()?myKids():S.kids;
   if(!own.length){go('kids');if(!needJoin()&&!showTip('start'))openKidEditor();}else{go('home');if(!hinted){hinted=true;setTimeout(()=>{if(view==='home'&&!sheetOpen&&!popCtx&&!sel)toast('اضغط على أي شخصية لتضيف لها نقاطًا أو تخصمها');},900);}}
+}
+$('#goBtn').addEventListener('click',()=>{
+  if(!ready)return;
+  if(cloudNeedsGate()){acctGate(startGame);return;}
+  startGame();
 });
 (async function init(){
   i18nStart();$$('.langmenu button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===I18N.lang)));drawSplash();$('#goBtn').disabled=true;
@@ -1006,4 +1014,5 @@ $('#goBtn').addEventListener('click',()=>{
   await Promise.race([loadAll(),new Promise(r=>setTimeout(r,7000))]);
   ready=true;if(db)subscribe();$('#goBtn').disabled=false;$('#goHint').textContent=db?(isGuest()?'مرحبًا بك في تحدي العائلة':'مرحبًا بك'):'يحفظ بياناتك على هذا الجهاز';
   updateSound();$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===view)));render();
+  cloudInit().catch(e=>console.warn('cloud',e));
 })();
