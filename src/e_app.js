@@ -35,9 +35,11 @@ const curRound=()=>S.cfg.round||1;
 const isDone=k=>k.certs.some(c=>c.round===curRound());
 const kidById=id=>S.kids.find(k=>k.id===id);
 const mapOf=()=>MAPS[S.cfg.mapId]||MAPS.peak;
-/* worlds that open only after some child has finished any map (the Mario world); a world already in use stays open */
+/* worlds that open only after a child finishes a map: the Mario world. Only certificates earned from MAP_GATE_FROM on count
+   (older ones stay saved and shown, but do not open it). A world that is the current map stays usable so no game in progress breaks. */
 const MAP_GATED=['hop'];
-const mapLocked=m=>MAP_GATED.indexOf(m.id)>=0&&S.cfg.mapId!==m.id&&!S.kids.some(k=>k.certs.length>0);
+const MAP_GATE_FROM=1792239545920;
+const mapLocked=m=>MAP_GATED.indexOf(m.id)>=0&&S.cfg.mapId!==m.id&&!S.kids.some(k=>k.certs.some(c=>(+c.ts||0)>=MAP_GATE_FROM));
 /* ---- the fork on routes that have one (the volcano): the child chooses the long road or a bridge shortcut ---- */
 const FORK_NEGS=3;
 const forkOf=k=>{const f=k.fork;return f&&f.tk===tierKey()?f:null;};
