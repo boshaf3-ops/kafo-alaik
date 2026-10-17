@@ -91,6 +91,10 @@ self.addEventListener('fetch',e=>{{
 '''
 open(OUT+'sw.js','w').write(sw)
 open(OUT+'privacy.html','w').write(open(K+'privacy.html').read())
+_cl=open(K+'n_cloud.js',encoding='utf-8').read()
+_url=re.search(r"const CLOUD_URL='([^']*)'",_cl).group(1);_key=re.search(r"const CLOUD_KEY='([^']*)'",_cl).group(1)
+if _url and _key and HAS_SB:
+    open(OUT+'admin.html','w',encoding='utf-8').write(open(K+'admin.html',encoding='utf-8').read().replace('{{CLOUD_URL}}',_url).replace('{{CLOUD_KEY}}',_key))
 open(OUT+'robots.txt','w').write('User-agent: *\nAllow: /\n')
 open(OUT+'_headers','w').write('''/*
   X-Content-Type-Options: nosniff

@@ -62,6 +62,7 @@ async function acctLoggedIn(ses){
   if(ses&&ses.user)CL.user=ses.user;
   else{try{const g=await CL.sb.auth.getSession();CL.user=g.data&&g.data.session?g.data.session.user:null;}catch(e){}}
   if(!CL.user){toast('تعذّر تسجيل الدخول، حاول مرة ثانية');return;}
+  CL.admin=null;
   if(CL.user.email)clLS.set(CL_EMAIL,clShowName(CL.user.email));
   acctShow('<div class="empty"><p class="sub">جارٍ تجهيز حسابك…</p></div>');
   let r;try{r=await cloudBegin();}catch(e){console.warn(e);toast(clErrText(e));acctDone(true);return;}
@@ -129,7 +130,7 @@ function acctOutAsk(){
 async function acctOut(wipe){
   if(clLinked()){await cloudFlush();if(clPending()&&wipe){toast('ارفع تغييراتك أولًا: ما فيه اتصال بالإنترنت');return;}}
   try{await clAuth.out();}catch(e){}
-  clUnsub();CL.user=null;CL.gateDone=false;
+  CL.admin=null;clUnsub();CL.user=null;CL.gateDone=false;
   if(wipe){clWipeLocal();clLS.del(CL_OWN);clLS.del(CL_SYNC);clLS.del(CL_EMAIL);}
   closeSheet();
   if(wipe){location.reload();return;}
@@ -242,7 +243,14 @@ function acctMenu(){
   openSheet('<div class="sheet-head"><div class="grow"><h2>حسابي</h2>'+(S.cfg.famName?'<div><b>'+esc(S.cfg.famName)+'</b></div>':'')+'<div class="sub" dir="ltr" style="text-align:start">'+esc(cloudEmail())+'</div><div class="sub" id="acctStat">'+esc(cloudStatus())+'</div></div><button class="btn small" type="button" data-act="close">تم</button></div>'
    +(acctRealEmail()?'<div class="row"><button class="btn gold" type="button" data-act="acctmig">اختر اسم مستخدم وامسح إيميلك</button></div>':'')
    +'<div class="row"><button class="btn gold" type="button" data-act="acctsync">مزامنة الآن</button><button class="btn" type="button" data-act="acctpw">تغيير كلمة السر</button></div>'
-   +'<div class="row"><button class="btn" type="button" data-act="acctoutask">تسجيل الخروج</button><button class="btn neg" type="button" data-act="acctdel">حذف الحساب وبياناته</button></div>',{});
+   +'<div class="row"><button class="btn" type="button" data-act="acctoutask">تسجيل الخروج</button><button class="btn neg" type="button" data-act="acctdel">حذف الحساب وبياناته</button></div><div class="row" id="acctAdminSlot"></div>',{});
+  clIsAdmin().then(ok=>{const sl=$('#acctAdminSlot');if(ok&&sl)sl.innerHTML='<a class="btn gold" href="admin.html">لوحة المتابعة</a>';});
+}
+/* the owner dashboard link only appears for an account the server lists as admin */
+async function clIsAdmin(){
+  if(CL.admin!=null)return CL.admin;
+  try{const r=await CL.sb.rpc('is_admin');CL.admin=!!(r&&r.data===true);}catch(e){CL.admin=false;}
+  return CL.admin;
 }
 
 /* ---------- (1) install the game on the home screen: opens like an app and keeps the browser from clearing the data ---------- */
