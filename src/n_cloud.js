@@ -25,13 +25,14 @@ const CL={sb:null,user:null,timer:0,retry:0,busy:false,syncing:false,chan:null,e
 const CLOUD_DOMAIN='kafo.invalid';
 const clUserEmail=n=>{n=String(n||'').trim().toLowerCase();return n.indexOf('@')>=0?n:n+'@'+CLOUD_DOMAIN;};   /* an old account that signed up with a real email can still type it */
 const clShowName=e=>String(e||'').replace('@'+CLOUD_DOMAIN,'');
-/* rules: English lowercase letters and digits, starts with a letter, at least one dot between parts (mohammed.ali), 5 to 24 characters */
+/* rules: English letters (capitals are lowered) and digits; a single dot, underscore or dash may sit inside; 3 to 24 characters; no spaces.
+   A name like mohammed, boshaf3 or mohammed.ali is fine. The only thing that really matters is that nobody else has it. */
 function clNameCheck(n){
-  if(!n)return'empty';if(/[^\x00-\x7f]/.test(n))return'english';if(n.length<5)return'short';if(n.length>24)return'long';
-  if(!/^[a-z]/.test(n))return'start';if(n.indexOf('.')<0)return'dot';if(/\.\./.test(n)||/\.$/.test(n))return'dots';
-  if(!/^[a-z][a-z0-9]*(\.[a-z0-9]+)+$/.test(n))return'chars';return'';
+  if(!n)return'empty';if(/[^\x00-\x7f]/.test(n))return'english';if(n.length<3)return'short';if(n.length>24)return'long';
+  if(!/^[a-z0-9]/.test(n))return'start';if(/[._-]$/.test(n))return'end';if(/[._-]{2}/.test(n))return'dots';
+  if(!/^[a-z0-9]+([._-][a-z0-9]+)*$/.test(n))return'chars';return'';
 }
-const CL_NAMEMSG={english:'اكتب الاسم بالإنجليزي (حروف a-z فقط)',short:'الاسم قصير، 5 أحرف على الأقل',long:'الاسم طويل، 24 حرف كحد أقصى',start:'لازم يبدأ بحرف إنجليزي',dot:'لازم فيه نقطة بين جزئين، مثل: mohammed.ali',dots:'النقطة ما تكون في الآخر ولا تتكرر',chars:'مسموح حروف إنجليزية وأرقام ونقطة فقط'};
+const CL_NAMEMSG={english:'اكتب الاسم بحروف إنجليزية (a-z) وأرقام',short:'الاسم قصير، 3 أحرف على الأقل',long:'الاسم طويل، 24 حرف كحد أقصى',start:'لازم يبدأ بحرف إنجليزي أو رقم',end:'الاسم ما ينتهي بنقطة أو شرطة',dots:'النقطة والشرطة ما تتكرر ورا بعض',chars:'مسموح حروف إنجليزية وأرقام ونقطة وشرطة فقط (بدون مسافات)'};
 const clNameMsg=k=>CL_NAMEMSG[k]||'اسم المستخدم غير صالح';
 const CL_SYNC='kafo.sync',CL_OWN='kafo.owner',CL_KEY='kafo.auth',CL_EMAIL='kafo.email';   /* the last email used on this device (never the password) */
 const clLS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}},del:k=>{try{localStorage.removeItem(k);}catch(e){}}};
