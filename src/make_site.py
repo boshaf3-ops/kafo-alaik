@@ -1,5 +1,7 @@
 import re, json, hashlib, os, time
-K='/home/claude/kafo/'
+HERE=os.path.dirname(os.path.abspath(__file__))
+K=HERE+'/'
+OUT=os.path.dirname(HERE)+'/'   # repo root (index.html, sw.js ...)
 head=open(K+'a_head.html').read()
 # fonts: replace the Google Fonts links for the Arabic faces with local ones; keep only the optional pixel font from the CDN
 head=re.sub(r'<title>.*?</title>\n','',head,count=1)
@@ -58,8 +60,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 </body>
 </html>
 '''
-os.makedirs('dist',exist_ok=True)
-open('dist/index.html','w').write(page)
+open(OUT+'index.html','w').write(page)
 VER=hashlib.md5(page.encode()).hexdigest()[:8]
 manifest={
  "name":"كفو عليك","short_name":"كفو عليك","description":"تطبيق عائلي لتحفيز الأبناء على السلوك الطيب بخرائط مغامرة وشارات وشهادات.",
@@ -68,7 +69,7 @@ manifest={
  "icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
           {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
           {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
-open('dist/manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
+open(OUT+'manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
 sw=f'''/* كفو عليك: خدمة العمل دون إنترنت. غيّر رقم النسخة عند كل تحديث ليصل الجهاز للنسخة الجديدة. */
 const VERSION='kafo-{VER}';
 const CORE=['./','index.html','manifest.webmanifest','fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
@@ -83,9 +84,9 @@ self.addEventListener('fetch',e=>{{
     e.respondWith(caches.match(r).then(hit=>hit||fetch(r).then(res=>{{if(res&&(res.ok||res.type==='opaque')){{const cp=res.clone();caches.open(VERSION).then(c=>c.put(r,cp));}}return res;}}).catch(()=>hit)));}}
 }});
 '''
-open('dist/sw.js','w').write(sw)
-open('dist/robots.txt','w').write('User-agent: *\nAllow: /\n')
-open('dist/_headers','w').write('''/*
+open(OUT+'sw.js','w').write(sw)
+open(OUT+'robots.txt','w').write('User-agent: *\nAllow: /\n')
+open(OUT+'_headers','w').write('''/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=()
