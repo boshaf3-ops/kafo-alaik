@@ -142,7 +142,7 @@ label.lbl{display:block;font-weight:800;margin:14px 4px 4px}
 .langmenu button[data-v=en]{font:800 22px/1 'HJ',sans-serif;direction:ltr}
 .langmenu button+button{border-top:3px solid #0e2a33}
 .langmenu button[aria-pressed=true]{background:#ffd23f;cursor:default}
-.esh{text-align:center;padding:4px 2px}.esh img{display:block;width:150px;height:auto;margin:0 auto 12px}.esh h3{margin:0 0 8px;font:800 18px/1.4 var(--f-body);color:var(--brand)}.esh p{margin:6px 0;font:500 15px/1.8 var(--f-body)}
+.esh{text-align:center;padding:4px 2px}.esh img{display:block;width:150px;height:auto;margin:0 auto 12px}.eshban{margin:14px 0 4px;background:#fff;border:3px solid #0e2a33;box-shadow:0 4px 0 #0e2a33;padding:8px 10px}.eshban img{display:block;width:100%;height:auto}.esh h3{margin:0 0 8px;font:800 18px/1.4 var(--f-body);color:var(--brand)}.esh p{margin:6px 0;font:500 15px/1.8 var(--f-body)}
 .ttl .org{display:block;width:clamp(112px,34vw,180px);height:auto;margin:0 auto clamp(14px,3.4vh,30px);filter:drop-shadow(0 1px 2px rgba(14,42,51,.5))}
 .ttl h1{margin:0;font:400 clamp(50px,15vw,100px)/1.05 var(--f-display);white-space:nowrap;color:#ffd23f;text-shadow:0 5px 0 #0e2a33,5px 5px 0 #0e2a33,-5px 5px 0 #0e2a33,0 -5px 0 #0e2a33,5px 0 0 #0e2a33,-5px 0 0 #0e2a33,4px 4px 0 #0e2a33,-4px -4px 0 #0e2a33,4px -4px 0 #0e2a33,-4px 4px 0 #0e2a33}
 .ttl .sub-en{margin-top:6px;font:800 clamp(40px,11vw,66px)/1 'HJ',sans-serif;color:#fff;direction:ltr;letter-spacing:.02em;text-shadow:0 4px 0 #0e2a33,4px 4px 0 #0e2a33,-4px 4px 0 #0e2a33,0 -4px 0 #0e2a33,4px 0 0 #0e2a33,-4px 0 0 #0e2a33,3px 3px 0 #0e2a33,-3px -3px 0 #0e2a33,3px -3px 0 #0e2a33,-3px 3px 0 #0e2a33}
@@ -3776,7 +3776,8 @@ function secHtml(id,title,sub,body){return '<details class="panel set" data-sec=
 function eshSec(){
   return '<div class="esh"><img src="icons/eshraqat.png" alt="" width="191" height="81"><h3>مبادرة إشراقات «للتوعية الأسرية»</h3>'
    +'<p>وهي مبادرة تطوعية تابعة للجمعية البحرينية لتنمية المرأة.</p>'
-   +'<p>انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».</p></div>';
+   +'<p>انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».</p>'
+   +'<div class="eshban"><img src="icons/eshraqat-banner.jpg" alt="مبادرة إشراقات التابعة للجمعية البحرينية لتنمية المرأة" width="770" height="135"></div></div>';
 }
 function langSec(){
   const en=I18N.lang==='en';

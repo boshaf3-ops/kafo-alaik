@@ -785,7 +785,8 @@ function secHtml(id,title,sub,body){return '<details class="panel set" data-sec=
 function eshSec(){
   return '<div class="esh"><img src="icons/eshraqat.png" alt="" width="191" height="81"><h3>مبادرة إشراقات «للتوعية الأسرية»</h3>'
    +'<p>وهي مبادرة تطوعية تابعة للجمعية البحرينية لتنمية المرأة.</p>'
-   +'<p>انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».</p></div>';
+   +'<p>انطلقت عام ٢٠١٢ لتنمية الوعي الأسري لدى الأسرة من الناحية «التربوية والزوجية».</p>'
+   +'<div class="eshban"><img src="icons/eshraqat-banner.jpg" alt="مبادرة إشراقات التابعة للجمعية البحرينية لتنمية المرأة" width="770" height="135"></div></div>';
 }
 function langSec(){
   const en=I18N.lang==='en';
