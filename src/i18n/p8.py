@@ -31,6 +31,9 @@ D8 = {
 'اكتب إيميل حسابك ونرسل لك رمزًا من 6 أرقام.':'Enter your account email and we will send you a 6-digit code.',
 'ادخل بإيميلك وكلمة سرك.':'Sign in with your email and password.',
 'الإيميل':'Email',
+'تنفتح بعد ما تكمل أي خريطة':'Opens after you finish any map',
+'خرائط جديدة قريبًا':'New maps coming soon',
+'تنفتح هذه الخريطة بعد ما تكمل أي خريطة':'This map opens after you finish any map',
 'حمّل نسخة من بياناتك أولًا':'Download a copy of your data first',
 'ملف يحفظ الأبناء والنقاط والشهادات (وصور هذا الجهاز) تقدر ترجع تستعيده بعدين من الإعدادات.':"A file that keeps the kids, points and certificates (and this device's photos). You can restore it later from Settings.",
 'ثبّت اللعبة':'Install the game',
@@ -120,6 +123,7 @@ D8 = {
 'تمت المزامنة':'Synced',
 }
 P8 = [
+(r'^(.+)، مقفلة$', r'$1, locked'),
 (r'^آخر مزامنة: (.+)$', r'Last sync: $1'),
 (r'^قبل (\d+) د$', r'$1 min ago'),
 (r'^قبل (\d+) س$', r'$1 h ago'),

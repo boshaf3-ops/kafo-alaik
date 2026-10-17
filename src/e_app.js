@@ -35,6 +35,9 @@ const curRound=()=>S.cfg.round||1;
 const isDone=k=>k.certs.some(c=>c.round===curRound());
 const kidById=id=>S.kids.find(k=>k.id===id);
 const mapOf=()=>MAPS[S.cfg.mapId]||MAPS.peak;
+/* worlds that open only after some child has finished any map (the Mario world); a world already in use stays open */
+const MAP_GATED=['hop'];
+const mapLocked=m=>MAP_GATED.indexOf(m.id)>=0&&S.cfg.mapId!==m.id&&!S.kids.some(k=>k.certs.length>0);
 /* ---- the fork on routes that have one (the volcano): the child chooses the long road or a bridge shortcut ---- */
 const FORK_NEGS=3;
 const forkOf=k=>{const f=k.fork;return f&&f.tk===tierKey()?f:null;};
@@ -691,7 +694,10 @@ function roundBody(){
   if(isGuest())return roundBodyRO();
   const p=S.cfg.period||{start:'',end:''};
   return '<section class="panel"><h3>اختر الخريطة</h3><p class="sub">الأبناء كلهم يتنافسون على الخريطة نفسها، وتقدر تغيّرها وقت ما تبي ويبقى تقدّمهم كما هو.</p><div class="maps">'
-   +MAP_LIST.map(m=>'<button class="map-card" type="button" data-act="pickmap" data-id="'+m.id+'" aria-pressed="'+(m.id===S.cfg.mapId)+'"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><b>'+m.name+'</b><small>'+m.tag+'</small><small class="ft">'+m.feat+'</small></button>').join('')
+   +MAP_LIST.map(m=>mapLocked(m)
+     ?'<button class="map-card locked" type="button" data-act="maplocked" aria-disabled="true" aria-label="'+esc(m.name)+'، مقفلة"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><span class="lockbadge"><span class="ico i-lock"></span></span><b>'+m.name+'</b><small>'+m.tag+'</small><small class="ft">تنفتح بعد ما تكمل أي خريطة</small></button>'
+     :'<button class="map-card" type="button" data-act="pickmap" data-id="'+m.id+'" aria-pressed="'+(m.id===S.cfg.mapId)+'"><canvas width="'+MW+'" height="'+MH+'" data-map="'+m.id+'"></canvas><b>'+m.name+'</b><small>'+m.tag+'</small><small class="ft">'+m.feat+'</small></button>').join('')
+   +'<div class="map-card soon" role="note"><div class="qmark" aria-hidden="true">?</div><b>خرائط جديدة قريبًا</b></div>'
    +'</div><div class="row" style="margin-top:14px"><button class="btn gold" type="button" data-act="prevcert">معاينة شهادة هذه الخريطة</button></div></section>'
    +'<section class="panel"><h3>فترة المغامرة</h3><p class="sub">النقاط تُسجَّل خلال هذه الفترة فقط. اتركها فاضية إذا ما تبي تحديد وقت.</p><div class="two"><div><label class="lbl" for="pStart">من تاريخ</label><input class="field" id="pStart" type="date" value="'+esc(p.start)+'"></div><div><label class="lbl" for="pEnd">إلى تاريخ</label><input class="field" id="pEnd" type="date" value="'+esc(p.end)+'"></div></div><div class="row" style="margin-top:6px"><button class="btn small" type="button" data-act="pclear">إلغاء الفترة</button></div></section>'
    +'<section class="panel"><h3>نقاط الوصول إلى النهاية</h3><p class="sub">كم نقطة يحتاج الابن ليوصل المستوى 100؟ كل ما قلّ الرقم صارت الخريطة أسرع.</p><input class="field" id="goalIn" type="number" min="10" max="5000" inputmode="numeric" value="'+goal()+'" style="max-width:200px"></section>'
@@ -931,7 +937,8 @@ const ACT={
   sugg(el){const t=el.dataset.type,s=SUGG[t][+el.dataset.i];(t==='pos'?BH().pos:BH().neg).push({id:uid(),t:s[0],p:s[1]});persistBH();render();},
   bp(el){const l=el.dataset.type==='pos'?BH().pos:BH().neg,b=l.find(x=>x.id===el.dataset.id);if(!b)return;b.p=clamp(b.p+(+el.dataset.d),1,100);persistBH();render();},
   bdel(el){const t=el.dataset.type,h=BH();if(t==='pos')h.pos=h.pos.filter(x=>x.id!==el.dataset.id);else h.neg=h.neg.filter(x=>x.id!==el.dataset.id);persistBH();render();},
-  pickmap(el){S.cfg.mapId=el.dataset.id;persistCfg();$$('.map-card').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===S.cfg.mapId)));toast('الخريطة الآن: '+mapOf().name+' — '+mapOf().feat);tone(SND.pos);},
+  maplocked(){toast('تنفتح هذه الخريطة بعد ما تكمل أي خريطة');},
+  pickmap(el){if(MAPS[el.dataset.id]&&mapLocked(MAPS[el.dataset.id])){toast('تنفتح هذه الخريطة بعد ما تكمل أي خريطة');return;}S.cfg.mapId=el.dataset.id;persistCfg();$$('.map-card').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===S.cfg.mapId)));toast('الخريطة الآن: '+mapOf().name+' — '+mapOf().feat);tone(SND.pos);},
   prevcert(){showCert({mapId:S.cfg.mapId,name:'اسم البطل',av:avatarFrom(2),photo:null,goal:goal(),period:S.cfg.period,ts:Date.now()},'معاينة الشهادة');},
   pclear(){S.cfg.period=null;persistCfg();render();toast('أُلغيت الفترة');},
   newround(){newRound();},
