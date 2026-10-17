@@ -16,8 +16,8 @@ function cloudSupportHref(){
     :'السلام عليكم،\n\nنسيت بيانات الدخول لحسابي في «كفو عليك».\n\nأسماء الأبناء:\nأعمارهم:\nالإيميل اللي أتذكره (إن وجد):\n\nملاحظة: لا ترسل كلمة السر في الرسالة.';
   return 'mailto:'+CLOUD_SUPPORT+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
 }
-const CLOUD_URL='';
-const CLOUD_KEY='';
+const CLOUD_URL='https://dqowufqtkkwkmebtrskf.supabase.co';
+const CLOUD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxb3d1ZnF0a2t3a21lYnRyc2tmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMzE1MTgsImV4cCI6MjEwNzgwNzUxOH0.DPkD_JK6AUa03-9F9f6HDr6kKBNO6Mz9EyyU-3GHjTA';   /* public anon key: safe in the browser, the data is protected by RLS */
 
 const CL={sb:null,user:null,timer:0,retry:0,busy:false,syncing:false,chan:null,err:'',R:null,gateDone:false,lastPull:0,meta:{cfg:false,kids:{},del:{},last:0}};
 const CL_SYNC='kafo.sync',CL_OWN='kafo.owner',CL_KEY='kafo.auth',CL_EMAIL='kafo.email';   /* the last email used on this device (never the password) */
