@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Accounts and cloud sync (n_cloud.js, o_account.js). Keys are text nodes / attributes exactly as they reach the page, trimmed.
 D8 = {
+'الجمعية البحرينية لتنمية المرأة':'Bahrain Women’s Development Association',
 'مبادرة إشراقات':'Eshraqaat Initiative',
 'للتوعية الأسرية':'For family awareness',
 'مبادرة إشراقات «للتوعية الأسرية»':'Eshraqaat Initiative “for family awareness”',
