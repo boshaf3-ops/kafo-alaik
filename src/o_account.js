@@ -26,8 +26,10 @@ function acctForm(mode){
   const su=mode==='signup',fg=mode==='forgot';
   let h='<form id="authForm" data-cform="auth" data-mode="'+mode+'" autocomplete="on"><h2>'+(su?'إنشاء حساب':fg?'نسيت كلمة السر':'تسجيل الدخول')+'</h2>'
    +'<p class="sub">'+(su?'اختر اسم مستخدم وكلمة سر. الحساب لولي الأمر فقط، والأبناء يلعبون من خلاله.':fg?'اكتب اسم المستخدم.':'ادخل باسم المستخدم وكلمة السر.')+'</p>'
-   +acctField('aUser','اسم المستخدم','text','name="username" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="mohammed.ali" value="'+esc(su?(AF.email||''):(AF.email||clLS.get(CL_EMAIL)||''))+'"');
-  if(su)h+='<p class="sub" style="margin:2px 6px 0">بالإنجليزي، وفيه نقطة بين جزئين. مثال: <b dir="ltr">mohammed.ali</b></p><div class="uhint" id="aUserMsg" aria-live="polite"></div>';
+   +'<label class="lbl" for="aUser">اسم المستخدم</label>'
+   +(su?'<p class="sub" style="margin:0 6px 2px">بالإنجليزي، وفيه نقطة بين جزئين <span class="ex">(مثال: mohammed.ali)</span></p>':'')
+   +'<input class="field" id="aUser" type="text" name="username" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="اكتب اسم المستخدم هنا" value="'+esc(su?(AF.email||''):(AF.email||clLS.get(CL_EMAIL)||''))+'">';
+  if(su)h+='<div class="uhint" id="aUserMsg" aria-live="polite"></div>';
   if(mode==='login')h+='<p class="sub" style="margin:2px 6px 0">إذا سجّلت قبل بإيميل، اكتب إيميلك في نفس الخانة.</p>';
   if(!fg)h+=acctField('aPw','كلمة السر','password','name="password" dir="ltr" autocomplete="'+(su?'new-password':'current-password')+'" maxlength="72" required'+(su?' minlength="8" placeholder="8 أحرف أو أرقام على الأقل"':''));
   if(su)h+=acctField('aPw2','أعد كتابة كلمة السر','password','dir="ltr" autocomplete="new-password" maxlength="72" required');
@@ -295,8 +297,10 @@ async function acctMigrate(next){
   try{const g=await CL.sb.auth.getUser();if(g&&g.data&&g.data.user){CL.user=g.data.user;if(!acctRealEmail()){clLS.set(CL_EMAIL,cloudEmail());refreshHud();if(next)next();return;}}}catch(e){}
   openSheet('<form id="migForm" data-cform="mig" data-mode="signup" autocomplete="off"><h2>اختر اسم مستخدم</h2>'
    +'<p class="sub">ما عدنا نطلب الإيميل. اختر اسم مستخدم بالإنجليزي وتدخل به من الآن. بعد ما تحفظه نمسح إيميلك من النظام، وبيانات أبنائك ونقاطهم تبقى كما هي.</p>'
-   +acctField('aUser','اسم المستخدم','text','name="username" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="mohammed.ali"')
-   +'<p class="sub" style="margin:2px 6px 0">بالإنجليزي، وفيه نقطة بين جزئين. مثال: <b dir="ltr">mohammed.ali</b></p><div class="uhint" id="aUserMsg" aria-live="polite"></div>'
+   +'<label class="lbl" for="aUser">اسم المستخدم</label>'
+   +'<p class="sub" style="margin:0 6px 2px">بالإنجليزي، وفيه نقطة بين جزئين <span class="ex">(مثال: mohammed.ali)</span></p>'
+   +'<input class="field" id="aUser" type="text" name="username" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="اكتب اسم المستخدم هنا">'
+   +'<div class="uhint" id="aUserMsg" aria-live="polite"></div>'
    +'<div class="row" style="margin-top:14px"><button class="btn primary" type="submit">حفظ الاسم ومسح الإيميل</button><button class="btn" type="button" data-act="close">لاحقًا</button></div></form>',{next:next});
   const b=$('#sheetHost .sheet-back');if(b)b.classList.add('gate');acctFocus('aUser');
 }
