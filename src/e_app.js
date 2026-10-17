@@ -607,7 +607,7 @@ async function joinFamily(){
   }catch(e){console.warn(e);toast('تعذّر الانضمام. اطلب من الرئيس يعطيك صلاحية «مشارك» من قائمة المشاركة');}
 }
 function openInvite(){
-  openSheet('<form id="invForm" autocomplete="off"><h2>دعوة عائلة جديدة</h2><label class="lbl" for="ownFam">اسم عائلتك أنت</label><input class="field" id="ownFam" maxlength="24" value="'+esc(S.cfg.famName||'')+'" placeholder="مثال: عائلة الشافعي">'
+  openSheet('<form id="invForm" autocomplete="off"><h2>دعوة عائلة جديدة</h2><label class="lbl" for="ownFam">اسم عائلتك أنت</label><input class="field" id="ownFam" maxlength="24" value="'+esc(S.cfg.famName||'')+'" placeholder="مثال: عائلة أبو سالم">'
    +'<label class="lbl" for="invLabel">اسم العائلة المدعوة</label><input class="field" id="invLabel" maxlength="24" required placeholder="مثال: عائلة أختي"><div class="row" style="margin-top:14px"><button class="btn primary" type="submit">إنشاء الكود</button><button class="btn" type="button" data-act="close">إلغاء</button></div></form>',{});
   setTimeout(()=>{const n=$('#invLabel');if(n)n.focus();},50);
 }
@@ -758,7 +758,7 @@ function toggleSound(){
 const volIcon=()=>'<span class="ico i-mute"></span>';
 function famSec(){
   const nm=isGuest()?((myFam()||{}).name||''):(S.cfg.famName||''),ks=myKids();
-  return '<label class="lbl" for="famIn">اسم العائلة</label><input class="field" id="famIn" maxlength="24" value="'+esc(nm)+'" placeholder="مثال: عائلة الشافعي" autocomplete="off">'
+  return '<label class="lbl" for="famIn">اسم العائلة</label><input class="field" id="famIn" maxlength="24" value="'+esc(nm)+'" placeholder="مثال: عائلة أبو سالم" autocomplete="off">'
    +'<div class="lbl" style="margin-top:18px">الأبناء ('+ks.length+')</div>'
    +(ks.length?ks.map(k=>'<div class="srow"><div class="av">'+avHtml(k)+'</div><div class="grow"><b>'+esc(k.name)+'</b><div class="sub">'+(k.age!==''?'العمر '+esc(k.age)+' · ':'')+k.pts+' نقطة</div></div><button class="btn small" type="button" data-act="editkid" data-id="'+k.id+'">تعديل</button></div>').join(''):'<p class="sub">ما أضفت أحد بعد.</p>')
    +'<div class="row"><button class="btn primary" type="button" data-act="addkid">+ إضافة ابن أو ابنة</button></div><p class="sub">للحذف: اضغط «تعديل» على الابن ثم «حذف الابن».</p>';

@@ -33,7 +33,7 @@ function acctForm(mode){
   if(mode==='login')h+='<p class="sub" style="margin:2px 6px 0">إذا سجّلت قبل بإيميل، اكتب إيميلك في نفس الخانة.</p>';
   if(!fg)h+=acctField('aPw','كلمة السر','password','name="password" dir="ltr" autocomplete="'+(su?'new-password':'current-password')+'" maxlength="72" required'+(su?' minlength="8" placeholder="8 أحرف أو أرقام على الأقل"':''));
   if(su)h+=acctField('aPw2','أعد كتابة كلمة السر','password','dir="ltr" autocomplete="new-password" maxlength="72" required');
-  if(su)h+=acctField('aFam','اسم العائلة (اختياري)','text','name="family" maxlength="24" autocomplete="off" placeholder="مثال: عائلة الشافعي" value="'+esc(AF.fam)+'"')
+  if(su)h+=acctField('aFam','اسم العائلة (اختياري)','text','name="family" maxlength="24" autocomplete="off" placeholder="مثال: عائلة أبو سالم" value="'+esc(AF.fam)+'"')
    +'<label class="chk"><input type="checkbox" id="aOk" required><span>أنا ولي أمر، وأوافق على <a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>.</span></label>';
   if(CLOUD_RECOVERY&&(su||fg))h+='<p class="sub" style="margin-top:10px">يوصلك رمز التأكيد على إيميلك خلال دقيقة تقريبًا. إذا ما لقيته، شوف مجلد الرسائل غير المرغوبة (Spam).</p>';
   if(!CLOUD_RECOVERY&&su)h+='<p class="sub" style="margin-top:10px"><b>مهم:</b> احفظ اسم المستخدم وكلمة السر في مكان آمن. حاليًا ما فيه طريقة لاسترجاع كلمة السر إذا نسيتها.</p>';

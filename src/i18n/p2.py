@@ -53,7 +53,7 @@ D2 = {
 'اضغط «إضافة ابن أو ابنة» وأدخل الاسم والعمر، والصورة اختيارية.':'Tap “Add a son or daughter” and enter the name and age. A photo is optional.',
 'نظام النقاط':'Points System','نظام النقاط مقفل':'Points System is Locked','فتح بكلمة السر':'Unlock with password','الآن':'now','أمس':'yesterday',
 'كود الدعوة':'Invitation code','مثال':'Example','اسم عائلتكم':'Your family name','مثال: عائلة أم سارة':'e.g. Um Sara Family','كم عدد الأبناء؟':'How many kids?','انضمام':'Join','اكتب الكود واسم العائلة':'Enter the code and family name',
-'مثال: عائلة الشافعي':'e.g. Al-Shafei Family','مثال: عائلة أختي':'e.g. My Sister\'s Family','دعوة عائلة جديدة':'Invite a new family','إنشاء الكود':'Create the code','نسخ الكود':'Copy the code','الكود':'Code',
+'مثال: عائلة أبو سالم':'e.g. Abu Salem Family','مثال: عائلة أختي':'e.g. My Sister\'s Family','دعوة عائلة جديدة':'Invite a new family','إنشاء الكود':'Create the code','نسخ الكود':'Copy the code','الكود':'Code',
 'أُزيلت العائلة':'Family removed','لا حركات بعد':'No moves yet','أول نقطة تُضاف تظهر هنا':'The first point added shows up here','خيار':'Option',
 'معاينة الشخصية':'Character preview','النوع':'Type','ولد':'Boy','بنت':'Girl','البشرة':'Skin','الرأس':'Head','لون الشعر أو القبعة أو الطرحة':'Hair, cap or headscarf color','لون القميص':'Shirt color',
 'الاسم':'Name','مثال: خالد':'e.g. Khalid','مثال: 9':'e.g. 9','الصورة (اختيارية)':'Photo (optional)','رفع صورة':'Upload a photo','إزالة الصورة':'Remove photo','بدون صورة، تظهر شخصيته الكرتونية في الشهادة.':'Without a photo, the cartoon character appears on the certificate.',
