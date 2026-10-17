@@ -32,6 +32,7 @@ D8 = {
 'ادخل بإيميلك وكلمة سرك.':'Sign in with your email and password.',
 'الإيميل':'Email',
 'اسم المستخدم':'Username',
+'حسابك يدخل باسم مستخدم من قبل':'Your account already signs in with a username',
 'بالإنجليزي وبدون مسافات':'In English, with no spaces',
 '(مثال: mohammed.ali أو salman3)':'(example: mohammed.ali or salman3)',
 'نصيحة: اختر اسمًا تتذكره بسهولة، مثل اسمك، لأنك تحتاجه كل مرة تدخل.':'Tip: choose a name you will easily remember, like your own name, because you need it every time you sign in.',

@@ -187,9 +187,10 @@ async function acctSubmit(f){
       return;}
     if(k==='mig'){
       const name=v('aUser').trim().toLowerCase(),bad=clNameCheck(name);if(bad){toast(clNameMsg(bad));return;}
-      acctBusy(f,true);const r=await CL.sb.auth.updateUser({email:clUserEmail(name)});
+      acctBusy(f,true);const r=await CL.sb.rpc('set_my_username',{p_name:name});      /* done on the server: the normal email-change route would need a confirmation mail */
       if(r.error){acctBusy(f,false);toast(clErrText(r.error));return;}
-      try{await CL.sb.auth.refreshSession();const g=await CL.sb.auth.getSession();if(g.data&&g.data.session)CL.user=g.data.session.user;}catch(e){}
+      try{await CL.sb.auth.refreshSession();}catch(e){}                            /* a fresh token that carries the new name */
+      try{const g=await CL.sb.auth.getUser();if(g&&g.data&&g.data.user)CL.user=g.data.user;}catch(e){}   /* and ask the server what the account is now */
       acctBusy(f,false);
       if(acctRealEmail()){toast('تعذّر تغيير الاسم الآن، حاول لاحقًا أو تواصل معنا');return;}
       clLS.set(CL_EMAIL,name);closeSheet();refreshHud();if(view==='settings')render();toast('تم! من الآن تدخل باسم المستخدم: '+name);tone(SND.lvl);return;}

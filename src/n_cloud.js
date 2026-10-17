@@ -56,6 +56,9 @@ function clErrText(e){
   const m=String((e&&(e.message||e.error_description||e.code))||e||'').toLowerCase(),st=e&&e.status;
   if(!navigator.onLine||m.indexOf('failed to fetch')>=0||m.indexOf('networkerror')>=0||m.indexOf('network request failed')>=0||m.indexOf('retryable')>=0)return 'ما فيه اتصال بالإنترنت';
   if(st===401||st===403||m.indexOf('jwt')>=0||m.indexOf('not authenticated')>=0)return 'انتهت الجلسة، سجّل دخولك من الإعدادات';
+  if(m.indexOf('username_taken')>=0||m.indexOf('duplicate key')>=0)return 'هذا الاسم مستخدم، اختر اسمًا ثانيًا';
+  if(m.indexOf('invalid_username')>=0)return 'اسم المستخدم غير صالح';
+  if(m.indexOf('already_username')>=0)return 'حسابك يدخل باسم مستخدم من قبل';
   if(m.indexOf('invalid login')>=0)return 'اسم المستخدم أو كلمة السر غير صحيحة';
   if(m.indexOf('not confirmed')>=0)return 'الإيميل لم يؤكَّد بعد';
   if(m.indexOf('already registered')>=0||m.indexOf('already been registered')>=0)return 'هذا الاسم مستخدم، اختر اسمًا ثانيًا';

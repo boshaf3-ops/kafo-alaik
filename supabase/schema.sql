@@ -92,6 +92,42 @@ $$;
 revoke all on function public.username_available(text) from public;
 grant execute on function public.username_available(text) to anon, authenticated;
 
+-- ───────────── تحويل حساب مسجّل بإيميل إلى اسم مستخدم (تستدعيها شاشة «اختر اسم مستخدم») ─────────────
+-- مسار الواجهة الجاهز (updateUser) يحتاج رسالة تأكيد على الإيميل لا يمكن إرسالها، فيتم التبديل هنا.
+-- تغيّر حساب المتصل نفسه فقط، وفقط ما دام إيميله حقيقيًا (ليس @kafo.invalid).
+create or replace function public.set_my_username(p_name text) returns void
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_name text := lower(coalesce(p_name, ''));
+  v_new text;
+  v_cur text;
+begin
+  if v_uid is null then raise exception 'not_authenticated'; end if;
+  if char_length(v_name) not between 3 and 24 or v_name !~ '^[a-z0-9]+([._-][a-z0-9]+)*$' then
+    raise exception 'invalid_username';
+  end if;
+  v_new := v_name || '@kafo.invalid';
+  select email into v_cur from auth.users where id = v_uid;
+  if v_cur is null then raise exception 'not_authenticated'; end if;
+  if lower(v_cur) like '%@kafo.invalid' then raise exception 'already_username'; end if;
+  if exists (select 1 from auth.users where lower(email) = v_new) then raise exception 'username_taken'; end if;
+
+  update auth.users
+     set email = v_new,
+         email_change = '', email_change_token_new = '', email_change_token_current = '',
+         email_change_sent_at = null, email_change_confirm_status = 0,
+         raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object('email', v_new),
+         updated_at = now()
+   where id = v_uid;
+  update auth.identities
+     set identity_data = identity_data || jsonb_build_object('email', v_new),
+         updated_at = now()
+   where user_id = v_uid and provider = 'email';
+end $$;
+revoke all on function public.set_my_username(text) from public, anon;
+grant execute on function public.set_my_username(text) to authenticated;
+
 -- ───────────── التحديث الفوري بين الأجهزة (Realtime) ─────────────
 do $$ begin
   alter publication supabase_realtime add table public.cloud_kids;
