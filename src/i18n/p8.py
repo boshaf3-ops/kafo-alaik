@@ -33,7 +33,7 @@ D8 = {
 'الإيميل':'Email',
 'اسم المستخدم':'Username',
 'بالإنجليزي وبدون مسافات':'In English, with no spaces',
-'(مثال: mohammed.ali أو boshaf3)':'(example: mohammed.ali or boshaf3)',
+'(مثال: mohammed.ali أو salman3)':'(example: mohammed.ali or salman3)',
 'نصيحة: اختر اسمًا تتذكره بسهولة، مثل اسمك، لأنك تحتاجه كل مرة تدخل.':'Tip: choose a name you will easily remember, like your own name, because you need it every time you sign in.',
 'اكتب الاسم بحروف إنجليزية (a-z) وأرقام':'Use English letters (a-z) and numbers',
 'الاسم قصير، 3 أحرف على الأقل':'The name is too short, at least 3 characters',

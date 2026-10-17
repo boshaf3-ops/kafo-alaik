@@ -26,7 +26,7 @@ const CLOUD_DOMAIN='kafo.invalid';
 const clUserEmail=n=>{n=String(n||'').trim().toLowerCase();return n.indexOf('@')>=0?n:n+'@'+CLOUD_DOMAIN;};   /* an old account that signed up with a real email can still type it */
 const clShowName=e=>String(e||'').replace('@'+CLOUD_DOMAIN,'');
 /* rules: English letters (capitals are lowered) and digits; a single dot, underscore or dash may sit inside; 3 to 24 characters; no spaces.
-   A name like mohammed, boshaf3 or mohammed.ali is fine. The only thing that really matters is that nobody else has it. */
+   A name like mohammed, salman3 or mohammed.ali is fine. The only thing that really matters is that nobody else has it. */
 function clNameCheck(n){
   if(!n)return'empty';if(/[^\x00-\x7f]/.test(n))return'english';if(n.length<3)return'short';if(n.length>24)return'long';
   if(!/^[a-z0-9]/.test(n))return'start';if(/[._-]$/.test(n))return'end';if(/[._-]{2}/.test(n))return'dots';

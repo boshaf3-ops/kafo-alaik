@@ -27,7 +27,7 @@ function acctForm(mode){
   let h='<form id="authForm" data-cform="auth" data-mode="'+mode+'" autocomplete="on"><h2>'+(su?'إنشاء حساب':fg?'نسيت كلمة السر':'تسجيل الدخول')+'</h2>'
    +'<p class="sub">'+(su?'اختر اسم مستخدم وكلمة سر. الحساب لولي الأمر فقط، والأبناء يلعبون من خلاله.':fg?'اكتب اسم المستخدم.':'ادخل باسم المستخدم وكلمة السر.')+'</p>'
    +'<label class="lbl" for="aUser">اسم المستخدم</label>'
-   +(su?'<p class="sub" style="margin:0 6px 2px">بالإنجليزي وبدون مسافات <span class="ex">(مثال: mohammed.ali أو boshaf3)</span></p>':'')
+   +(su?'<p class="sub" style="margin:0 6px 2px">بالإنجليزي وبدون مسافات <span class="ex">(مثال: mohammed.ali أو salman3)</span></p>':'')
    +'<input class="field" id="aUser" type="text" name="username" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="اكتب اسم المستخدم هنا" value="'+esc(su?(AF.email||''):(AF.email||clLS.get(CL_EMAIL)||''))+'">';
   if(su)h+='<div class="uhint" id="aUserMsg" aria-live="polite"></div><p class="sub" style="margin:0 6px 4px">نصيحة: اختر اسمًا تتذكره بسهولة، مثل اسمك، لأنك تحتاجه كل مرة تدخل.</p>';
   if(mode==='login')h+='<p class="sub" style="margin:2px 6px 0">إذا سجّلت قبل بإيميل، اكتب إيميلك في نفس الخانة.</p>';
@@ -298,7 +298,7 @@ async function acctMigrate(next){
   openSheet('<form id="migForm" data-cform="mig" data-mode="signup" autocomplete="off"><h2>اختر اسم مستخدم</h2>'
    +'<p class="sub">ما عدنا نطلب الإيميل. اختر اسم مستخدم بالإنجليزي وتدخل به من الآن. بعد ما تحفظه نمسح إيميلك من النظام، وبيانات أبنائك ونقاطهم تبقى كما هي.</p>'
    +'<label class="lbl" for="aUser">اسم المستخدم</label>'
-   +'<p class="sub" style="margin:0 6px 2px">بالإنجليزي وبدون مسافات <span class="ex">(مثال: mohammed.ali أو boshaf3)</span></p>'
+   +'<p class="sub" style="margin:0 6px 2px">بالإنجليزي وبدون مسافات <span class="ex">(مثال: mohammed.ali أو salman3)</span></p>'
    +'<input class="field" id="aUser" type="text" name="username" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="24" required placeholder="اكتب اسم المستخدم هنا">'
    +'<div class="uhint" id="aUserMsg" aria-live="polite"></div><p class="sub" style="margin:0 6px 4px">نصيحة: اختر اسمًا تتذكره بسهولة، مثل اسمك، لأنك تحتاجه كل مرة تدخل.</p>'
    +'<div class="row" style="margin-top:14px"><button class="btn primary" type="submit">حفظ الاسم ومسح الإيميل</button><button class="btn" type="button" data-act="close">لاحقًا</button></div></form>',{next:next});
