@@ -40,9 +40,9 @@ page=f'''<!doctype html>
 <meta property="og:url" content="https://boshaf3-ops.github.io/kafo-alaik/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png?v=2">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
 <link rel="preload" href="fonts/Tajawal-Regular.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="fonts/Lalezar-Regular.woff" as="font" type="font/woff" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -69,14 +69,14 @@ manifest={
  "name":"كفو عليك","short_name":"كفو عليك","description":"تطبيق عائلي لتحفيز الأبناء على السلوك الطيب بخرائط مغامرة وشارات وشهادات.",
  "lang":"ar","dir":"rtl","id":"./","start_url":"./","scope":"./","display":"standalone","orientation":"any",
  "background_color":"#dcefee","theme_color":"#0a8f68","categories":["education","kids","lifestyle"],
- "icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-          {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
-          {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
+ "icons":[{"src":"icons/icon-192.png?v=2","sizes":"192x192","type":"image/png","purpose":"any"},
+          {"src":"icons/icon-512.png?v=2","sizes":"512x512","type":"image/png","purpose":"any"},
+          {"src":"icons/maskable-512.png?v=2","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
 open(OUT+'manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
 VC=("'"+VENDOR+"',") if HAS_SB else ''
 sw=f'''/* كفو عليك: خدمة العمل دون إنترنت. غيّر رقم النسخة عند كل تحديث ليصل الجهاز للنسخة الجديدة. */
 const VERSION='kafo-{VER}';
-const CORE=['./','index.html','manifest.webmanifest',{VC}'fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png'];
+const CORE=['./','index.html','manifest.webmanifest',{VC}'fonts/Tajawal-Regular.woff','fonts/Tajawal-Bold.woff','fonts/Tajawal-Black.woff','fonts/Lalezar-Regular.woff','fonts/Handjet-800.woff','icons/icon-192.png?v=2','icons/icon-512.png?v=2','icons/apple-touch-icon.png?v=2','icons/favicon-32.png?v=2'];
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('kafo-')&&k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));}});
 self.addEventListener('fetch',e=>{{
